@@ -23,7 +23,7 @@ export const setTeam = (value) => {
 };
 export const setTeamSocket = () => {
   send(
-    "/app/game/message",
+    "/pub/puzzle/move",
     {},
     JSON.stringify({
       type: "GAME",

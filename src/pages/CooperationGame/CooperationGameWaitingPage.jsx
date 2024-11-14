@@ -72,7 +72,7 @@ export default function CooperationGameWaitingPage() {
         setRoomInfo(res.data);
 
         // WebSocket 연결
-        socket = new SockJS(`http://localhost:8080/game`);
+        socket = new SockJS(`http://localhost:8082/ws`);
         stomp = StompJS.over(socket);
 
         // 연결 시도
@@ -91,7 +91,7 @@ export default function CooperationGameWaitingPage() {
 
           // 서버로 메시지 전송
           stomp.send(
-            "/app/game/message",
+            "/pub/puzzle/move",
             {},
             JSON.stringify({
               type: "ENTER",
@@ -120,7 +120,7 @@ export default function CooperationGameWaitingPage() {
         message: messages.toString(),
         type: "GAME",
       };
-      stompClient.send(`/app/game/message`, {}, JSON.stringify(message));
+      stompClient.send(`/pub/puzzle/move`, {}, JSON.stringify(message));
     }
   };
 

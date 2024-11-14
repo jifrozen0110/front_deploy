@@ -18,13 +18,13 @@ export function Routes() {
       <Route path="/user/:userId" element={<ProfilePage />} />
       <Route path="/game" element={<SingleGame.ListPage />} />
       <Route path="/game/single" element={<SingleGame.ListPage />} />
-      <Route path="/game/single/:puzzleId" element={<SingleGame.IngamePage />} />
+      <Route path="/game/single" element={<SingleGame.IngamePage />} />
       <Route path="/game/cooperation" element={<CooperationGame.ListPage />} />
       {/* TODO: socket room의 상태에 따라 WaitingPage 또는 IngamePage 를 보여줘야한다. */}
-      <Route path="/game/cooperation/:roomId" element={<CooperationGame.WaitingPage />} />
+      <Route path="/game/cooperation" element={<CooperationGame.WaitingPage />} />
       <Route path="/game/battle" element={<BattleGame.ListPage />} />
       {/* TODO: socket room의 상태에 따라 WaitingPage 또는 IngamePage 를 보여줘야한다. */}
-      <Route path="/game/battle/:roomId" element={<BattleGame.WaitingPage />} />
+      <Route path="/game/battle" element={<BattleGame.WaitingPage />} />
     </ReactRouterRoutes>
   );
 }

@@ -2,7 +2,7 @@ import { Point } from "paper/dist/paper-core";
 import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
 import FindChange from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/FindChange";
 import { getRoomId, getSender } from "../../../../socket-utils/storage";
-import { socket } from "../../../../socket-utils/socket2";
+import { socket } from "@/socket-utils/socket";
 
 // let first = true;
 
@@ -59,7 +59,7 @@ const moveTile = () => {
 
       // socket 전송
       send(
-        "/app/game/message",
+        "/pub/puzzle/move",
         {},
         JSON.stringify({
           type: "GAME",
@@ -108,7 +108,7 @@ const moveTile = () => {
 
       // socket 전송
       send(
-        "/app/game/message",
+        "/pub/puzzle/move",
         {},
         JSON.stringify({
           type: "GAME",
@@ -154,7 +154,7 @@ const findNearTileGroup = () => {
       const puzzleGroup = getPuzzleGroup(event);
       // socket 전송
       send(
-        "/app/game/message",
+        "/pub/puzzle/move",
         {},
         JSON.stringify({
           type: "GAME",
@@ -390,7 +390,7 @@ export const uniteTiles = (
 ) => {
   if (isSender) {
     send(
-      "/app/game/message",
+      "/pub/puzzle/move",
       {},
       JSON.stringify({
         type: "GAME",
