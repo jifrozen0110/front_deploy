@@ -3,7 +3,6 @@ import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
 import FindChange from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/FindChange";
 import { getRoomId, getSender } from "../../../../socket-utils/storage";
 import { socket } from "../../../../socket-utils/socket2";
-import comboEffectPath from "@/assets/comboEffect.gif";
 
 // let first = true;
 
@@ -357,7 +356,6 @@ const fitTiles = (
     if (canvasContainer) {
       const comboEffect = document.createElement("img");
 
-      comboEffect.src = comboEffectPath;
       comboEffect.style.zIndex = 100;
       comboEffect.style.position = "absolute";
       comboEffect.style.left = `${nowTile.position._x}px`;
