@@ -3,7 +3,7 @@ import useSender from "./hooks/useSender";
 import { Routes } from "./pages/Routes";
 
 function App() {
-  useSender();
+  // useSender();
 
   return <Routes />;
 }

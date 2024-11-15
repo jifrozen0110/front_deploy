@@ -5,9 +5,15 @@ import HeaderRankImage from "@/assets/icons/header_rank.png";
 import HeaderShopImage from "@/assets/icons/header_shop.png";
 import Logo from "@/assets/logo.png";
 import { AppBar, Toolbar, Button } from "@mui/material";
+import { authRequest } from "../apis/requestBuilder";
 
 export default function Header() {
   const navigate = useNavigate();
+
+  const logout = async () => {
+    const res = await authRequest().get(`/api/user/logout?provider=${localStorage.getItem('provider')}`)
+    console.log(res)
+  }
 
   return (
     <AppBar
@@ -24,8 +30,8 @@ export default function Header() {
           <ImageIcon imageSource={HeaderPuzzleImage} size="md" onClick={() => navigate("/game")} />
           <ImageIcon imageSource={HeaderRankImage} size="md" onClick={() => navigate("/rank")} />
           <ImageIcon imageSource={HeaderShopImage} size="md" onClick={() => navigate("/shop")} />
-          <Button href="#" variant="outlined" sx={{ my: 1, mx: 1.5 }}>
-            Login
+          <Button variant="outlined" sx={{ my: 1, mx: 1.5 }} onClick={logout}>
+            Logout
           </Button>
         </nav>
       </Toolbar>
