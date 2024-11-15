@@ -3,10 +3,18 @@ import { Button } from "@mui/material";
 import naverLogo from "/src/assets/icons/login/naver_logo.png"
 import kakaoLogo from "/src/assets/icons/login/kakao_logo.png"
 import googleLogo from "/src/assets/icons/login/google_logo.png"
+import { useEffect } from "react";
+import { getCookie } from "../hooks/cookieUtil";
+import { useNavigate } from "react-router-dom";
 
 const serverBase = 'http://localhost:8080'
 
 export default function LoginPage() {
+    const navi = useNavigate()
+    useEffect(() => {
+        if(getCookie("jwt"))
+            navi("/home")
+    },[])
     const oauth2Login = provider => window.location.href = `${serverBase}/oauth2/authorization/${provider}`
     return (
         <BackGround>

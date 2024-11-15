@@ -6,13 +6,28 @@ import HeaderShopImage from "@/assets/icons/header_shop.png";
 import Logo from "@/assets/logo.png";
 import { AppBar, Toolbar, Button } from "@mui/material";
 import { authRequest } from "../apis/requestBuilder";
+import { useEffect } from "react";
+import { getCookie, removeCookie, setCookie } from "../hooks/cookieUtil";
 
 export default function Header() {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!getCookie('jwt')) 
+      navigate("/")
+  },[])
+
   const logout = async () => {
-    const res = await authRequest().get(`/api/user/logout?provider=${localStorage.getItem('provider')}`)
-    console.log(res)
+    const res = await authRequest().get('/api/user/logout')
+    if(res?.data?.resultCode === 'OK'){
+      localStorage.removeItem("email")
+      localStorage.removeItem("image")
+      localStorage.removeItem("provider")
+      localStorage.removeItem("userId")
+      localStorage.removeItem("userName")
+      removeCookie("jwt")
+      navigate("/")
+    }
   }
 
   return (

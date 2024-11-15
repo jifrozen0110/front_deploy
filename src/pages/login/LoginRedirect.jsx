@@ -1,6 +1,6 @@
 ﻿import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { setCookie } from "../../hooks/cookieUtil"
+import { setCookie, getCookie } from "../../hooks/cookieUtil"
 import { authRequest } from "../../apis/requestBuilder"
 
 const LoginRedirect = () => {
@@ -9,8 +9,9 @@ const LoginRedirect = () => {
         const token = new URL(window.location.href).searchParams.get("token")
         if(!token) 
             navi("/")
-        
+
         setCookie("jwt", token)
+        
         const goHome = async () => {
             const res = await authRequest(token).get("/api/user/info")
             if(typeof res.data === 'string'){
