@@ -8,7 +8,6 @@ import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
 import Chatting from "@/components/GameWaiting/Chatting";
 import { getSender, getTeam, setTeam, setTeamSocket } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
-import FromWaitingRoomToIngameLoading from "../FromWaitingRoomToIngameLoading";
 
 const { send } = socket;
 
@@ -18,8 +17,6 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
   const { redTeam, blueTeam, gameId, gameName, picture, roomSize } = data;
-
-  const [isShowToIngameLoadingModal, setIsShowToIngameLoadingModal] = useState(false);
 
   // 배틀의 경우 [red팀 빈칸 수, blue팀 빈칸 수]
   // 협동의 경우 방 빈칸 수

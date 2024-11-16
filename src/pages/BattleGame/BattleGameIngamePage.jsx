@@ -7,23 +7,16 @@ import Loading from "@/components/Loading";
 import Timer from "@/components/GameIngame/Timer";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
 import Chatting from "@/components/GameWaiting/Chatting";
-import ItemInventory from "@/components/ItemInventory";
 import ResultModal from "@/components/GameIngame/ResultModal";
 
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { configStore } from "@/puzzle-core";
-import { attackFire, attackRocket, attackEarthquake, addAudio } from "@/puzzle-core/attackItem";
 import { updateGroupByBundles } from "@/puzzle-core/utils";
 
-import comboAudioPath from "@/assets/audio/combo.mp3";
-import hintAudioPath from "@/assets/audio/hint.mp3";
-import magnetAudioPath from "@/assets/audio/magnet.mp3";
-import frameAudioPath from "@/assets/audio/frame.mp3";
 import redTeamBackgroundPath from "@/assets/backgrounds/background.png";
 import blueTeamBackgroundPath from "@/assets/backgrounds/background.gif";
-import dropRandomItemPath from "@/assets/effects/dropRandomItem.gif";
 
 import { Box, Dialog, DialogTitle, DialogContent, Snackbar } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -36,19 +29,7 @@ import { useInventory } from "../../hooks/useInventory";
 import { useSnackbar2 } from "../../hooks/useSnackbar2";
 
 const { connect, send, subscribe, disconnect } = socket;
-const {
-  getConfig,
-  lockPuzzle,
-  movePuzzle,
-  unLockPuzzle,
-  addPiece,
-  addCombo,
-  usingItemFire,
-  usingItemRocket,
-  usingItemEarthquake,
-  usingItemFrame,
-  usingItemMagnet,
-} = configStore;
+const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece } = configStore;
 
 export default function BattleGameIngamePage() {
   const navigate = useNavigate();
@@ -62,17 +43,6 @@ export default function BattleGameIngamePage() {
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
 
-  const {
-    prevItemInventory: prevRedItemInventory,
-    itemInventory: redItemInventory,
-    updateInventory: setRedItemInventory,
-  } = useInventory();
-  const {
-    prevItemInventory: prevBlueItemInventory,
-    itemInventory: blueItemInventory,
-    updateInventory: setBlueItemInventory,
-  } = useInventory();
-
   const { isShowSnackbar, setIsShowSnackbar, snackMessage, setSnackMessage } = useSnackbar({
     autoClosing: true,
   });
@@ -80,7 +50,6 @@ export default function BattleGameIngamePage() {
   const {
     isShowSnackbar: isShowRedSnackbar,
     onClose: onCloseRedSnackbar,
-    setSnackMessage: setRedSnackMessage,
     snackMessage: redSnackMessage,
   } = useSnackbar2({
     autoClosing: true,
@@ -89,27 +58,17 @@ export default function BattleGameIngamePage() {
   const {
     isShowSnackbar: isShowBlueSnackbar,
     onClose: onCloseBlueSnackbar,
-    setSnackMessage: setBlueSnackMessage,
     snackMessage: BlueSnackMessage,
   } = useSnackbar2({
     autoClosing: true,
   });
 
-  const {
-    hintList: redHintList,
-    addHint: redAddHint,
-    setHintList: setRedHintList,
-    cleanHint: redCleanHint,
-  } = useHint();
+  const { hintList: redHintList, setHintList: setRedHintList, cleanHint: redCleanHint } = useHint();
   const {
     hintList: blueHintList,
-    addHint: blueAddHint,
     setHintList: setBlueHintList,
     cleanHint: blueCleanHint,
   } = useHint();
-
-  const dropRandomItemElement = useRef(null);
-  const currentDropRandomItem = useRef(null);
 
   const numOfUsingItemRed = {
     positiveItem: useRef(0),
@@ -118,22 +77,6 @@ export default function BattleGameIngamePage() {
   const numOfUsingItemBlue = {
     positiveItem: useRef(0),
     attackItem: useRef(0),
-  };
-
-  const changeNumOfUsing = (targets, isPositive) => {
-    if (isPositive) {
-      if (targets === "RED") {
-        numOfUsingItemRed.positiveItem.current += 1;
-      } else {
-        numOfUsingItemBlue.positiveItem.current += 1;
-      }
-    } else {
-      if (targets === "RED") {
-        numOfUsingItemRed.attackItem.current += 1;
-      } else {
-        numOfUsingItemBlue.attackItem.current += 1;
-      }
-    }
   };
 
   const isLoaded = useMemo(() => {
