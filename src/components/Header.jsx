@@ -11,10 +11,14 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import GamePageNavigation from "@/components/GamePageNavigation";
 import { request } from "../apis/requestBuilder";
+import { authRequest } from "../apis/requestBuilder";
+import { useEffect } from "react";
+import { getCookie, removeCookie, setCookie } from "../hooks/cookieUtil";
+
 
 export default function Header() {
   const navigate = useNavigate();
-
+  
   const theme = createTheme({
     typography: {
       fontFamily: "'Galmuri11', sans-serif",

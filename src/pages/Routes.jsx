@@ -6,6 +6,8 @@ import RankPage from "./RankPage";
 // import ShopPage from "./ShopPage";
 // import OptionsPage from "./OptionsPage";
 import ProfilePage from "./ProfilePage";
+import LoginPage from "./LoginPage";
+import LoginRedirect from "./login/LoginRedirect";
 
 export function Routes() {
   return (
