@@ -2,7 +2,8 @@ import { Point } from "paper/dist/paper-core";
 import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
 import FindChange from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/FindChange";
 import { getRoomId, getSender } from "../../../../socket-utils/storage";
-import { socket } from "@/socket-utils/socket";
+import { socket } from "../../../../socket-utils/socket2";
+import comboEffectPath from "@/assets/comboEffect.gif";
 
 // let first = true;
 
@@ -59,7 +60,7 @@ const moveTile = () => {
 
       // socket 전송
       send(
-        "/pub/puzzle/move",
+        "/app/game/message",
         {},
         JSON.stringify({
           type: "GAME",
@@ -108,7 +109,7 @@ const moveTile = () => {
 
       // socket 전송
       send(
-        "/pub/puzzle/move",
+        "/app/game/message",
         {},
         JSON.stringify({
           type: "GAME",
@@ -154,7 +155,7 @@ const findNearTileGroup = () => {
       const puzzleGroup = getPuzzleGroup(event);
       // socket 전송
       send(
-        "/pub/puzzle/move",
+        "/app/game/message",
         {},
         JSON.stringify({
           type: "GAME",
@@ -356,6 +357,7 @@ const fitTiles = (
     if (canvasContainer) {
       const comboEffect = document.createElement("img");
 
+      comboEffect.src = comboEffectPath;
       comboEffect.style.zIndex = 100;
       comboEffect.style.position = "absolute";
       comboEffect.style.left = `${nowTile.position._x}px`;
@@ -390,7 +392,7 @@ export const uniteTiles = (
 ) => {
   if (isSender) {
     send(
-      "/pub/puzzle/move",
+      "/app/game/message",
       {},
       JSON.stringify({
         type: "GAME",

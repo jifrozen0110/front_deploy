@@ -1,15 +1,16 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import styled from "styled-components";
 import Paper from "paper";
 import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
-import { createTiles } from "@/components/PlayPuzzle/PUzzleCanvas/Puzzle/CreatePuzzle";
+import { createTiles } from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/CreatePuzzle";
+import { configStore } from "../../../puzzle-core";
 
 // level 임의로 3단계로
-const levelSize = { 1: 500, 2: 600, 3: 800 };
+const levelSize = { 1: 400, 2: 500, 3: 600 };
 
-const setConfig = (img, level, Paper) => {
-  const originHeight = img.current.height;
-  const originWidth = img.current.width;
+const setConfig = (img, level, picture) => {
+  const originHeight = picture.length;
+  const originWidth = picture.width;
   const imgWidth =
     originHeight >= originWidth
       ? Math.round((levelSize[level] * originWidth) / originHeight / 100) * 100
@@ -18,15 +19,15 @@ const setConfig = (img, level, Paper) => {
     originHeight >= originWidth
       ? levelSize[level]
       : Math.round((levelSize[level] * originHeight) / originWidth / 100) * 100;
-  const tileWidth = 100;
+  const tileWidth = 40;
 
   const config = {
     originHeight: originHeight, // 실제 사진의 높이
     originWidth: originWidth, // 실제 사진의 너비
     imgWidth: imgWidth, // canvas에 나타날 이미지의 너비
     imgHeight: imgHeight, // canvas에 나타날 이미지의 높이
-    tilesPerRow: Math.floor(imgWidth / tileWidth), // 한 행당 피스 개수
-    tilesPerColumn: Math.floor(imgHeight / tileWidth), // 한 열당 피스 개수
+    tilesPerRow: picture.widthPieceCnt, // 한 행당 피스 개수
+    tilesPerColumn: picture.lengthPieceCnt, // 한 열당 피스 개수
     tileWidth: tileWidth, // 한 피스의 길이 (피스는 정사각형)
     tileMarginWidth: tileWidth * 0.203125, // 피스가 딱 맞기 위한 margin 값
     level: level, // 난이도
@@ -46,44 +47,45 @@ const setConfig = (img, level, Paper) => {
     groupArr: [],
     selectIndex: -1,
   };
+
   Puzzle.setting(config);
+
+  return config;
 };
 
-const PuzzleCanvas = (props) => {
+const { initializePuzzle2 } = configStore;
+
+export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture }) {
   const canvasRef = useRef(null);
-  const { puzzleImg, level } = props;
-  // eslint-disable-next-line
-  const [showCanvas, setShowCanvas] = useState(true);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas === null) {
+    if (!canvasRef.current) {
       return;
     }
-    Paper.setup(canvas);
 
-    setConfig(puzzleImg, level, Paper);
+    Paper.setup(canvasRef.current);
+    setConfig(puzzleImg, level, picture);
     // console.log(Puzzle.exportConfig());
-    createTiles();
 
+    createTiles(shapes, board);
     Puzzle.move();
-  }, [level, puzzleImg]);
+    initializePuzzle2(Puzzle.exportConfig());
+    // initializePuzzle2(config)
+  }, [level, puzzleImg, shapes, board, picture]);
 
   return (
-    <div style={{ width: "100vw", display: "flex", justifyContent: "center" }}>
-      {showCanvas ? (
-        <Canvas ref={canvasRef} id="canvas" />
-      ) : (
-        <img src={puzzleImg.current.src} alt="puzzleImage" />
-      )}
-    </div>
+    <>
+      <div style={{ width: "100vw", display: "flex", justifyContent: "center" }}>
+        <div id="canvasContainer" style={{ position: "relative" }}>
+          <Canvas ref={canvasRef} id="canvas" />
+        </div>
+      </div>
+    </>
   );
-};
+}
 
 const Canvas = styled.canvas`
   width: 2580px;
   height: 1440px;
   border: 1px solid #ccc;
 `;
-
-export default PuzzleCanvas;

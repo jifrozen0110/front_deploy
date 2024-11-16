@@ -14,7 +14,7 @@ export const findNearTileGroup = ({ config }) => {
       const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
       // socket 전송
       send(
-        "/pub/puzzle/move",
+        "/app/game/message",
         {},
         JSON.stringify({
           type: "GAME",
@@ -126,7 +126,7 @@ const sendFitTilePosition = (tile, tileIdx) => {
   console.log("fittile 에서 위치 보냄!", tile.position.x, tile.position.y);
   // // socket 전송
   send(
-    "/pub/puzzle/move",
+    "/app/game/message",
     {},
     JSON.stringify({
       type: "GAME",
