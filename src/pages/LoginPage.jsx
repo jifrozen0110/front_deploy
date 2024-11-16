@@ -6,8 +6,8 @@ import googleLogo from "/src/assets/icons/login/google_logo.png"
 import { useEffect } from "react";
 import { getCookie } from "../hooks/cookieUtil";
 import { useNavigate } from "react-router-dom";
-
-const serverBase = 'https://container-service-1.9sjrmz3hsgdvw.ap-northeast-2.cs.amazonlightsail.com'
+import { BackGround, LoginButtonBox, PaddingDiv } from "../components/styled/styled";
+import { SERVER_END_POINT } from "../apis/requestBuilder";
 
 export default function LoginPage() {
     const navi = useNavigate()
@@ -15,7 +15,7 @@ export default function LoginPage() {
         if(getCookie("jwt"))
             navi("/home")
     },[])
-    const oauth2Login = provider => window.location.href = `${serverBase}/oauth2/authorization/${provider}`
+    const oauth2Login = provider => window.location.href = `${SERVER_END_POINT}/oauth2/authorization/${provider}`
     return (
         <BackGround>
             <PaddingDiv />
@@ -26,7 +26,7 @@ export default function LoginPage() {
                 }}>
                     <img src="logo.png" alt=""  style={{width:60}}/>
                     <h1 style={{
-                        color:"#7b95b7",
+                        color:"#7b95b7", 
                         fontSize:"2.5em",
                         textShadow: "3px 0 white, -3px 0 white, 0 3px white, 0 -3px white, 3px 3px white, -3px -3px white, -3px 3px white, 3px -3px white"
                         }}>Puzzle Share</h1>
@@ -60,20 +60,3 @@ export default function LoginPage() {
   );
 }
 
-const BackGround = styled.div`
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    background-image: url(background.png);
-    background-size: cover;
-`;
-const PaddingDiv = styled.div`
-    height: calc(50vh - 250px)
-`
-const LoginButtonBox = styled.div`
-    width: 350px;
-    height: 500px;
-    // background-color : rgb(255,255,255,0.5);
-    margin: 0 auto;
-    backdrop-filter: blur(7px);
-`

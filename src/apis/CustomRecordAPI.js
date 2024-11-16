@@ -1,8 +1,10 @@
 import axios from "axios";
+const { VITE_SERVER_END_POINT, VITE_DEV_SERVER_END_POINT } = import.meta.env;
 
+export const SERVER_END_POINT = import.meta.env.DEV ? VITE_DEV_SERVER_END_POINT : VITE_SERVER_END_POINT;
 export const RecordAPI = axios.create({
   // baseURL: import.meta.env.VITE_SERVER_END_POINT,
-  baseURL: 'https://container-service-1.9sjrmz3hsgdvw.ap-northeast-2.cs.amazonlightsail.com',
+  baseURL: SERVER_END_POINT,
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",
