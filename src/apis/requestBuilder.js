@@ -15,7 +15,7 @@ export const requestFile = axios.create({
   timeout: 10000,
   headers: {
     "Content-Type": "multipart/form-data",
-    "Authorization": `Bearer ${getCookie("jwt")}`
+    "Authorization": `Bearer ${localStorage.getItem("jwt")}`
   },
 });
 
@@ -26,7 +26,8 @@ export const authRequest = () => {
     timeout: 3000,
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${getCookie("jwt")}`
+      "Authorization": `Bearer ${localStorage.getItem("jwt")}`
     },
+    withCredentials: true
   })
 }

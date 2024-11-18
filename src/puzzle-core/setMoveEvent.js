@@ -41,7 +41,7 @@ const moveTile = ({ config }) => {
       const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
       // socket 전송
       send(
-        "/app/game/message",
+        "/app/game/puzzle",
         {},
         JSON.stringify({
           type: "GAME",
@@ -94,7 +94,7 @@ const moveTile = ({ config }) => {
 
         // socket 전송
         send(
-          "/app/game/message",
+          "/app/game/puzzle",
           {},
           JSON.stringify({
             type: "GAME",

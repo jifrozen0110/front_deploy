@@ -15,7 +15,7 @@ export const uniteTiles = ({
 }) => {
   if (isSender) {
     send(
-      "/app/game/message",
+      "/app/game/puzzle",
       {},
       JSON.stringify({
         type: "GAME",

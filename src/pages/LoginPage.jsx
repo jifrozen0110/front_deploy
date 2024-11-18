@@ -12,7 +12,7 @@ import { SERVER_END_POINT } from "../apis/requestBuilder";
 export default function LoginPage() {
     const navi = useNavigate()
     useEffect(() => {
-        if(getCookie("jwt"))
+        if(localStorage.getItem("jwt"))
             navi("/home")
     },[])
     const oauth2Login = provider => window.location.href = `${SERVER_END_POINT}/oauth2/authorization/${provider}`

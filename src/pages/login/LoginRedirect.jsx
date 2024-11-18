@@ -10,10 +10,10 @@ const LoginRedirect = () => {
         if(!token) 
             navi("/")
 
-        setCookie("jwt", token)
-        
+        localStorage.setItem('jwt', token)
+
         const goHome = async () => {
-            const res = await authRequest(token).get("/api/user/info")
+            const res = await authRequest().get("/api/user/info")
             if(typeof res.data === 'string'){
                 navi("/")
             }else{
