@@ -36,31 +36,31 @@ export default function BattleGameWaitingPage() {
     connect(() => {
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
 
-      subscribe(`/topic/game/room/${roomId}`, (message) => {
-        const data = JSON.parse(message.body);
+      subscribe(`/topic/room`, (entranceMessage) => {
+        console.log(entranceMessage)
 
-        if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
-          data.blueTeam.players.forEach((player) => {
-            console.log(player);
-            if (player.id === getSender()) {
-              setTeam("blue");
-            }
-          });
-        }
+        // if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
+        //   data.blueTeam.players.forEach((player) => {
+        //     console.log(player);
+        //     if (player.id === getSender()) {
+        //       setTeam("blue");
+        //     }
+        //   });
+        // }
 
-        // 1. 게임이 시작되면 인게임 화면으로 보낸다.
-        if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
-          window.location.replace(`/game/battle/ingame/${data.gameId}`);
-          return;
-        }
-        setGameData(data);
-        if (data.picture.encodedString === "짱구.jpg") {
-          setImage(
-            "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
-          );
-        } else {
-          setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
-        }
+        // // 1. 게임이 시작되면 인게임 화면으로 보낸다.
+        // if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
+        //   window.location.replace(`/game/battle/ingame/${data.gameId}`);
+        //   return;
+        // }
+        // setGameData(data);
+        // if (data.picture.encodedString === "짱구.jpg") {
+        //   setImage(
+        //     "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+        //   );
+        // } else {
+        //   setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
+        // }
       });
 
       subscribe(`/topic/chat/room/${roomId}`, (message) => {
@@ -72,13 +72,10 @@ export default function BattleGameWaitingPage() {
 
       // 서버로 메시지 전송
       send(
-        "/app/game/message",
+        "/app/room/enter",
         {},
         JSON.stringify({
-          type: "ENTER",
           roomId: getRoomId(),
-          sender: getSender(),
-          member: getCookie("userId") ? true : false,
         }),
       );
     });
