@@ -23,14 +23,10 @@ export const setTeam = (value) => {
 };
 export const setTeamSocket = () => {
   send(
-    "/app/game/message",
+    "/app/room/switch",
     {},
     JSON.stringify({
-      type: "GAME",
-      roomId: getRoomId(),
-      sender: getSender(),
-      message: "CHANGE_TEAM",
-      targets: getSender(),
+      roomId: getRoomId()
     }),
   );
 };

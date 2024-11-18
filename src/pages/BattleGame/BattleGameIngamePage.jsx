@@ -236,12 +236,10 @@ export default function BattleGameIngamePage() {
 
         // 서버로 메시지 전송
         send(
-          "/app/game/message",
+          "/app/room/enter",
           {},
           JSON.stringify({
-            type: "ENTER",
-            roomId: getRoomId(),
-            sender: getSender(),
+            roomId: getRoomId()
           }),
         );
       },

@@ -12,7 +12,7 @@ import GamePageNavigation from "@/components/GamePageNavigation";
 import { authRequest } from "../apis/requestBuilder";
 import { getCookie, removeCookie } from "../hooks/cookieUtil";
 
-export default function Header() {
+export default function Header({parentUpdate}) {
   const navigate = useNavigate();
 
   const theme = createTheme({
@@ -32,22 +32,39 @@ export default function Header() {
   });
 
   useEffect(() => {
-    const token = getCookie("jwt");
+    const token = localStorage.getItem("jwt");
     if(!token)
-      navigate("/");
+      authRequest().get('/api/user/refresh')
+      .then(res => {
+        const {
+          userId,
+          userName,
+          image,
+          email,
+          provider,
+          token,
+        } = res.data
+        localStorage.setItem('userId', userId)
+        localStorage.setItem('userName', userName)
+        localStorage.setItem('image', image)
+        localStorage.setItem('email', email)
+        localStorage.setItem('provider', provider)
+        localStorage.setItem('jwt', token)
+
+      }).catch(err => navigate("/"))
+      
   }, []);
 
   const logout = async () => {
-    const res = await authRequest().get('/api/user/logout')
-    if(res?.data?.resultCode === 'OK'){
-      localStorage.removeItem("email")
-      localStorage.removeItem("image")
-      localStorage.removeItem("provider")
-      localStorage.removeItem("userId")
-      localStorage.removeItem("userName")
-      removeCookie("jwt")
-      navigate("/")
-    }
+    localStorage.removeItem("email")
+    localStorage.removeItem("image")
+    localStorage.removeItem("provider")
+    localStorage.removeItem("userId")
+    localStorage.removeItem("userName")
+    localStorage.removeItem("jwt")
+    removeCookie("jwt")
+
+    navigate("/")
   };
 
   const moveProfile = async () => {

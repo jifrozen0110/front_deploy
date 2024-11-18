@@ -58,34 +58,49 @@ export default function BattleGameWaitingPage() {
   const connectSocket = async () => {  
     connect(() => {
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
-  
-      subscribe(`/topic/room/${roomId}`, (message) => {
-        const data = JSON.parse(message.body);
-        switch (data.event) {
-          case "enter":
-            console.log("Enter event:", data.message);
-            break;
-          case "exit":
-            console.log("Exit event:", data.message);
-            break;
-          case "switch":
-            console.log("Switch team event:", data.message);
-            break;
-          case "start":
-            console.log("Game start event:", data.message);
-            break;
-          default:
-            console.log("Unknown event:", data);
-        }
+
+      subscribe(`/topic/room`, (entranceMessage) => {
+        console.log(entranceMessage)
+
+        // if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
+        //   data.blueTeam.players.forEach((player) => {
+        //     console.log(player);
+        //     if (player.id === getSender()) {
+        //       setTeam("blue");
+        //     }
+        //   });
+        // }
+
+        // // 1. 게임이 시작되면 인게임 화면으로 보낸다.
+        // if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
+        //   window.location.replace(`/game/battle/ingame/${data.gameId}`);
+        //   return;
+        // }
+        // setGameData(data);
+        // if (data.picture.encodedString === "짱구.jpg") {
+        //   setImage(
+        //     "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+        //   );
+        // } else {
+        //   setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
+        // }
       });
-      
-  
-      // subscribe(`/topic/chat/room/${roomId}`, (message) => {
-      //   const data = JSON.parse(message.body);
-      //   const { userid, chatMessage, time } = data;
-      //   const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
-      //   setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
-      // });
+
+      subscribe(`/topic/chat/room/${roomId}`, (message) => {
+        const data = JSON.parse(message.body);
+        const { userid, chatMessage, time } = data;
+        const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
+        setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
+      });
+
+      // 서버로 메시지 전송
+      send(
+        "/app/room/enter",
+        {},
+        JSON.stringify({
+          roomId: getRoomId(),
+        }),
+      );
     });
   };
 

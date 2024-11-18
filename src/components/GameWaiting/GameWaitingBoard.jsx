@@ -30,13 +30,10 @@ export default function GameWaitingBoard(props) {
 
   const gameStartCallback = () => {
     send(
-      `/app/game/message`,
+      `/app/room/start`,
       {},
       JSON.stringify({
         roomId: gameId,
-        sender: getSender(),
-        message: "GAME_START",
-        type: "GAME",
       }),
     );
   };
