@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
+import { isAxiosError } from "axios";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,7 +11,7 @@ import Button from "@mui/material/Button";
 
 import { socket } from "@/socket-utils/socket2"; // 소켓 유틸리티
 
-import backgroundPath from "@/assets/backgrounds/background.png";
+import backgroundPath from "@/assets/backgrounds/background2.png";
 import { authRequest } from "../../apis/requestBuilder";
 
 import Typography from "@mui/material/Typography";
@@ -30,63 +31,17 @@ export default function BattleGameWaitingPage() {
   const [emptyPlayerCount, setEmptyPlayerCount] = useState([0, 0]);
   const [xPlayerCount, setXPlayerCount] = useState([0, 0]);
 
+  const playerId = localStorage.getItem("userId");
+  const playerImage = localStorage.getItem("image");
+  const playerName = localStorage.getItem("userName");
+
   const isLoading = useMemo(() => roomData === null, [roomData]);
 
-  // 소켓 연결 및 이벤트 처리
-  useEffect(() => {
-    const handleRoomEvent = (message) => {
-      const data = JSON.parse(message.body);
-      console.log("Room Event:", data);
-
-      switch (data.event) {
-        case "enter":
-          console.log("방 입장:", data.message);
-          break;
-        case "exit":
-          console.log("방 나가기:", data.message);
-          break;
-        case "switch":
-          console.log("팀 변경:", data.message);
-          break;
-        case "start":
-          console.log("게임 시작:", data.message);
-          break;
-        default:
-          console.log("알 수 없는 이벤트:", data);
-      }
-    };
-
-    console.log('connecting...')
-    
-    // 소켓 연결 및 구독
-    connect(() => {
-      console.log("WebSocket 연결 성공");
-      subscribe(`/topic/room/${roomId}`, handleRoomEvent);
-    });
-    console.log('connecting execed')
-    return () => {
-      socket.disconnect(); // 소켓 연결 해제
-    };
-  }, [roomId]);
-
-  useEffect(() => {
-    const fetchRoomData = async () => {
-      try {
-        const response = await authRequest().get(`/api/rooms/${roomId}`);
-        const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
-        setRoomData(response.data);
-        setEmptyPlayerCount([
-          Math.max(0, halfPlayers - response.data.redPlayers.length),
-          Math.max(0, halfPlayers - response.data.bluePlayers.length),
-        ]);
-        setXPlayerCount([Math.max(0, 4 - halfPlayers), Math.max(0, 4 - halfPlayers)]);
-      } catch (error) {
-        console.error("Error fetching room data:", error);
-      }
-    };
-
-    fetchRoomData();
-  }, [roomId]);
+  const createPlayerRequest = () => ({
+    playerId,
+    playerImage,
+    playerName
+  });
 
   const makeEmptyPlayer = (count) => {
     return Array(count)
@@ -100,10 +55,66 @@ export default function BattleGameWaitingPage() {
       .map((_, i) => <XPlayerCard key={`xplayer-${i}`} />);
   };
 
-  const enterRoom = () => send(`/pub/room/${roomId}/enter`, {}, JSON.stringify({ roomId }));
-  const exitRoom = () => send(`/pub/room/${roomId}/exit`, {}, JSON.stringify({ roomId }));
-  const switchTeam = () => send(`/pub/room/${roomId}/switch`, {}, JSON.stringify({ roomId }));
-  const startGame = () => send(`/pub/room/${roomId}/start`, {}, JSON.stringify({ roomId }));
+  const connectSocket = async () => {  
+    connect(() => {
+      console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
+  
+      subscribe(`/topic/room/${roomId}`, (message) => {
+        const data = JSON.parse(message.body);
+        switch (data.event) {
+          case "enter":
+            console.log("Enter event:", data.message);
+            break;
+          case "exit":
+            console.log("Exit event:", data.message);
+            break;
+          case "switch":
+            console.log("Switch team event:", data.message);
+            break;
+          case "start":
+            console.log("Game start event:", data.message);
+            break;
+          default:
+            console.log("Unknown event:", data);
+        }
+      });
+      
+  
+      // subscribe(`/topic/chat/room/${roomId}`, (message) => {
+      //   const data = JSON.parse(message.body);
+      //   const { userid, chatMessage, time } = data;
+      //   const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
+      //   setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
+      // });
+    });
+  };
+
+  const initialize = async () => {
+    try {
+      // enterRoom();
+      const response = await authRequest().get(`/api/rooms/${roomId}`);
+      const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
+      setRoomData(response.data);
+      setEmptyPlayerCount([
+        Math.max(0, halfPlayers - response.data.redPlayers.length),
+        Math.max(0, halfPlayers - response.data.bluePlayers.length),
+      ]);
+      setXPlayerCount([Math.max(0, 4 - halfPlayers), Math.max(0, 4 - halfPlayers)]);
+      console.log(response.data);
+  
+      // WebSocket 연결 시도
+      await connectSocket();
+    } catch (e) {
+      if (isAxiosError(e) && e.response?.status >= 400) {
+        console.error("방 정보를 불러오지 못했습니다.", e.message);
+        navigate("/game/battle", { replace: true });
+      }
+    }
+  };
+
+  useEffect(() => {
+    initialize();
+  }, [roomId]);
 
   if (isLoading) {
     return (
@@ -115,11 +126,20 @@ export default function BattleGameWaitingPage() {
     );
   }
 
+  const enterRoom = () => send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
+  const exitRoom = () => {
+    setTimeout(() => navigate("/game/battle"), 100);
+    send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const switchTeam = () => send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
+  const startGame = () => send(`/pub/room/${roomId}/start`, {}, JSON.stringify(createPlayerRequest()));
+
+
   return (
     <Wrapper>
       <Top>
         <ButtonGroup>
-          <TopButton onClick={() => navigate("/game/battle")}>
+          <TopButton onClick={exitRoom}>
             <div style={{ textAlign: "center" }}>
               <img src={LeftArrow} alt="나가기" className="icon" style={{ display: "block", margin: "0 auto" }} />
               나가기

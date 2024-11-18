@@ -7,27 +7,25 @@ import Typography from "@mui/material/Typography";
 
 function PlayerCard(props) {
   const { player, color } = props;
-  // const player = 
-  const state = player.isCaptain ? "방 장" : player.isReady ? "준비 완료" : "준비 중";
-  
+  console.log(player);
 
   return (
     <WrapperCard sx={{ height: "80%" }} className={color}>
       <CardMedia
         sx={{ width: "100px", height: "100px" }}
         component="img"
-        alt={player.nickname}
-        image={player.img}
+        alt={player.playerName}
+        image={player.playerImage}
       />
       <Content>
         <Nickname component="div" variant="subtitle1">
-          {player.nickname}
+          {player.playerName}
         </Nickname>
         {/* <State component="div" variant="subtitle2">
           {state}
         </State> */}
       </Content>
-      {/* <GameOpenVidu gameId={gameId} playerName={player.nickname} /> */}
+      {/* <GameOpenVidu gameId={gameId} playerName={player.playerName} /> */}
     </WrapperCard>
   );
 }
@@ -125,18 +123,5 @@ const State = styled.div`
   user-select: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 약간의 그림자 */
 `;
-
-
-// 사용 예제
-function Example() {
-  return (
-    <div>
-      <State state="방 장">방 장</State>
-      <State state="준비 완료">준비 완료</State>
-      <State state="대기 중">대기 중</State>
-    </div>
-  );
-}
-
 
 export { PlayerCard, EmptyPlayerCard, XPlayerCard };
