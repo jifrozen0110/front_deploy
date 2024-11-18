@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import styled from "styled-components";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -9,7 +10,7 @@ function PlayerCard(props) {
   const state = player.isCaptain ? "방 장" : player.isReady ? "준비 완료" : "준비 중";
 
   return (
-    <WrapperCard className={color}>
+    <WrapperCard sx={{ height: "80%" }} className={color}>
       <CardMedia
         sx={{ width: "100px", height: "100px" }}
         component="img"
@@ -24,6 +25,7 @@ function PlayerCard(props) {
           {state}
         </State> */}
       </Content>
+      {/* <GameOpenVidu gameId={gameId} playerName={player.nickname} /> */}
     </WrapperCard>
   );
 }
@@ -40,7 +42,7 @@ function EmptyPlayerCard() {
 
 function XPlayerCard() {
   return (
-    <WrapperCard sx={{ height: "85%" }}>
+    <WrapperCard sx={{ height: "80%", minHeight: "120px", backgroundColor: "#eee" }}>
       <CardContent sx={{ margin: "auto" }}>
         <Typography sx={{ color: "#ccc" }} component="div" variant="h1">
           X

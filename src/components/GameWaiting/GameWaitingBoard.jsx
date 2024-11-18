@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styled from "styled-components";
 import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
@@ -26,6 +27,77 @@ export default function GameWaitingBoard(props) {
         <EmptyPlayerCard />
       ));
   };
+
+  const gameStartCallback = () => {
+    send(
+      `/app/game/message`,
+      {},
+      JSON.stringify({
+        roomId: gameId,
+        sender: getSender(),
+        message: "GAME_START",
+        type: "GAME",
+      }),
+    );
+  };
+
+  const handleGameStart = () => {
+    if (!getSender()) {
+      window.alert("방을 다시 생성해주세요.");
+      return;
+    }
+    setIsShowToIngameLoadingModal(true);
+  };
+
+  const handleChangeTeam = (value) => {
+    const targetTeamLength = value === "red" ? redTeam.players.length : blueTeam.players.length;
+
+    if (getTeam() === value) {
+      // alert(`이미 ${value}팀입니다!`);
+      setSnackMessage(`이미 ${value}팀입니다!`);
+      setSnackOpen(true);
+    } else if (parseInt(roomSize / 2) === targetTeamLength) {
+      // alert(`${value}팀의 정원이 가득찼습니다!`);
+      setSnackMessage(`${value}팀의 정원이 가득찼습니다!`);
+      setSnackOpen(true);
+    } else {
+      setTeam(value);
+      setTeamSocket();
+    }
+  };
+
+  const handleSnackClose = () => {
+    setSnackOpen(false);
+  };
+
+  const theme = createTheme({
+    typography: {
+      fontFamily: "'Galmuri11', sans-serif",
+    },
+    palette: {
+      redTeam: {
+        light: red[300],
+        main: red[400],
+        dark: red[500],
+        darker: red[600],
+        contrastText: "#fff",
+      },
+      blueTeam: {
+        light: blue[300],
+        main: blue[400],
+        dark: blue[500],
+        darker: blue[600],
+        contrastText: "#fff",
+      },
+      purple: {
+        light: deepPurple[200],
+        main: deepPurple[300],
+        dark: deepPurple[400],
+        darker: deepPurple[600],
+        contrastText: "#fff",
+      },
+    },
+  });
 
   return (
     <Wrapper container spacing={4}>

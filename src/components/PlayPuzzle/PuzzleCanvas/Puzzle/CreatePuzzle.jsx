@@ -1,12 +1,17 @@
-import Puzzle from "@/components/playPuzzle/puzzleCanvas/puzzle/index";
-import initPuzzle from "@/components/playPuzzle/puzzleCanvas/puzzle/ConfigInit";
+import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
+import initPuzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/ConfigInit";
 
 let config;
 
-export const createTiles = () => {
+export const createTiles = (shapes, board) => {
   config = Puzzle.exportConfig();
-  getRandomShapes();
-  initPuzzle.initConfig();
+  if (shapes && Array.isArray(shapes)) {
+    // getRandomShapes();
+    config.shapes = shapes;
+  } else {
+    getRandomShapes();
+  }
+  initPuzzle.initConfig(board);
 };
 
 // 모든 피스에 대해 랜덤 모양 결정
