@@ -89,7 +89,7 @@ const theme = createTheme({
 export default function BattleGameListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [roomList, setRoomList] = useState([]);
-  const [pageNumber, setPageNumber] = useState([]);
+  const [pageNumber, setPageNumber] = useState(0);
 
   const refetchAllRoom = () => {
     fetchAllRoom();

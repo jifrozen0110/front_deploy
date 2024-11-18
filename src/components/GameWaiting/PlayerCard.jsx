@@ -42,11 +42,9 @@ function EmptyPlayerCard() {
 
 function XPlayerCard() {
   return (
-    <WrapperCard sx={{ height: "80%", minHeight: "120px", backgroundColor: "#eee" }}>
-      <CardContent sx={{ margin: "auto" }}>
-        <Typography sx={{ color: "#ccc" }} component="div" variant="h1">
-          X
-        </Typography>
+    <WrapperCard sx={{backgroundColor: "rgba(0,0,0,0.7)"}}>
+      <CardContent sx={{margin: "auto", color: "#C9C9C9", fontWeight: "bold", fontsize: 500}}>
+        X
       </CardContent>
     </WrapperCard>
   );

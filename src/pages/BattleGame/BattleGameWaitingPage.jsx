@@ -19,109 +19,52 @@ import backgroundPath from "@/assets/backgrounds/background.png";
 import { useGameInfo } from "../../hooks/useGameInfo";
 import { authRequest } from "../../apis/requestBuilder";
 
+import Typography from "@mui/material/Typography";
+import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
+
+import LeftArrow from "@/assets/icons/gameRoom/left_arrow.png";
+import Gear from "@/assets/icons/gameRoom/gear.png";
+import Invite from "@/assets/icons/gameRoom/invite.png";
+import TeamChange from "@/assets/icons/gameRoom/team_change.png";
+
 const { connect, send, subscribe } = socket;
 
 export default function BattleGameWaitingPage() {
   // const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const [gameData, setGameData] = useState(null);
+  const [roomData, setRoomData] = useState(null);
   const [chatHistory, setChatHistory] = useState([]); // 채팅 기록을 저장하는 상태 추가
+  const [emptyPlayerCount, setEmptyPlayerCount] = useState([0, 0])
+  const [xPlayerCount, setXPlayerCount] = useState([0, 0])
 
   const { setImage } = useGameInfo();
-
+ 
   const isLoading = useMemo(() => {
-    return gameData === null;
-  }, [gameData]);
-
-  const connectSocket = async () => {
-    // websocket 연결 시도
-
-    connect(() => {
-      console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
-
-      subscribe(`/topic/game/room/${roomId}`, (message) => {
-        const data = JSON.parse(message.body);
-
-        if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
-          data.blueTeam.players.forEach((player) => {
-            console.log(player);
-            if (player.id === getSender()) {
-              setTeam("blue");
-            }
-          });
-        }
-
-        // 1. 게임이 시작되면 인게임 화면으로 보낸다.
-        if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
-          window.location.replace(`/game/battle/ingame/${data.gameId}`);
-          return;
-        }
-        setGameData(data);
-        if (data.picture.encodedString === "짱구.jpg") {
-          setImage(
-            "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
-          );
-        } else {
-          setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
-        }
-      });
-
-      subscribe(`/topic/chat/room/${roomId}`, (message) => {
-        const data = JSON.parse(message.body);
-        const { userid, chatMessage, time } = data;
-        const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
-        setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
-      });
-
-      // 서버로 메시지 전송
-      send(
-        "/app/game/message",
-        {},
-        JSON.stringify({
-          type: "ENTER",
-          roomId: getRoomId(),
-          sender: getSender(),
-          member: getCookie("userId") ? true : false,
-        }),
-      );
-    });
-  };
-
-  //쿠키 확인
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-      return parts.pop().split(";").shift();
-    }
-  }
-
-  const initialize = async () => {
-    try {
-      await authRequest().post(`/api/rooms/${roomId}`, { id: getSender() });
-      await connectSocket();
-    } catch (e) {
-      if (isAxiosError(e) && e.response.status >= 400) {
-        navigate("/game/battle", {
-          replace: true,
-        });
-      }
-    }
-  };
+    return roomData === null;
+  }, [roomData]);
 
   useEffect(() => {
-    if (roomId !== getRoomId() || !getSender()) {
-      navigate("/game/battle", {
-        replace: true,
-      });
-      return;
-    }
-
-    initialize();
-
-    // eslint-disable-next-line
-  }, []);
+    const fetchRoomData = async () => {
+      try {
+        const response = await authRequest().get(`/api/rooms/${roomId}`);
+        const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
+        setRoomData(response.data);
+        setEmptyPlayerCount([Math.max(0, halfPlayers - response.data.redPlayers.length), Math.max(0, halfPlayers - response.data.bluePlayers.length)])
+        setXPlayerCount([Math.max(0, 4 - halfPlayers), Math.max(0, 4 - halfPlayers)])
+        console.log("============");
+        console.log(roomData);
+        console.log(response.data);
+        console.log(emptyPlayerCount);
+        console.log(xPlayerCount);
+        console.log("============");
+      } catch (error) {
+        console.error("Error fetching room data:", error);
+      }
+    };
+  
+    fetchRoomData();
+  }, [roomId]);
 
   if (isLoading) {
     return (
@@ -133,60 +76,76 @@ export default function BattleGameWaitingPage() {
     );
   }
 
+  const makeEmptyPlayer = (count) => {
+    return Array(count)
+      .fill(null)
+      .map((_, i) => (
+        <EmptyPlayerCard key={`empty-${i}`} />
+      ));
+  };
+
+  const makeXPlayer = (count) => {
+    return Array(count)
+      .fill(null)
+      .map((_, i) => (
+        <XPlayerCard key={`xplayer-${i}`} />
+      ));
+  };
+
   return (
-    <Wrapper container spacing={4}>
-      <Header>
+    <Wrapper>
+      <Top>
         <ButtonGroup>
-          <HeaderButton>
+          <TopButton onClick={() => navigate("/game/battle")}>
             <div style={{ textAlign: "center" }}>
               <img src={LeftArrow} alt="나가기" className="icon" style={{ display: "block", margin: "0 auto" }} />
               나가기
             </div>
-          </HeaderButton>
-          <HeaderButton>
+          </TopButton>
+          <TopButton>
             <div style={{textAlign:"center"}}>
               <img src={TeamChange} alt="이동" className="icon" style={{display:"block", margin:"0 auto"}} />
               이동
             </div>
-          </HeaderButton>
-          <HeaderButton>
+          </TopButton>
+          <TopButton>
             <div style={{textAlign:"center"}}>
               <img src={Gear} alt="설정" className="icon" style={{display:"block", margin:"0 auto"}} />
               설정
             </div>
-          </HeaderButton>
-          <HeaderButton>
+          </TopButton>
+          <TopButton>
             <div style={{textAlign:"center"}}>
               <img src={Invite} alt="초대" className="icon" style={{display:"block", margin:"0 auto"}} />
               초대
             </div>
-          </HeaderButton>
+          </TopButton>
         </ButtonGroup>
-      </Header>
+      </Top>
 
       <Body>
         <MainSection>
           <TeamSection>
-            <Team variant="h6" color="blue">파란팀</Team>
+            <Team>파란팀</Team>
             <TeamGrid>
-              {redTeams.map((player) => (
-                <PlayerCard player={player} color="blue" />
+              {roomData.redPlayers.map((player, i) => (
+                <PlayerCard key={`red-player-${i}`} player={player} color="blue" />
               ))}
-              {makeEmptyPlayer(emptyPlayerCount[2])}
-              {makeEmptyPlayer(emptyPlayerCount[2])}
+              {makeEmptyPlayer(emptyPlayerCount[0])}
+              {makeXPlayer(xPlayerCount[0])}
             </TeamGrid>
           </TeamSection>
 
           <Versus>VS</Versus>
 
           <TeamSection>
-            <Team variant="h6" color="red">빨간팀</Team>
+            <Team>빨간팀</Team>
             <TeamGrid>
-              {blueTeams.map((player) => (
-                <PlayerCard player={player} color="red" />
+              {roomData.bluePlayers.map((player, i) => (
+                <PlayerCard key={`blue-player-${i}`} player={player} color="red" />
               ))}
-              {makeEmptyPlayer(emptyPlayerCount[2])}
-              {makeEmptyPlayer(emptyPlayerCount[2])}
+              {makeEmptyPlayer(emptyPlayerCount[1])}
+              {makeXPlayer(xPlayerCount[1])}
             </TeamGrid>
           </TeamSection>
         </MainSection>
@@ -197,12 +156,12 @@ export default function BattleGameWaitingPage() {
             <img src="https://images.unsplash.com/photo-1731413263252-cbce5c09f8c2?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Puzzle" />
           </PuzzleImage>
           <Details style={{borderBottom: "white solid 1px"}}>
-            <Title>{data.title}</Title>
+            <Title>{roomData.roomName}</Title>
           </Details>
           <Details>
-            <Typography variant="subtitle1" style={{fontSize: "35px"}}>아이템전</Typography>
-            <Typography variant="subtitle1" style={{fontSize: "35px"}}>100 피스</Typography>
-            <Typography variant="subtitle1" style={{fontSize: "35px"}}>{data.curPlayerCount}/{data.maxPlayerCount}</Typography>
+            <Typography variant="subtitle1" style={{fontSize: "35px"}}>{roomData.gameMode}</Typography>
+            <Typography variant="subtitle1" style={{fontSize: "35px"}}>{roomData.puzzlePiece} 피스</Typography>
+            <Typography variant="subtitle1" style={{fontSize: "35px"}}>{roomData.nowPlayers}/{roomData.maxPlayers}</Typography>
             <StartButton>시작</StartButton>
           </Details>
         </PuzzleDetails>
@@ -210,8 +169,6 @@ export default function BattleGameWaitingPage() {
     </Wrapper>
   );
 }
-
-const allowedPiece = [100, 200, 300, 400, 500];
 
 const Wrapper = styled.div`
   height: 100%;

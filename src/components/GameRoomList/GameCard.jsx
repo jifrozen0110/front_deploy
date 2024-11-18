@@ -1,10 +1,16 @@
+import { useNavigate } from "react-router-dom";
 import { CardContent, CardMedia, Typography, Box, Divider, Chip, CardActionArea, Snackbar, Button } from "@mui/material";
 import styled from "styled-components";
 
-export default function GameCard({ room }) {
+export default function GameCard({ room, category }) {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/game/${category}/waiting/${room.roomId}`);
+  };
 
   return (
-    <StyledCard>
+    <StyledCard onClick={handleCardClick}>
       <CardMedia
         component="img"
         image="https://via.placeholder.com/151" // 이미지 경로 수정
