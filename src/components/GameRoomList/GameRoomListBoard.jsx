@@ -59,7 +59,7 @@ export default function GameRoomListBoard({ category, roomList }) {
     <ThemeProvider theme={theme}>
       <Wrapper>
         <Grid container spacing={2}>
-          {rooms.map((room) => {
+          {(Array.isArray(rooms) ? rooms : [] ).map((room) => {
             return (
               <Grid item xs={6} key={room.gameId}>
                 <GameCard room={room} category={category} />
