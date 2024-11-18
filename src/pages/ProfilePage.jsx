@@ -10,10 +10,10 @@ const width = 100
 
 export default function ProfilePage() {
   const [userData, setUserData] = useState({})
+  const [forUpdate, setForUpdate] = useState(0)
   const navi = useNavigate()
-
-  console.log(SERVER_END_POINT)
-  console.log(getCookie('jwt'))
+  const forceUpdate = () => setForUpdate(forUpdate + 1)
+  
   useEffect(() => {
     const getUserInfo = async () => {
       const res = await authRequest().get("/api/user/info")
@@ -29,7 +29,7 @@ export default function ProfilePage() {
       }
     }
     getUserInfo()
-  }, [])
+  }, [forUpdate])
 
   return (
     <>
@@ -39,7 +39,7 @@ export default function ProfilePage() {
           width:'100vw',
           height:'100vh',
         }}>
-          <Header />
+          <Header parentUpdate={forceUpdate} />
           <InfoWraper>
             <div style={{
               backgroundImage:`url(${userData.image})`,
