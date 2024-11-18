@@ -3,29 +3,26 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import { red, blue } from "@mui/material/colors";
 
 function PlayerCard(props) {
   const { player, color } = props;
-  const state = player.isCaptain ? "방 장" : player.isReady ? "준 비 완 료" : "준 비 중";
+  const state = player.isCaptain ? "방 장" : player.isReady ? "준비 완료" : "준비 중";
 
   return (
     <WrapperCard className={color}>
       <CardMedia
-        sx={{ width: "110px", height: "110px" }}
+        sx={{ width: "100px", height: "100px" }}
         component="img"
         alt={player.nickname}
         image={player.img}
       />
       <Content>
-        <Typography component="div" variant="subtitle1">
+        <Nickname component="div" variant="subtitle1">
           {player.nickname}
-        </Typography>
-        <Divider sx={{ width: "100%" }} />
-        <State component="div" variant="subtitle2">
+        </Nickname>
+        {/* <State component="div" variant="subtitle2">
           {state}
-        </State>
+        </State> */}
       </Content>
     </WrapperCard>
   );
@@ -33,8 +30,10 @@ function PlayerCard(props) {
 
 function EmptyPlayerCard() {
   return (
-    <WrapperCard sx={{ height: "85%" }}>
-      <CardContent sx={{ margin: "auto" }}></CardContent>
+    <WrapperCard sx={{backgroundColor: "rgba(0,0,0,0.7)"}}>
+      <CardContent sx={{margin: "auto", color: "#C9C9C9", fontWeight: "bold", fontsize: 20}}>
+        비어 있음
+      </CardContent>
     </WrapperCard>
   );
 }
@@ -53,10 +52,13 @@ function XPlayerCard() {
 
 const WrapperCard = styled(Card)`
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100px;
+  background: "rgba(0, 0, 0, 0.7)";
   align-items: center;
-  padding: 10% 0;
-  border-radius: 15px;
+  padding: 20px;
+  border-radius: 10px;
 
   & img {
     border-radius: 10px;
@@ -64,41 +66,75 @@ const WrapperCard = styled(Card)`
 
   background-color: ${(props) => {
     if (props.className === "red") {
-      return red[100];
+      return "#FE5B5E";
     } else if (props.className === "blue") {
-      return blue[100];
+      return "#5BAFFE";
     }
   }};
 `;
 
-const Content = styled(CardContent)`
-  width: 80%;
+const Nickname = styled(Typography)`
+  color: white;
+  font-weight: bold;
+  font-size: 30px;
+`
+
+const Content = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   margin-top: 5px;
-
+  margin-left: 20px;
   &:last-child {
     padding: 0;
   }
 `;
 
-const State = styled(Typography)`
-  margin-top: 5px;
+const State = styled.div`
+  display: inline-block;
+  padding: 8px 16px;
+  font-size: 18px;
+  font-weight: bold;
   color: ${(props) => {
-    if (props.children === "방 장") {
-      return "#3f51b5";
-    } else if (props.children === "준 비 완 료") {
-      return "#333";
-    } else {
-      return "#aaa";
+    switch (props.children) {
+      case "방 장":
+        return "white";
+      case "준비 중":
+        return "black";
+      case "준비 완료":
+        return "white";
+      default:
+        return "white";
     }
   }};
-  font-weight: ${(props) => {
-    if (props.children === "방 장") {
-      return "800";
+  background-color: ${(props) => {
+    switch (props.children) {
+      case "방 장":
+        return "#FF5722";
+      case "준비 중":
+        return "#FFEB3B";
+      case "준비 완료":
+        return "#4CAF50";
     }
   }};
+  border-radius: 15px;
+  text-align: center;
+  white-space: nowrap;
+  user-select: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 약간의 그림자 */
 `;
+
+
+// 사용 예제
+function Example() {
+  return (
+    <div>
+      <State state="방 장">방 장</State>
+      <State state="준비 완료">준비 완료</State>
+      <State state="대기 중">대기 중</State>
+    </div>
+  );
+}
+
 
 export { PlayerCard, EmptyPlayerCard, XPlayerCard };

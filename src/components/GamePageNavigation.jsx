@@ -11,7 +11,7 @@ export default function GamePageNavigation() {
   return (
     <Box
       sx={{
-        width: "100vw",
+        width: "100%",
         height: "50px",
         borderBottom: 1,
         borderColor: "divider",
