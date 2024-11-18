@@ -7,7 +7,9 @@ import Typography from "@mui/material/Typography";
 
 function PlayerCard(props) {
   const { player, color } = props;
+  // const player = 
   const state = player.isCaptain ? "방 장" : player.isReady ? "준비 완료" : "준비 중";
+  
 
   return (
     <WrapperCard sx={{ height: "80%" }} className={color}>

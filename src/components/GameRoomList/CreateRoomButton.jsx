@@ -62,26 +62,26 @@ export default function CreateRoomButton({ category }) {
       return;
     }
 
-    let sender = getCookie("userId"); // 쿠키에서 userId 가져오기
-    if (!sender) {
-      setIsOpenedModal(false);
-      setIsOpenedNicknameModal(true);
-      // sender = window.prompt("닉네임을 입력해주세요");
-      sender = nickname;
-      if (!sender) {
-        return;
-      }
-    }
+    // let sender = getCookie("userId"); // 쿠키에서 userId 가져오기
+    // if (!sender) {
+    //   setIsOpenedModal(false);
+    //   setIsOpenedNicknameModal(true);
+    //   // sender = window.prompt("닉네임을 입력해주세요");
+    //   sender = nickname;
+    //   if (!sender) {
+    //     return;
+    //   }
+    // }
 
-    setSender(sender);
-    setTeam("red");
+    // setSender(sender);
+    setTeam("blue");
 
-    const { data } = await request.post("/game/room", {
-      name: roomTitle,
-      userid: sender,
-      type: "TEAM",
-      roomSize,
-      gameType: category.toUpperCase(),
+    const { data } = await request.post("/api/rooms", {
+      roomName: roomTitle,
+      gameMode: sender,
+      puzzleImage: "TEAM",
+      puzzlePiece,
+      maxPlayers: category.toUpperCase(),
     });
     // 방 속성 정보
     const { blueTeam, gameId, gameName, gameType, isStarted, redTeam, sessionToUser, startTime } =
@@ -236,14 +236,14 @@ export default function CreateRoomButton({ category }) {
       </Modal>
 
       {/* 닉네임 모달 */}
-      <NicknameModal
+      {/* <NicknameModal
         nickname={nickname}
         setNickname={setNickname}
         open={isOpenedNicknameModal}
         handleClose={handleClose}
         handleKeyUp={handleKeyUp}
         createRoom={createRoom}
-      />
+      /> */}
     </ThemeProvider>
   );
 }
