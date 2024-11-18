@@ -10,6 +10,8 @@ const LoginRedirect = () => {
         if(!token) 
             navi("/")
 
+        localStorage.setItem('jwt', token)
+
         const goHome = async () => {
             const res = await authRequest().get("/api/user/info")
             if(typeof res.data === 'string'){

@@ -32,11 +32,25 @@ export default function Header({parentUpdate}) {
   });
 
   useEffect(() => {
-    const token = getCookie("jwt");
+    const token = localStorage.getItem("jwt");
     if(!token)
       authRequest().get('/api/user/refresh')
       .then(res => {
-        // 응답이 오면서 이미 쿠키가 설정됨
+        const {
+          userId,
+          userName,
+          image,
+          email,
+          provider,
+          token,
+        } = res.data
+        localStorage.setItem('userId', userId)
+        localStorage.setItem('userName', userName)
+        localStorage.setItem('image', image)
+        localStorage.setItem('email', email)
+        localStorage.setItem('provider', provider)
+        localStorage.setItem('jwt', token)
+
       }).catch(err => navigate("/"))
       
   }, []);
@@ -47,7 +61,9 @@ export default function Header({parentUpdate}) {
     localStorage.removeItem("provider")
     localStorage.removeItem("userId")
     localStorage.removeItem("userName")
+    localStorage.removeItem("jwt")
     removeCookie("jwt")
+
     navigate("/")
   };
 
