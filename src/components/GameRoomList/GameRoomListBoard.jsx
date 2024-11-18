@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import styled from "styled-components";
-// import Grid from "@mui/material/Unstable_Grid2";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Pagination from "@mui/material/Pagination";
@@ -11,17 +10,15 @@ import { deepPurple } from "@mui/material/colors";
 import GameCard from "@/components/GameRoomList/GameCard";
 
 export default function GameRoomListBoard({ category, roomList }) {
+  
   const [rooms, setRooms] = useState([]);
+  const [page, setPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
-
-  const location = useLocation();
-  const query = new URLSearchParams(location.search);
-  const page = parseInt(query.get("page") || "1", 10);
 
   const makeEmptyRooms = (rooms) => {
     const result = [];
-
-    for (let i = 0; i < 6 - rooms.length; i++) {
+    const totalItems = 10; // 한 페이지에 10개 항목
+    for (let i = 0; i < totalItems - rooms.length; i++) {
       result.push(
         <Grid item xs={6} key={`empty ${i}`}>
           <EmptyCard></EmptyCard>
@@ -33,12 +30,10 @@ export default function GameRoomListBoard({ category, roomList }) {
   };
 
   useEffect(() => {
-    setTotalPage(Math.ceil(roomList.length / 6));
+    setRooms(roomList?.content ?? []); // roomList가 없으면 빈 배열 반환
+    setPage(roomList.pageable?.pageNumber ?? 0);
+    setTotalPage(roomList.totalPages); // 페이지당 10개 항목
   }, [roomList]);
-
-  useEffect(() => {
-    setRooms(roomList.slice((page - 1) * 6, page * 6));
-  }, [page, roomList]);
 
   const theme = createTheme({
     typography: {
@@ -59,9 +54,9 @@ export default function GameRoomListBoard({ category, roomList }) {
     <ThemeProvider theme={theme}>
       <Wrapper>
         <Grid container spacing={2}>
-          {(Array.isArray(rooms) ? rooms : [] ).map((room) => {
+          {rooms.map((room) => {
             return (
-              <Grid item xs={6} key={room.gameId}>
+              <Grid item xs={6} key={room.roomId}>
                 <GameCard room={room} category={category} />
               </Grid>
             );
@@ -77,7 +72,8 @@ export default function GameRoomListBoard({ category, roomList }) {
           renderItem={(item) => (
             <PaginationItem
               component={Link}
-              to={`/game/${category}${item.page === 1 ? "" : `?page=${item.page}`}`}
+              to={`/game/${category}${item.page === 1 ? "" : `?page=${item.page-1}`}`}
+              // to={`/api/rooms${page === 0 ? "" : `?page=${page}`}`}
               {...item}
             />
           )}
