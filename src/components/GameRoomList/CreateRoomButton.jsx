@@ -16,78 +16,70 @@ import {
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import { request } from "@/apis/requestBuilder";
-import { setRoomId, setSender, setTeam } from "@/socket-utils/storage";
-import NicknameModal from "./NicknameModal";
 
 export default function CreateRoomButton({ category }) {
   const navigate = useNavigate();
-  const [roomTitle, setRoomTitle] = useState("퍼즐 한 판 !!");
-  const [roomSize, setRoomSize] = useState(2);
+  const [roomName, setRoomName] = useState("퍼즐 한 판 !!");
+  const [gameMode, setGameMode] = useState("battle"); // Default value
+  const [puzzleImage, setPuzzleImage] = useState("default-image.png"); // Default image
+  const [puzzlePiece, setPuzzlePiece] = useState(100); // Default puzzle pieces
+  const [maxPlayers, setMaxPlayers] = useState(4); // Default max players
   const [isOpenedModal, setIsOpenedModal] = useState(false);
 
-  const [nickname, setNickname] = useState("");
-  const [isOpenedNicknameModal, setIsOpenedNicknameModal] = useState(false);
+  const playerId = localStorage.getItem("userId");
+  const playerImage = localStorage.getItem("image");
+  const playerName = localStorage.getItem("userName");
 
-  const handleClose = () => {
-    setRoomTitle("");
-    setRoomSize(2);
-    setIsOpenedModal(false);
-    setNickname("");
-    setIsOpenedNicknameModal(false);
+  const handleGameMode = (e) => {
+    setGameMode(e.target.value);
   };
 
-  const handleKeyUp = (e) => {
-    if (e.keyCode === 13) {
-      createRoom();
-    }
+  const handlePuzzlePiece = (e) => {
+    setPuzzlePiece(e.target.value);
   };
 
   const handleRoomSize = (e) => {
     const count = Number(e.target.value);
     if (2 <= count && count <= 8) {
-      setRoomSize(count);
+      setMaxPlayers(count);
     }
   };
 
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-      return parts.pop().split(";").shift();
-    }
-  }
+  const handleClose = () => {
+    setGameMode("일반 모드");
+    setPuzzlePiece("100");
+    setGameMode("battle");
+    setRoomName("퍼즐 한 판 !!");
+    setMaxPlayers(4);
+    setIsOpenedModal(false);
+  };
 
   const createRoom = async () => {
-    if (!roomTitle) {
-      return;
-    }
-
-    // let sender = getCookie("userId"); // 쿠키에서 userId 가져오기
-    // if (!sender) {
-    //   setIsOpenedModal(false);
-    //   setIsOpenedNicknameModal(true);
-    //   // sender = window.prompt("닉네임을 입력해주세요");
-    //   sender = nickname;
-    //   if (!sender) {
-    //     return;
-    //   }
+    // if (roomName!="" || puzzleImage!="") {
+    //   alert("필수 정보가 누락되었습니다.");
+    //   return;
     // }
 
-    // setSender(sender);
-    setTeam("blue");
-
-    const { data } = await request.post("/api/rooms", {
-      roomName: roomTitle,
-      gameMode: sender,
-      puzzleImage: "TEAM",
+    const requestData = {
+      roomName,
+      gameMode,
+      puzzleImage,
       puzzlePiece,
-      maxPlayers: category.toUpperCase(),
-    });
-    // 방 속성 정보
-    const { blueTeam, gameId, gameName, gameType, isStarted, redTeam, sessionToUser, startTime } =
-      data;
-    setRoomId(gameId);
-    navigate(`/game/${category}/waiting/${gameId}`);
+      maxPlayers,
+      playerId,
+      playerImage,
+      playerName,
+    };
+    console.log(requestData);
+
+    try {
+      const { data } = await request.post("/api/rooms", requestData);
+      const { roomId } = data; // Assume roomId is returned
+      navigate(`/game/${category}/waiting/${roomId}`);
+    } catch (error) {
+      console.error("방 생성에 실패했습니다.", error);
+      alert("방 생성 중 오류가 발생했습니다.");
+    }
   };
 
   const theme = createTheme({
@@ -112,7 +104,6 @@ export default function CreateRoomButton({ category }) {
         styleOverrides: {
           root: {
             margin: "3% auto",
-
             "& label": {
               color: deepPurple[200],
             },
@@ -193,38 +184,56 @@ export default function CreateRoomButton({ category }) {
             <Grid item xs={12}>
               <TextField
                 label="방 제목"
-                value={roomTitle}
-                onChange={(e) => setRoomTitle(e.target.value)}
-                onKeyUp={handleKeyUp}
+                value={roomName}
+                onChange={(e) => setRoomName(e.target.value)}
                 autoFocus
                 sx={{ width: "100%" }}
               />
             </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="퍼즐 이미지 URL"
+                value={puzzleImage}
+                onChange={(e) => setPuzzleImage(e.target.value)}
+                sx={{ width: "100%" }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl>
+                <FormLabel id="radio-game-mode">게임 모드</FormLabel>
+                <RadioGroup row value={gameMode} onChange={handleGameMode}>
+                  <FormControlLabel value="normal" control={<Radio />} label="일반 모드" />
+                  <FormControlLabel value="battle" control={<Radio />} label="아이템 모드" />
+                  <FormControlLabel value="timeAttack" control={<Radio />} label="타임어택" />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl>
+                <FormLabel id="radio-puzzle-piece">퍼즐 조각 수</FormLabel>
+                <RadioGroup row value={puzzlePiece} onChange={handlePuzzlePiece}>
+                  <FormControlLabel value={100} control={<Radio />} label="100" />
+                  <FormControlLabel value={200} control={<Radio />} label="200" />
+                  <FormControlLabel value={300} control={<Radio />} label="300" />
+                  <FormControlLabel value={400} control={<Radio />} label="400" />
+                  <FormControlLabel value={500} control={<Radio />} label="500" />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
             <Grid item xs={9}>
-              {category === "cooperation" ? (
-                <TextField
-                  label="최대 인원수"
-                  type="number"
-                  value={roomSize}
-                  onChange={handleRoomSize}
-                  sx={{ width: "100%" }}
-                  helperText="최소 2인 최대 8인 플레이 가능합니다."
-                />
-              ) : (
-                <FormControl>
-                  <FormLabel id="demo-controlled-radio-buttons-group">최대 인원수</FormLabel>
-                  <RadioGroup row value={roomSize} onChange={handleRoomSize}>
-                    <FormControlLabel value={2} control={<Radio />} label="1:1" />
-                    <FormControlLabel value={4} control={<Radio />} label="2:2" />
-                    <FormControlLabel value={6} control={<Radio />} label="3:3" />
-                    <FormControlLabel value={8} control={<Radio />} label="4:4" />
-                  </RadioGroup>
-                </FormControl>
-              )}
+              <FormControl>
+                <FormLabel id="radio-room-size">최대 인원수</FormLabel>
+                <RadioGroup row value={maxPlayers} onChange={handleRoomSize}>
+                  <FormControlLabel value={2} control={<Radio />} label="1:1" />
+                  <FormControlLabel value={4} control={<Radio />} label="2:2" />
+                  <FormControlLabel value={6} control={<Radio />} label="3:3" />
+                  <FormControlLabel value={8} control={<Radio />} label="4:4" />
+                </RadioGroup>
+              </FormControl>
             </Grid>
             <Grid item xs={3}>
               <Button
-                disabled={!roomTitle}
+                disabled={!roomName}
                 onClick={createRoom}
                 sx={{ width: "100%", height: "50px", padding: "2%", margin: "15% auto" }}
               >
@@ -234,16 +243,6 @@ export default function CreateRoomButton({ category }) {
           </Grid>
         </Box>
       </Modal>
-
-      {/* 닉네임 모달 */}
-      {/* <NicknameModal
-        nickname={nickname}
-        setNickname={setNickname}
-        open={isOpenedNicknameModal}
-        handleClose={handleClose}
-        handleKeyUp={handleKeyUp}
-        createRoom={createRoom}
-      /> */}
     </ThemeProvider>
   );
 }
