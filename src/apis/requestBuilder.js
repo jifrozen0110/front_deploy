@@ -28,5 +28,6 @@ export const authRequest = () => {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${getCookie("jwt")}`
     },
+    withCredentials: true
   })
 }
