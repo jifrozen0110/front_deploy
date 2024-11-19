@@ -32,7 +32,7 @@ export default function Header({parentUpdate}) {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem("jwt");
+    const token = getCookie("jwt");
     if(!token)
       authRequest().get('/api/user/refresh')
       .then(res => {
@@ -42,14 +42,12 @@ export default function Header({parentUpdate}) {
           image,
           email,
           provider,
-          token,
         } = res.data
         localStorage.setItem('userId', userId)
         localStorage.setItem('userName', userName)
         localStorage.setItem('image', image)
         localStorage.setItem('email', email)
         localStorage.setItem('provider', provider)
-        localStorage.setItem('jwt', token)
 
       }).catch(err => navigate("/"))
       
@@ -61,7 +59,6 @@ export default function Header({parentUpdate}) {
     localStorage.removeItem("provider")
     localStorage.removeItem("userId")
     localStorage.removeItem("userName")
-    localStorage.removeItem("jwt")
     removeCookie("jwt")
 
     navigate("/")

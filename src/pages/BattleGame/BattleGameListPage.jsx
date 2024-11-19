@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState,useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { IconButton, Button, createTheme, ThemeProvider } from "@mui/material";
@@ -89,8 +89,10 @@ const theme = createTheme({
 
 export default function BattleGameListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [roomList, setRoomList] = useState([]);
+  const [roomList, setRoomList] = useState(null);
   const [pageNumber, setPageNumber] = useState(0);
+  const isLoading = useMemo(() => roomList === null, [roomList]);
+
 
   const refetchAllRoom = () => {
     fetchAllRoom();
@@ -104,11 +106,11 @@ export default function BattleGameListPage() {
 
   useEffect(() => {
     fetchAllRoom();
-  }, []);
+  }, [roomList]);
 
   useEffect(() => {
     // 페이지 번호가 변경될 때 데이터 가져오기
-    setPageNumber(parseInt(searchParams.get("page"), 10) || 1);
+    setPageNumber(parseInt(searchParams.get("page"), 10) || 0);
   }, [pageNumber]);
 
   function getCookie(name) {
@@ -158,7 +160,17 @@ export default function BattleGameListPage() {
       //응답 메시지 파싱
     });
   };
-  
+  if (isLoading) {
+    return (
+      <Wrapper>
+        <Header />
+        <div>Loading...</div>
+        <Footer />
+      </Wrapper>
+    );
+  }
+
+
   return (
     <Wrapper>
       <Header />
