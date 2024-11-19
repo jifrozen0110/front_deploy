@@ -78,7 +78,14 @@ export default function BattleGameWaitingPage() {
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
 
       subscribe(`/topic/room/${roomId}`, (entranceMessage) => {
-        setRoomData(JSON.parse(entranceMessage.body));
+        const data = JSON.parse(entranceMessage.body);
+        const halfPlayers = Math.ceil(data.maxPlayers / 2);
+        setRoomData(data);
+        setEmptyPlayerCount([
+          Math.max(0, halfPlayers - data.redPlayers.length),
+          Math.max(0, halfPlayers - data.bluePlayers.length),
+        ]);
+        setXPlayerCount([Math.max(0, 4 - halfPlayers), Math.max(0, 4 - halfPlayers)]);
         // if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
         //   data.blueTeam.players.forEach((player) => {
         //     console.log(player);
