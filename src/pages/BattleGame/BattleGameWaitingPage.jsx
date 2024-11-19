@@ -79,40 +79,34 @@ export default function BattleGameWaitingPage() {
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
 
       subscribe(`/topic/room/${roomId}`, (entranceMessage) => {
-        const data = JSON.parse(entranceMessage.body);
-        const halfPlayers = Math.ceil(data.maxPlayers / 2);
-        setRoomData(data);
-        setPlayerCount(data.nowPlayers);
-        setEmptyPlayerCount([
-          Math.max(0, halfPlayers - data.redPlayers.length),
-          Math.max(0, halfPlayers - data.bluePlayers.length),
-        ]);
-        setXPlayerCount([Math.max(0, 4 - halfPlayers), Math.max(0, 4 - halfPlayers)]);
-        // if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
-        //   data.blueTeam.players.forEach((player) => {
-        //     console.log(player);
-        //     if (player.id === getSender()) {
-        //       setTeam("blue");
-        //     }
-        //   });
-        // }
+        console.log(entranceMessage)
+        const data = JSON.parse(entranceMessage.body)
+
+        if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
+          data.blueTeam.players.forEach((player) => {
+            console.log(player);
+            if (player.id === getSender()) {
+              setTeam("blue");
+            }
+          });
+        }
 
         // // 1. 게임이 시작되면 인게임 화면으로 보낸다.
-        // if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
-        //   window.location.replace(`/game/battle/ingame/${data.gameId}`);
-        //   return;
-        // }
-        // setGameData(data);
-        // if (data.picture.encodedString === "짱구.jpg") {
-        //   setImage(
-        //     "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
-        //   );
-        // } else {
-          //   setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
-          // }
-        });
-        enterRoom(roomId);
-        
+        if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
+          window.location.replace(`/game/battle/ingame/${data.gameId}`);
+          return;
+        }
+        setGameData(data);
+        if (data.picture.encodedString === "짱구.jpg") {
+          setImage(
+            "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+          );
+        } else {
+          setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
+        }
+      });
+      enterRoom(roomId);
+
       // subscribe(`/topic/chat/room/${roomId}`, (message) => {
       //   const data = JSON.parse(message.body);
       //   const { userid, chatMessage, time } = data;
@@ -174,37 +168,38 @@ export default function BattleGameWaitingPage() {
         <Footer />
       </Wrapper>
     );
-  } else {
-    return (
-      <Wrapper>
-        <Top>
-          <ButtonGroup>
-            <TopButton onClick={() => setTimeout(() => navigate("/game/battle"), 100)}>
-              <div style={{ textAlign: "center" }}>
-                <img src={LeftArrow} alt="나가기" className="icon" style={{ display: "block", margin: "0 auto" }} />
-                나가기
-              </div>
-            </TopButton>
-            <TopButton onClick={switchTeam}>
-              <div style={{ textAlign: "center" }}>
-                <img src={TeamChange} alt="이동" className="icon" style={{ display: "block", margin: "0 auto" }} />
-                이동
-              </div>
-            </TopButton>
-            <TopButton>
-              <div style={{ textAlign: "center" }}>
-                <img src={Gear} alt="설정" className="icon" style={{ display: "block", margin: "0 auto" }} />
-                설정
-              </div>
-            </TopButton>
-            <TopButton>
-              <div style={{ textAlign: "center" }}>
-                <img src={Invite} alt="초대" className="icon" style={{ display: "block", margin: "0 auto" }} />
-                초대
-              </div>
-            </TopButton>
-          </ButtonGroup>
-        </Top>
+  }
+
+  return (
+    <Wrapper>
+      <Top>
+        <ButtonGroup>
+          <TopButton onClick={exitRoom}>
+            <div style={{ textAlign: "center" }}>
+              <img src={LeftArrow} alt="나가기" className="icon" style={{ display: "block", margin: "0 auto" }} />
+              나가기
+            </div>
+          </TopButton>
+          <TopButton onClick={switchTeam}>
+            <div style={{ textAlign: "center" }}>
+              <img src={TeamChange} alt="이동" className="icon" style={{ display: "block", margin: "0 auto" }} />
+              이동
+            </div>
+          </TopButton>
+          <TopButton>
+            <div style={{ textAlign: "center" }}>
+              <img src={Gear} alt="설정" className="icon" style={{ display: "block", margin: "0 auto" }} />
+              설정
+            </div>
+          </TopButton>
+          <TopButton>
+            <div style={{ textAlign: "center" }}>
+              <img src={Invite} alt="초대" className="icon" style={{ display: "block", margin: "0 auto" }} />
+              초대
+            </div>
+          </TopButton>
+        </ButtonGroup>
+      </Top>
 
         <Body>
           <MainSection>
@@ -251,7 +246,7 @@ export default function BattleGameWaitingPage() {
       </Wrapper>
     );
   }
-}
+
 
 const Wrapper = styled.div`
   height: 100%;
