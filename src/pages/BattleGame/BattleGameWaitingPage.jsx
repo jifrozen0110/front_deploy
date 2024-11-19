@@ -42,6 +42,23 @@ export default function BattleGameWaitingPage() {
     playerImage,
     playerName
   });
+  
+  const enterRoom = (roomId) => {
+    console.log("방 입장~");
+    send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const exitRoom = () => {
+    console.log("방 나가기~");
+    send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const switchTeam = () => {
+    console.log("팀 바꾸기~");
+    send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const startGame = () => {
+    console.log("게임 시작~");
+    send(`/pub/room/${roomId}/start`, {}, JSON.stringify(createPlayerRequest()));
+  }
 
   const makeEmptyPlayer = (count) => {
     return Array(count)
@@ -60,9 +77,8 @@ export default function BattleGameWaitingPage() {
       console.log(roomId);
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
 
-      subscribe(`/topic/room${roomId}`, (entranceMessage) => {
-        console.log(entranceMessage)
-
+      subscribe(`/topic/room/${roomId}`, (entranceMessage) => {
+        setRoomData(JSON.parse(entranceMessage.body));
         // if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
         //   data.blueTeam.players.forEach((player) => {
         //     console.log(player);
@@ -83,11 +99,11 @@ export default function BattleGameWaitingPage() {
         //     "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
         //   );
         // } else {
-        //   setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
-        // }
-      });
-      enterRoom(roomId);
-
+          //   setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
+          // }
+        });
+        enterRoom(roomId);
+        
       // subscribe(`/topic/chat/room/${roomId}`, (message) => {
       //   const data = JSON.parse(message.body);
       //   const { userid, chatMessage, time } = data;
@@ -109,6 +125,11 @@ export default function BattleGameWaitingPage() {
   const initialize = async () => {
     try {
       const response = await authRequest().get(`/api/rooms/${roomId}`);
+      if (response.data.maxPlayers <= response.data.nowPlayers){
+        alert("방이 꽉 찼습니다.");
+        setTimeout(() => navigate("/game/battle"), 100);
+      }
+
       const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
       setRoomData(response.data);
       setEmptyPlayerCount([
@@ -116,7 +137,6 @@ export default function BattleGameWaitingPage() {
         Math.max(0, halfPlayers - response.data.bluePlayers.length),
       ]);
       setXPlayerCount([Math.max(0, 4 - halfPlayers), Math.max(0, 4 - halfPlayers)]);
-      console.log(response.data);
   
       // WebSocket 연결 시도
       await connectSocket(response.data.roomId);
@@ -130,6 +150,10 @@ export default function BattleGameWaitingPage() {
 
   useEffect(() => {
     initialize();
+
+    return() => {
+      exitRoom();
+    }
   }, [roomId]);
 
   if (isLoading) {
@@ -140,105 +164,85 @@ export default function BattleGameWaitingPage() {
         <Footer />
       </Wrapper>
     );
+  } else {
+    return (
+      <Wrapper>
+        <Top>
+          <ButtonGroup>
+            <TopButton onClick={() => setTimeout(() => navigate("/game/battle"), 100)}>
+              <div style={{ textAlign: "center" }}>
+                <img src={LeftArrow} alt="나가기" className="icon" style={{ display: "block", margin: "0 auto" }} />
+                나가기
+              </div>
+            </TopButton>
+            <TopButton onClick={switchTeam}>
+              <div style={{ textAlign: "center" }}>
+                <img src={TeamChange} alt="이동" className="icon" style={{ display: "block", margin: "0 auto" }} />
+                이동
+              </div>
+            </TopButton>
+            <TopButton>
+              <div style={{ textAlign: "center" }}>
+                <img src={Gear} alt="설정" className="icon" style={{ display: "block", margin: "0 auto" }} />
+                설정
+              </div>
+            </TopButton>
+            <TopButton>
+              <div style={{ textAlign: "center" }}>
+                <img src={Invite} alt="초대" className="icon" style={{ display: "block", margin: "0 auto" }} />
+                초대
+              </div>
+            </TopButton>
+          </ButtonGroup>
+        </Top>
+
+        <Body>
+          <MainSection>
+            <TeamSection>
+              <Team>파란팀</Team>
+              <TeamGrid>
+                {roomData.bluePlayers.map((player, i) => (
+                  <PlayerCard key={`blue-player-${i}`} player={player} color="blue" />
+                ))}
+                {makeEmptyPlayer(emptyPlayerCount[1])}
+                {makeXPlayer(xPlayerCount[1])}
+              </TeamGrid>
+            </TeamSection>
+
+            <Versus>VS</Versus>
+
+            <TeamSection>
+              <Team>빨간팀</Team>
+              <TeamGrid>
+                {roomData.redPlayers.map((player, i) => (
+                  <PlayerCard key={`red-player-${i}`} player={player} color="red" />
+                ))}
+                {makeEmptyPlayer(emptyPlayerCount[0])}
+                {makeXPlayer(xPlayerCount[0])}
+              </TeamGrid>
+            </TeamSection>
+          </MainSection>
+
+          <PuzzleDetails>
+            <PuzzleImage>
+              <img
+                src="https://images.unsplash.com/photo-1731413263252-cbce5c09f8c2?q=80&w=2940&auto=format&fit=crop"
+                alt="Puzzle"
+              />
+            </PuzzleImage>
+            <Details>
+              <Title>{roomData.roomName}</Title>
+              <Typography variant="subtitle1">{roomData.gameMode}</Typography>
+              <Typography variant="subtitle1">{roomData.puzzlePiece} 피스</Typography>
+              <Typography variant="subtitle1">{roomData.nowPlayers}/{roomData.maxPlayers}</Typography>
+              <StartButton onClick={startGame}>시작</StartButton>
+            </Details>
+          </PuzzleDetails>
+        </Body>
+      </Wrapper>
+    );
   }
-
-  const enterRoom = (roomId) => {
-    console.log("방 입장~");
-    send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
-  }
-  const exitRoom = () => {
-    console.log("방 나가기~");
-    setTimeout(() => navigate("/game/battle"), 100);
-    send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
-  }
-  const switchTeam = () => {
-    console.log("팀 바꾸기~");
-    send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
-  }
-  const startGame = () => {
-    console.log("게임 시작~");
-    send(`/pub/room/${roomId}/start`, {}, JSON.stringify(createPlayerRequest()));
-  }
-
-
-  return (
-    <Wrapper>
-      <Top>
-        <ButtonGroup>
-          <TopButton onClick={exitRoom}>
-            <div style={{ textAlign: "center" }}>
-              <img src={LeftArrow} alt="나가기" className="icon" style={{ display: "block", margin: "0 auto" }} />
-              나가기
-            </div>
-          </TopButton>
-          <TopButton onClick={switchTeam}>
-            <div style={{ textAlign: "center" }}>
-              <img src={TeamChange} alt="이동" className="icon" style={{ display: "block", margin: "0 auto" }} />
-              이동
-            </div>
-          </TopButton>
-          <TopButton>
-            <div style={{ textAlign: "center" }}>
-              <img src={Gear} alt="설정" className="icon" style={{ display: "block", margin: "0 auto" }} />
-              설정
-            </div>
-          </TopButton>
-          <TopButton>
-            <div style={{ textAlign: "center" }}>
-              <img src={Invite} alt="초대" className="icon" style={{ display: "block", margin: "0 auto" }} />
-              초대
-            </div>
-          </TopButton>
-        </ButtonGroup>
-      </Top>
-
-      <Body>
-        <MainSection>
-          <TeamSection>
-            <Team>파란팀</Team>
-            <TeamGrid>
-              {roomData.bluePlayers.map((player, i) => (
-                <PlayerCard key={`blue-player-${i}`} player={player} color="blue" />
-              ))}
-              {makeEmptyPlayer(emptyPlayerCount[1])}
-              {makeXPlayer(xPlayerCount[1])}
-            </TeamGrid>
-          </TeamSection>
-
-          <Versus>VS</Versus>
-
-          <TeamSection>
-            <Team>빨간팀</Team>
-            <TeamGrid>
-              {roomData.redPlayers.map((player, i) => (
-                <PlayerCard key={`red-player-${i}`} player={player} color="red" />
-              ))}
-              {makeEmptyPlayer(emptyPlayerCount[0])}
-              {makeXPlayer(xPlayerCount[0])}
-            </TeamGrid>
-          </TeamSection>
-        </MainSection>
-
-        <PuzzleDetails>
-          <PuzzleImage>
-            <img
-              src="https://images.unsplash.com/photo-1731413263252-cbce5c09f8c2?q=80&w=2940&auto=format&fit=crop"
-              alt="Puzzle"
-            />
-          </PuzzleImage>
-          <Details>
-            <Title>{roomData.roomName}</Title>
-            <Typography variant="subtitle1">{roomData.gameMode}</Typography>
-            <Typography variant="subtitle1">{roomData.puzzlePiece} 피스</Typography>
-            <Typography variant="subtitle1">{roomData.nowPlayers}/{roomData.maxPlayers}</Typography>
-            <StartButton onClick={startGame}>시작</StartButton>
-          </Details>
-        </PuzzleDetails>
-      </Body>
-    </Wrapper>
-  );
 }
-
 const Wrapper = styled.div`
   height: 100%;
   background-image: url(${backgroundPath});
