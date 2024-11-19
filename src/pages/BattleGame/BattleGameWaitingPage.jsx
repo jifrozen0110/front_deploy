@@ -164,88 +164,85 @@ export default function BattleGameWaitingPage() {
         <Footer />
       </Wrapper>
     );
+  } else {
+    return (
+      <Wrapper>
+        <Top>
+          <ButtonGroup>
+            <TopButton onClick={() => setTimeout(() => navigate("/game/battle"), 100)}>
+              <div style={{ textAlign: "center" }}>
+                <img src={LeftArrow} alt="나가기" className="icon" style={{ display: "block", margin: "0 auto" }} />
+                나가기
+              </div>
+            </TopButton>
+            <TopButton onClick={switchTeam}>
+              <div style={{ textAlign: "center" }}>
+                <img src={TeamChange} alt="이동" className="icon" style={{ display: "block", margin: "0 auto" }} />
+                이동
+              </div>
+            </TopButton>
+            <TopButton>
+              <div style={{ textAlign: "center" }}>
+                <img src={Gear} alt="설정" className="icon" style={{ display: "block", margin: "0 auto" }} />
+                설정
+              </div>
+            </TopButton>
+            <TopButton>
+              <div style={{ textAlign: "center" }}>
+                <img src={Invite} alt="초대" className="icon" style={{ display: "block", margin: "0 auto" }} />
+                초대
+              </div>
+            </TopButton>
+          </ButtonGroup>
+        </Top>
+
+        <Body>
+          <MainSection>
+            <TeamSection>
+              <Team>파란팀</Team>
+              <TeamGrid>
+                {roomData.bluePlayers.map((player, i) => (
+                  <PlayerCard key={`blue-player-${i}`} player={player} color="blue" />
+                ))}
+                {makeEmptyPlayer(emptyPlayerCount[1])}
+                {makeXPlayer(xPlayerCount[1])}
+              </TeamGrid>
+            </TeamSection>
+
+            <Versus>VS</Versus>
+
+            <TeamSection>
+              <Team>빨간팀</Team>
+              <TeamGrid>
+                {roomData.redPlayers.map((player, i) => (
+                  <PlayerCard key={`red-player-${i}`} player={player} color="red" />
+                ))}
+                {makeEmptyPlayer(emptyPlayerCount[0])}
+                {makeXPlayer(xPlayerCount[0])}
+              </TeamGrid>
+            </TeamSection>
+          </MainSection>
+
+          <PuzzleDetails>
+            <PuzzleImage>
+              <img
+                src="https://images.unsplash.com/photo-1731413263252-cbce5c09f8c2?q=80&w=2940&auto=format&fit=crop"
+                alt="Puzzle"
+              />
+            </PuzzleImage>
+            <Details>
+              <Title>{roomData.roomName}</Title>
+              <Typography variant="subtitle1">{roomData.gameMode}</Typography>
+              <Typography variant="subtitle1">{roomData.puzzlePiece} 피스</Typography>
+              <Typography variant="subtitle1">{roomData.nowPlayers}/{roomData.maxPlayers}</Typography>
+              <StartButton onClick={startGame}>시작</StartButton>
+            </Details>
+          </PuzzleDetails>
+        </Body>
+      </Wrapper>
+    );
   }
-
-
-
-  return (
-    <Wrapper>
-      <Top>
-        <ButtonGroup>
-          <TopButton onClick={() => setTimeout(() => navigate("/game/battle"), 100)}>
-            <div style={{ textAlign: "center" }}>
-              <img src={LeftArrow} alt="나가기" className="icon" style={{ display: "block", margin: "0 auto" }} />
-              나가기
-            </div>
-          </TopButton>
-          <TopButton onClick={switchTeam}>
-            <div style={{ textAlign: "center" }}>
-              <img src={TeamChange} alt="이동" className="icon" style={{ display: "block", margin: "0 auto" }} />
-              이동
-            </div>
-          </TopButton>
-          <TopButton>
-            <div style={{ textAlign: "center" }}>
-              <img src={Gear} alt="설정" className="icon" style={{ display: "block", margin: "0 auto" }} />
-              설정
-            </div>
-          </TopButton>
-          <TopButton>
-            <div style={{ textAlign: "center" }}>
-              <img src={Invite} alt="초대" className="icon" style={{ display: "block", margin: "0 auto" }} />
-              초대
-            </div>
-          </TopButton>
-        </ButtonGroup>
-      </Top>
-
-      <Body>
-        <MainSection>
-          <TeamSection>
-            <Team>파란팀</Team>
-            <TeamGrid>
-              {roomData.bluePlayers.map((player, i) => (
-                <PlayerCard key={`blue-player-${i}`} player={player} color="blue" />
-              ))}
-              {makeEmptyPlayer(emptyPlayerCount[1])}
-              {makeXPlayer(xPlayerCount[1])}
-            </TeamGrid>
-          </TeamSection>
-
-          <Versus>VS</Versus>
-
-          <TeamSection>
-            <Team>빨간팀</Team>
-            <TeamGrid>
-              {roomData.redPlayers.map((player, i) => (
-                <PlayerCard key={`red-player-${i}`} player={player} color="red" />
-              ))}
-              {makeEmptyPlayer(emptyPlayerCount[0])}
-              {makeXPlayer(xPlayerCount[0])}
-            </TeamGrid>
-          </TeamSection>
-        </MainSection>
-
-        <PuzzleDetails>
-          <PuzzleImage>
-            <img
-              src="https://images.unsplash.com/photo-1731413263252-cbce5c09f8c2?q=80&w=2940&auto=format&fit=crop"
-              alt="Puzzle"
-            />
-          </PuzzleImage>
-          <Details>
-            <Title>{roomData.roomName}</Title>
-            <Typography variant="subtitle1">{roomData.gameMode}</Typography>
-            <Typography variant="subtitle1">{roomData.puzzlePiece} 피스</Typography>
-            <Typography variant="subtitle1">{roomData.nowPlayers}/{roomData.maxPlayers}</Typography>
-            <StartButton onClick={startGame}>시작</StartButton>
-          </Details>
-        </PuzzleDetails>
-      </Body>
-    </Wrapper>
-  );
 }
-
 const Wrapper = styled.div`
   height: 100%;
   background-image: url(${backgroundPath});
