@@ -106,7 +106,7 @@ export default function BattleGameListPage() {
 
   useEffect(() => {
     fetchAllRoom();
-  }, [roomList]);
+  }, []);
 
   useEffect(() => {
     // 페이지 번호가 변경될 때 데이터 가져오기
@@ -160,37 +160,31 @@ export default function BattleGameListPage() {
       //응답 메시지 파싱
     });
   };
-  if (isLoading) {
-    return (
-      <Wrapper>
+  return (
+    <>
+    {isLoading
+    ? <Wrapper>
         <Header />
         <div>Loading...</div>
         <Footer />
       </Wrapper>
-    );
-  }
+    : <Wrapper>
+        <Header />
+        <div style={{ display: "flex", alignItems: "center", width: "950px", margin: "3% auto 0 auto" }}>
+          <h1>배틀 플레이</h1>
+          <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginRight: "auto" }}>
+            <RefreshIcon />
+          </IconButton>
 
-
-  return (
-    <Wrapper>
-      <Header />
-
-      <div
-        style={{ display: "flex", alignItems: "center", width: "950px", margin: "3% auto 0 auto" }}
-      >
-        <h1>배틀 플레이</h1>
-        <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginRight: "auto" }}>
-          <RefreshIcon />
-        </IconButton>
-
-        <CreateRoomButton category="battle" />
-      </div>
-      <div style={{display : "flex"}}>
-      <GameRoomListBoard category="battle" roomList={roomList} />
-      <UserListSidebar />
-      </div>
-      <Footer />
-    </Wrapper>
+          <CreateRoomButton category="battle" />
+        </div>
+        <div style={{display : "flex"}}>
+          <GameRoomListBoard category="battle" roomList={roomList} />
+          <UserListSidebar />
+        </div>
+        <Footer />
+      </Wrapper>}
+    </>
   );
 }
 

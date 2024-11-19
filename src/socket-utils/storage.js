@@ -9,7 +9,8 @@ const TEAM_KEY = "wschat.team";
 const ROOM_KEY = "wschat.roomId";
 
 export const getSender = () => {
-  return webStorage.getItem(SENDER_KEY) || null;
+  // return webStorage.getItem(SENDER_KEY) || null;
+  return localStorage.getItem('userId');
 };
 export const setSender = (value) => {
   webStorage.setItem(SENDER_KEY, value);
@@ -23,7 +24,7 @@ export const setTeam = (value) => {
 };
 export const setTeamSocket = () => {
   send(
-    "/app/room/switch",
+    "/pub/room/switch",
     {},
     JSON.stringify({
       roomId: getRoomId()
