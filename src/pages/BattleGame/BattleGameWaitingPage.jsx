@@ -13,7 +13,7 @@ import { socket } from "@/socket-utils/socket2"; // 소켓 유틸리티
 
 import backgroundPath from "@/assets/backgrounds/background2.png";
 import { authRequest } from "../../apis/requestBuilder";
-
+import { useGameInfo } from "../../hooks/useGameInfo";
 import Typography from "@mui/material/Typography";
 import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
 
@@ -31,17 +31,17 @@ export default function BattleGameWaitingPage() {
   const [playerCount, setPlayerCount] = useState(1);
   const [emptyPlayerCount, setEmptyPlayerCount] = useState([0, 0]);
   const [xPlayerCount, setXPlayerCount] = useState([0, 0]);
-
+  const [gameData, setGameData] = useState(null);
   const playerId = localStorage.getItem("userId");
   const playerImage = localStorage.getItem("image");
   const playerName = localStorage.getItem("userName");
-
+  const { setImage } = useGameInfo();
   const isLoading = useMemo(() => roomData === null, [roomData]);
 
   const createPlayerRequest = () => ({
     playerId,
     playerImage,
-    playerName
+    playerName,
   });
   
   const enterRoom = (roomId) => {
@@ -72,15 +72,20 @@ export default function BattleGameWaitingPage() {
       .fill(null)
       .map((_, i) => <XPlayerCard key={`xplayer-${i}`} />);
   };
-
-  const connectSocket = async (roomId) => {  
+  const enterRoom = (roomId) => {
+    console.log("방 입장~");
+    send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
+  };
+  const connectSocket = async (roomId) => {
     connect(() => {
       console.log(roomId);
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
 
-      subscribe(`/topic/room/${roomId}`, (entranceMessage) => {
-        console.log(entranceMessage)
-        const data = JSON.parse(entranceMessage.body)
+
+      subscribe(`/topic/room/${roomId}`, (message) => {
+        const data = JSON.parse(message.body);
+
+        console.log(data);
 
         if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
           data.blueTeam.players.forEach((player) => {
@@ -91,19 +96,20 @@ export default function BattleGameWaitingPage() {
           });
         }
 
-        // // 1. 게임이 시작되면 인게임 화면으로 보낸다.
-        if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
+        console.log(data.gameId);
+        console.log(data.gameId && Boolean(data.isStarted) && !Boolean(data.isFinished));
+        // 1. 게임이 시작되면 인게임 화면으로 보낸다.
+        if (data.gameId && Boolean(data.isStarted) && !Boolean(data.isFinished)) {
+
           window.location.replace(`/game/battle/ingame/${data.gameId}`);
           return;
         }
         setGameData(data);
-        if (data.picture.encodedString === "짱구.jpg") {
-          setImage(
-            "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
-          );
-        } else {
-          setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
-        }
+
+        setImage(
+          "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+        );
+
       });
       enterRoom(roomId);
 
@@ -141,7 +147,7 @@ export default function BattleGameWaitingPage() {
         Math.max(0, halfPlayers - response.data.bluePlayers.length),
       ]);
       setXPlayerCount([Math.max(0, 4 - halfPlayers), Math.max(0, 4 - halfPlayers)]);
-  
+
       // WebSocket 연결 시도
       await connectSocket(response.data.roomId);
     } catch (e) {
@@ -170,37 +176,57 @@ export default function BattleGameWaitingPage() {
     );
   }
 
+
   return (
     <Wrapper>
       <Top>
         <ButtonGroup>
           <TopButton onClick={exitRoom}>
             <div style={{ textAlign: "center" }}>
-              <img src={LeftArrow} alt="나가기" className="icon" style={{ display: "block", margin: "0 auto" }} />
+              <img
+                src={LeftArrow}
+                alt="나가기"
+                className="icon"
+                style={{ display: "block", margin: "0 auto" }}
+              />
               나가기
             </div>
           </TopButton>
           <TopButton onClick={switchTeam}>
             <div style={{ textAlign: "center" }}>
-              <img src={TeamChange} alt="이동" className="icon" style={{ display: "block", margin: "0 auto" }} />
+              <img
+                src={TeamChange}
+                alt="이동"
+                className="icon"
+                style={{ display: "block", margin: "0 auto" }}
+              />
               이동
             </div>
           </TopButton>
           <TopButton>
             <div style={{ textAlign: "center" }}>
-              <img src={Gear} alt="설정" className="icon" style={{ display: "block", margin: "0 auto" }} />
+              <img
+                src={Gear}
+                alt="설정"
+                className="icon"
+                style={{ display: "block", margin: "0 auto" }}
+              />
               설정
             </div>
           </TopButton>
           <TopButton>
             <div style={{ textAlign: "center" }}>
-              <img src={Invite} alt="초대" className="icon" style={{ display: "block", margin: "0 auto" }} />
+              <img
+                src={Invite}
+                alt="초대"
+                className="icon"
+                style={{ display: "block", margin: "0 auto" }}
+              />
               초대
             </div>
           </TopButton>
         </ButtonGroup>
       </Top>
-
         <Body>
           <MainSection>
             <TeamSection>
@@ -265,8 +291,8 @@ const Team = styled.div`
   font-size: 30px;
   border-radius: 5px;
   border: white solid 1px;
-  color: white
-`
+  color: white;
+`;
 
 const Top = styled.div`
   align-items: center;
@@ -279,7 +305,7 @@ const TopButton = styled(Button)`
   height: 100px;
   padding: 0 40px;
   position: relative;
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.25);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
 
   &:hover {
     background-color: orange;
@@ -318,7 +344,7 @@ const Title = styled.h1`
 const MainSection = styled.div`
   display: flex;
   justify-content: space-between;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(20px);
   width: 70%;
   padding: 60px;
@@ -344,7 +370,7 @@ const Versus = styled.div`
 `;
 
 const PuzzleDetails = styled.div`
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(20px);
   color: white;
   padding: 5px;
@@ -382,4 +408,4 @@ const Divider = styled.div`
   height: 0;
   weight: 100%;
   border-bottom: white solid 1px;
-`
+`;

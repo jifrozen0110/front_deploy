@@ -239,7 +239,7 @@ export default function BattleGameIngamePage() {
           "/app/room/enter",
           {},
           JSON.stringify({
-            roomId: getRoomId()
+            roomId: getRoomId(),
           }),
         );
       },
@@ -254,12 +254,12 @@ export default function BattleGameIngamePage() {
   };
 
   useEffect(() => {
-    if (roomId !== getRoomId() || !getSender()) {
-      navigate("/game/battle", {
-        replace: true,
-      });
-      return;
-    }
+    // if (roomId !== getRoomId() || !getSender()) {
+    //   navigate("/game/battle", {
+    //     replace: true,
+    //   });
+    //   return;
+    // }
 
     connectSocket();
 
