@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { IconButton, Button, createTheme, ThemeProvider } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -12,6 +13,8 @@ import backgroundPath from "@/assets/backgrounds/background.png";
 import { socket } from "../../socket-utils/socket2";
 import { setRoomId, setSender, setTeam } from "../../socket-utils/storage";
 import { deepPurple } from "@mui/material/colors";
+import UserListSidebar from "../../components/GameRoomList/UserListSidebar";
+import { authRequest } from "../../apis/requestBuilder";
 
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -85,22 +88,28 @@ const theme = createTheme({
 });
 
 export default function BattleGameListPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [roomList, setRoomList] = useState([]);
+  const [pageNumber, setPageNumber] = useState(0);
 
   const refetchAllRoom = () => {
     fetchAllRoom();
   };
 
   const fetchAllRoom = async () => {
-    const res = await request.get("/game/rooms/battle", { id: getSender() });
+    const res = await authRequest().get(`/api/rooms?page=${pageNumber}`);
     const { data: fetchedRoomList } = res;
-    console.log(fetchedRoomList);
     setRoomList(fetchedRoomList);
   };
 
   useEffect(() => {
     fetchAllRoom();
   }, []);
+
+  useEffect(() => {
+    // 페이지 번호가 변경될 때 데이터 가져오기
+    setPageNumber(parseInt(searchParams.get("page"), 10) || 1);
+  }, [pageNumber]);
 
   function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -149,6 +158,7 @@ export default function BattleGameListPage() {
       //응답 메시지 파싱
     });
   };
+  
   return (
     <Wrapper>
       <Header />
@@ -163,15 +173,18 @@ export default function BattleGameListPage() {
 
         <CreateRoomButton category="battle" />
       </div>
-
+      <div style={{display : "flex"}}>
       <GameRoomListBoard category="battle" roomList={roomList} />
-
+      <UserListSidebar />
+      </div>
       <Footer />
     </Wrapper>
   );
 }
 
 const Wrapper = styled.div`
-  height: 900px;
+  height: 100%;
   background-image: url(${backgroundPath});
+  background-size: cover;
+  background-attachment: fixed;
 `;

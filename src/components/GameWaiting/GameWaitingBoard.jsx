@@ -1,67 +1,31 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { Grid, Box, Typography, Button, Snackbar } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { red, blue, deepPurple } from "@mui/material/colors";
+import Grid from "@mui/material/Unstable_Grid2";
+import Typography from "@mui/material/Typography";
 import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
-import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
-import Chatting from "@/components/GameWaiting/Chatting";
-import { getSender, getTeam, setTeam, setTeamSocket } from "@/socket-utils/storage";
-import { socket } from "@/socket-utils/socket2";
+import Button from "@mui/material/Button";
+import LeftArrow from "@/assets/icons/gameRoom/left_arrow.png";
+import Gear from "@/assets/icons/gameRoom/gear.png";
+import Invite from "@/assets/icons/gameRoom/invite.png";
+import TeamChange from "@/assets/icons/gameRoom/team_change.png";
 
-const { send } = socket;
+export default function GameWaitingBoard(props) {
+  const { data, allowedPiece, category } = props;
+  const redTeams = data.player.filter((player) => player.isRedTeam);
+  const blueTeams = data.player.filter((player) => !player.isRedTeam);
 
-export default function GameWaitingBoard({ player, data, allowedPiece, category, chatHistory }) {
-  // const redTeam = data.player.filter((player) => player.isRedTeam);
-  // const blueTeam = data.player.filter((player) => !player.isRedTeam);
-  const [snackOpen, setSnackOpen] = useState(false);
-  const [snackMessage, setSnackMessage] = useState("");
-  const { redTeam, blueTeam, gameId, gameName, picture, roomSize } = data;
-
-  // 배틀의 경우 [red팀 빈칸 수, blue팀 빈칸 수]
-  // 협동의 경우 방 빈칸 수
-  let emptyPlayerCount = 0;
+  let emptyPlayerCount = [0, 0];
   if (category === "battle") {
-    emptyPlayerCount = [0, 0];
-    emptyPlayerCount[0] = parseInt(roomSize / 2) - redTeam.players.length;
-    emptyPlayerCount[1] = parseInt(roomSize / 2) - blueTeam.players.length;
-  } else if (category === "cooperation") {
-    emptyPlayerCount = roomSize - redTeam.players.length - blueTeam.players.length;
-  }
-
-  let xPlayerCount = 0;
-  if (category === "battle") {
-    xPlayerCount = 4 - parseInt(roomSize / 2);
-  } else if (category === "cooperation") {
-    xPlayerCount = 8 - roomSize;
+    emptyPlayerCount[0] = parseInt(data.maxPlayerCount / 2) - redTeams.length;
+    emptyPlayerCount[1] = parseInt(data.maxPlayerCount / 2) - blueTeams.length;
   }
 
   const makeEmptyPlayer = (count) => {
-    const result = [];
-
-    for (let i = 0; i < count; i++) {
-      result.push(
-        <Grid item xs={3} sx={{ paddingRight: "8px" }}>
-          <EmptyPlayerCard></EmptyPlayerCard>
-        </Grid>,
-      );
-    }
-
-    return result;
-  };
-
-  const makeXPlayer = () => {
-    const result = [];
-
-    for (let i = 0; i < xPlayerCount; i++) {
-      result.push(
-        <Grid item xs={3} sx={{ paddingRight: "8px" }}>
-          <XPlayerCard></XPlayerCard>
-        </Grid>,
-      );
-    }
-
-    return result;
+    return Array(count)
+      .fill(null)
+      .map((_, i) => (
+        <EmptyPlayerCard />
+      ));
   };
 
   const gameStartCallback = () => {
@@ -133,151 +97,215 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
   });
 
   return (
-    <>
-      <ThemeProvider theme={theme}>
-        <Wrapper container={true}>
-          <ColGrid item={true} xs={8}>
-            {/* 방 번호, 방 제목, 인원수 header */}
-            <InnerBox sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              {/* <Typography component="div" variant="subtitle2">
-            {gameId}번방
-          </Typography> */}
-              <Typography component="div" variant="h6">
-                {gameName}
-              </Typography>
-              <Typography component="div" variant="subtitle1" sx={{ marginLeft: "auto" }}>
-                {redTeam.players.length + blueTeam.players.length} / {roomSize}
-              </Typography>
-            </InnerBox>
+    <Wrapper container spacing={4}>
+      <Header>
+        <ButtonGroup>
+          <HeaderButton>
+            <div style={{ textAlign: "center" }}>
+              <img src={LeftArrow} alt="나가기" className="icon" style={{ display: "block", margin: "0 auto" }} />
+              나가기
+            </div>
+          </HeaderButton>
+          <HeaderButton>
+            <div style={{textAlign:"center"}}>
+              <img src={TeamChange} alt="이동" className="icon" style={{display:"block", margin:"0 auto"}} />
+              이동
+            </div>
+          </HeaderButton>
+          <HeaderButton>
+            <div style={{textAlign:"center"}}>
+              <img src={Gear} alt="설정" className="icon" style={{display:"block", margin:"0 auto"}} />
+              설정
+            </div>
+          </HeaderButton>
+          <HeaderButton>
+            <div style={{textAlign:"center"}}>
+              <img src={Invite} alt="초대" className="icon" style={{display:"block", margin:"0 auto"}} />
+              초대
+            </div>
+          </HeaderButton>
+        </ButtonGroup>
+      </Header>
 
-            {/* 대기실에 있는 player들 card */}
-            <InnerBox>
-              {category === "battle" ? (
-                // 왜 여기서 unique key warning이 뜨는지 모르겠음...
-                <Grid container={true} sx={{ marginTop: "2%" }}>
-                  {redTeam.players.map((player) => (
-                    <Grid key={player.id} item={true} xs={3} sx={{ paddingRight: "8px" }}>
-                      <PlayerCard player={player} gameId={gameId} color="red" />
-                    </Grid>
-                  ))}
-                  {makeEmptyPlayer(emptyPlayerCount[0])}
-                  {makeXPlayer()}
-                  {blueTeam.players.map((player) => (
-                    <Grid key={player.id} item={true} xs={3} sx={{ paddingRight: "8px" }}>
-                      <PlayerCard player={player} gameId={gameId} color="blue" />
-                    </Grid>
-                  ))}
-                  {makeEmptyPlayer(emptyPlayerCount[1])}
-                  {makeXPlayer()}
-                </Grid>
-              ) : (
-                // 왜 여기서 unique key warning이 뜨는지 모르겠음...22
-                <Grid container={true} sx={{ marginTop: "2%" }}>
-                  {redTeam.players.map((player) => {
-                    return (
-                      <Grid key={player.id} item={true} xs={3} sx={{ paddingRight: "8px" }}>
-                        <PlayerCard player={player} gameId={gameId} />
-                      </Grid>
-                    );
-                  })}
-                  {makeEmptyPlayer(emptyPlayerCount)}
-                  {makeXPlayer()}
-                </Grid>
-              )}
-            </InnerBox>
+      <Body>
+        <MainSection>
+          <TeamSection>
+            <Team variant="h6" color="blue">파란팀</Team>
+            <TeamGrid>
+              {redTeams.map((player) => (
+                <PlayerCard player={player} color="blue" />
+              ))}
+              {makeEmptyPlayer(emptyPlayerCount[2])}
+              {makeEmptyPlayer(emptyPlayerCount[2])}
+            </TeamGrid>
+          </TeamSection>
 
-            {/* 텍스트 채팅 */}
-            <InnerBox style={{ padding: "1% 2% 0 2%" }}>
-              <Chatting chatHistory={chatHistory} />
-            </InnerBox>
-          </ColGrid>
+          <Versus>VS</Versus>
 
-          {/* 퍼즐 이미지 선택, 피스 수 선택 */}
-          <ColGrid item={true} xs={4}>
-            <SelectImgAndPiece src={picture.encodedString} />
-            {category === "battle" && (
-              <InnerBox>
-                <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
-                  팀 선택
-                </Typography>
+          <TeamSection>
+            <Team variant="h6" color="red">빨간팀</Team>
+            <TeamGrid>
+              {blueTeams.map((player) => (
+                <PlayerCard player={player} color="red" />
+              ))}
+              {makeEmptyPlayer(emptyPlayerCount[2])}
+              {makeEmptyPlayer(emptyPlayerCount[2])}
+            </TeamGrid>
+          </TeamSection>
+        </MainSection>
 
-                <Box sx={{ display: "flex" }}>
-                  {/* 팀 선택 버튼들, 추후 socket 연결하여 플레이어의 팀 정보 수정해야 함 */}
-                  <TeamButton
-                    variant="contained"
-                    color="redTeam"
-                    disableElevation
-                    onClick={() => handleChangeTeam("red")}
-                  >
-                    Red
-                  </TeamButton>
-                  <TeamButton
-                    variant="contained"
-                    color="blueTeam"
-                    disableElevation
-                    onClick={() => handleChangeTeam("blue")}
-                  >
-                    Blue
-                  </TeamButton>
-                </Box>
-              </InnerBox>
-            )}
-            <StartButton
-              variant="contained"
-              size="large"
-              color="purple"
-              onClick={gameStartCallback}
-            >
-              GAME START
-            </StartButton>
-          </ColGrid>
-        </Wrapper>
-
-        <Snackbar
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-          open={snackOpen}
-          autoHideDuration={3000}
-          onClose={handleSnackClose}
-          message={snackMessage}
-        />
-      </ThemeProvider>
-    </>
+        <PuzzleDetails>
+          <PuzzleImage>
+            {/* <img src={data.image} alt="Puzzle" /> */}
+            <img src="https://images.unsplash.com/photo-1731413263252-cbce5c09f8c2?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Puzzle" />
+          </PuzzleImage>
+          <Details style={{borderBottom: "white solid 1px"}}>
+            <Title>{data.title}</Title>
+          </Details>
+          <Details>
+            <Typography variant="subtitle1" style={{fontSize: "35px"}}>아이템전</Typography>
+            <Typography variant="subtitle1" style={{fontSize: "35px"}}>100 피스</Typography>
+            <Typography variant="subtitle1" style={{fontSize: "35px"}}>{data.curPlayerCount}/{data.maxPlayerCount}</Typography>
+            <StartButton>시작</StartButton>
+          </Details>
+        </PuzzleDetails>
+      </Body>
+    </Wrapper>
   );
 }
 
-const Wrapper = styled(Grid)`
-  width: 900px;
-  padding: 1% 2%;
-  margin: 3% auto;
-  background-color: rgba(255, 255, 255, 0.6);
-  border: 1px solid #ccc;
-  border-radius: 20px;
+const Wrapper = styled.div`
+  height: 100%;
+  background-image: url(../../background.png);
+  background-size: cover;
+  background-attachment: fixed;
+  margin: 0 auto;
+  padding: 60px 30px;
+  user-select: none; /* 텍스트 선택 금지 */
 `;
 
-const ColGrid = styled(Grid)`
-  padding: 1.5%;
+const Team = styled.div`
+  width: 70%;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 30px;
+  border-radius: 5px;
+  border: white solid 1px;
+  color: white
+`
+
+const Header = styled.div`
+  align-items: center;
+  width: 100%;
+`;
+
+const HeaderButton = styled(Button)`
+  background-color: white;
+  color: black;
+  height: 100px;
+  padding: 0 40px;
+  position: relative;
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.25);
+
+  &:hover {
+    background-color: orange;
+    color: white;
+
+    /* 호버 시 내부 img 요소에 스타일 적용 */
+    .icon {
+      filter: brightness(0) invert(1); /* 흰색으로 변경 */
+    }
+  }
+
+  .icon {
+    transition: filter 0.3s ease; /* 부드러운 전환 효과 */
+  }
+`;
+
+const Body = styled.div`
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  margin-top: 10px;
+  width: 100%;
+  gap: 30px;
 `;
 
-const InnerBox = styled(Box)`
-  width: 95%;
-  padding: 2% 3%;
-  margin: 5px 0;
-  background-color: rgba(231, 224, 255, 0.7);
-  border: 1px solid #c4b6fb;
-  border-radius: 10px;
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 10px;
 `;
 
-const TeamButton = styled(Button)`
-  width: 50%;
-  margin: 2% 3%;
+const Title = styled.h1`
+  font-weight: bold;
+  font-size: 46px;
+  color: white;
+`;
+
+const MainSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(20px);
+  width: 70%;
+  padding: 60px;
+  border-radius: 5px;
+`;
+
+const TeamSection = styled.div`
+  flex: 1;
+`;
+
+const TeamGrid = styled(Grid)`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 30px 0px 0;
+`;
+
+const Versus = styled.div`
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  margin: auto 60px;
+`;
+
+const PuzzleDetails = styled.div`
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(20px);
+  color: white;
+  padding: 5px;
+  width: 30%;
+  align-items: center;
+  border-radius: 5px;
+`;
+
+const PuzzleImage = styled.div`
+  width: 100%;
+  img {
+    width: 100%;
+  }
+`;
+
+const Details = styled.div`
+  padding: 10px 20px;
+  text-align: left;
 `;
 
 const StartButton = styled(Button)`
-  padding: 5%;
-  font-size: 25px;
+  margin-top: 10px;
+  background-color: orange;
+  color: white;
+  width: 100%;
+  height: 90px;
+  font-size: 35px;
   font-weight: bold;
-  margin-bottom: 5%;
-  margin-top: auto;
+  &:hover {
+    background-color: darkorange;
+  }
 `;
+
+const Divider = styled.div`
+  height: 0;
+  weight: 100%;
+  border-bottom: white solid 1px;
+`

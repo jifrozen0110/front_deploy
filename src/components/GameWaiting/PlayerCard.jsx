@@ -4,60 +4,47 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-// import Divider from "@mui/material/Divider";
-import { red, blue } from "@mui/material/colors";
-// import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
-// import OpenViduAudiocomponent from "@/components/GameIngame/openvidu/OvAudio";
 
 function PlayerCard(props) {
-  let { player, gameId, color } = props;
-  // 필드 없는 값 임시로 채움
-  player = {
-    nickname: player.id,
-    img: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
-    // isCaptain: true,
-    // isReady: true,
-    // isRedTeam: true,
-  };
-  // const state = player.isCaptain ? "방 장" : player.isReady ? "준 비 완 료" : "준 비 중";
+  const { player, color } = props;
+  console.log(player);
 
   return (
     <WrapperCard sx={{ height: "80%" }} className={color}>
       <CardMedia
-        sx={{ width: "80%", height: "70%" }}
+        sx={{ width: "100px", height: "100px" }}
         component="img"
-        alt={player.nickname}
-        image={player.img}
+        alt={player.playerName}
+        image={player.playerImage}
       />
       <Content>
-        <Typography component="div" variant="subtitle1">
-          {player.nickname}
-        </Typography>
-        {/* <Divider sx={{ width: "100%" }} />
-        <State component="div" variant="subtitle2">
+        <Nickname component="div" variant="subtitle1">
+          {player.playerName}
+        </Nickname>
+        {/* <State component="div" variant="subtitle2">
           {state}
         </State> */}
       </Content>
-      {/* <GameOpenVidu gameId={gameId} playerName={player.nickname} /> */}
+      {/* <GameOpenVidu gameId={gameId} playerName={player.playerName} /> */}
     </WrapperCard>
   );
 }
 
 function EmptyPlayerCard() {
   return (
-    <WrapperCard sx={{ height: "80%", minHeight: "120px" }}>
-      <CardContent sx={{ margin: "auto" }}></CardContent>
+    <WrapperCard sx={{backgroundColor: "rgba(0,0,0,0.7)"}}>
+      <CardContent sx={{margin: "auto", color: "#C9C9C9", fontWeight: "bold", fontsize: 20}}>
+        비어 있음
+      </CardContent>
     </WrapperCard>
   );
 }
 
 function XPlayerCard() {
   return (
-    <WrapperCard sx={{ height: "80%", minHeight: "120px", backgroundColor: "#eee" }}>
-      <CardContent sx={{ margin: "auto" }}>
-        <Typography sx={{ color: "#ccc" }} component="div" variant="h1">
-          X
-        </Typography>
+    <WrapperCard sx={{backgroundColor: "rgba(0,0,0,0.7)"}}>
+      <CardContent sx={{margin: "auto", color: "#C9C9C9", fontWeight: "bold", fontsize: 500}}>
+        X
       </CardContent>
     </WrapperCard>
   );
@@ -65,10 +52,13 @@ function XPlayerCard() {
 
 const WrapperCard = styled(Card)`
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100px;
+  background: "rgba(0, 0, 0, 0.7)";
   align-items: center;
-  padding: 10% 0;
-  border-radius: 15px;
+  padding: 20px;
+  border-radius: 10px;
 
   & img {
     border-radius: 10px;
@@ -76,41 +66,62 @@ const WrapperCard = styled(Card)`
 
   background-color: ${(props) => {
     if (props.className === "red") {
-      return red[100];
+      return "#FE5B5E";
     } else if (props.className === "blue") {
-      return blue[100];
+      return "#5BAFFE";
     }
   }};
 `;
 
-const Content = styled(CardContent)`
-  width: 80%;
+const Nickname = styled(Typography)`
+  color: white;
+  font-weight: bold;
+  font-size: 30px;
+`
+
+const Content = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   margin-top: 5px;
-
+  margin-left: 20px;
   &:last-child {
     padding: 0;
   }
 `;
 
-// const State = styled(Typography)`
-//   margin-top: 5px;
-//   color: ${(props) => {
-//     if (props.children === "방 장") {
-//       return "#3f51b5";
-//     } else if (props.children === "준 비 완 료") {
-//       return "#333";
-//     } else {
-//       return "#aaa";
-//     }
-//   }};
-//   font-weight: ${(props) => {
-//     if (props.children === "방 장") {
-//       return "800";
-//     }
-//   }};
-// `;
+const State = styled.div`
+  display: inline-block;
+  padding: 8px 16px;
+  font-size: 18px;
+  font-weight: bold;
+  color: ${(props) => {
+    switch (props.children) {
+      case "방 장":
+        return "white";
+      case "준비 중":
+        return "black";
+      case "준비 완료":
+        return "white";
+      default:
+        return "white";
+    }
+  }};
+  background-color: ${(props) => {
+    switch (props.children) {
+      case "방 장":
+        return "#FF5722";
+      case "준비 중":
+        return "#FFEB3B";
+      case "준비 완료":
+        return "#4CAF50";
+    }
+  }};
+  border-radius: 15px;
+  text-align: center;
+  white-space: nowrap;
+  user-select: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 약간의 그림자 */
+`;
 
 export { PlayerCard, EmptyPlayerCard, XPlayerCard };
