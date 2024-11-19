@@ -28,6 +28,7 @@ export default function BattleGameWaitingPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [roomData, setRoomData] = useState(null);
+  const [playerCount, setPlayerCount] = useState(1);
   const [emptyPlayerCount, setEmptyPlayerCount] = useState([0, 0]);
   const [xPlayerCount, setXPlayerCount] = useState([0, 0]);
 
@@ -42,6 +43,23 @@ export default function BattleGameWaitingPage() {
     playerImage,
     playerName
   });
+  
+  const enterRoom = (roomId) => {
+    console.log("방 입장~");
+    send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const exitRoom = () => {
+    console.log("방 나가기~");
+    send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const switchTeam = () => {
+    console.log("팀 바꾸기~");
+    send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const startGame = () => {
+    console.log("게임 시작~");
+    send(`/pub/room/${roomId}/start`, {}, JSON.stringify(createPlayerRequest()));
+  }
 
   const makeEmptyPlayer = (count) => {
     return Array(count)
@@ -54,24 +72,6 @@ export default function BattleGameWaitingPage() {
       .fill(null)
       .map((_, i) => <XPlayerCard key={`xplayer-${i}`} />);
   };
-
-  const enterRoom = (roomId) => {
-    console.log("방 입장~");
-    send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
-  }
-  const exitRoom = () => {
-    console.log("방 나가기~");
-    setTimeout(() => navigate("/game/battle"), 100);
-    send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
-  }
-  const switchTeam = () => {
-    console.log("팀 바꾸기~");
-    send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
-  }
-  const startGame = () => {
-    console.log("게임 시작~");
-    send(`/pub/room/${roomId}/start`, {}, JSON.stringify(createPlayerRequest()));
-  }
 
   const connectSocket = async (roomId) => {  
     connect(() => {
@@ -128,14 +128,19 @@ export default function BattleGameWaitingPage() {
   const initialize = async () => {
     try {
       const response = await authRequest().get(`/api/rooms/${roomId}`);
+      if (response.data.maxPlayers <= response.data.nowPlayers){
+        alert("방이 꽉 찼습니다.");
+        setTimeout(() => navigate("/game/battle"), 100);
+      }
+
       const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
       setRoomData(response.data);
+      setPlayerCount(response.data.nowPlayers);
       setEmptyPlayerCount([
         Math.max(0, halfPlayers - response.data.redPlayers.length),
         Math.max(0, halfPlayers - response.data.bluePlayers.length),
       ]);
       setXPlayerCount([Math.max(0, 4 - halfPlayers), Math.max(0, 4 - halfPlayers)]);
-      console.log(response.data);
   
       // WebSocket 연결 시도
       await connectSocket(response.data.roomId);
@@ -149,6 +154,10 @@ export default function BattleGameWaitingPage() {
 
   useEffect(() => {
     initialize();
+
+    return() => {
+      exitRoom();
+    }
   }, [roomId]);
 
   if (isLoading) {
@@ -192,52 +201,52 @@ export default function BattleGameWaitingPage() {
         </ButtonGroup>
       </Top>
 
-      <Body>
-        <MainSection>
-          <TeamSection>
-            <Team>파란팀</Team>
-            <TeamGrid>
-              {roomData.bluePlayers.map((player, i) => (
-                <PlayerCard key={`blue-player-${i}`} player={player} color="blue" />
-              ))}
-              {makeEmptyPlayer(emptyPlayerCount[1])}
-              {makeXPlayer(xPlayerCount[1])}
-            </TeamGrid>
-          </TeamSection>
+        <Body>
+          <MainSection>
+            <TeamSection>
+              <Team>파란팀</Team>
+              <TeamGrid>
+                {roomData.bluePlayers.map((player, i) => (
+                  <PlayerCard key={`blue-player-${i}`} player={player} color="blue" />
+                ))}
+                {makeEmptyPlayer(emptyPlayerCount[1])}
+                {makeXPlayer(xPlayerCount[1])}
+              </TeamGrid>
+            </TeamSection>
 
-          <Versus>VS</Versus>
+            <Versus>VS</Versus>
 
-          <TeamSection>
-            <Team>빨간팀</Team>
-            <TeamGrid>
-              {roomData.redPlayers.map((player, i) => (
-                <PlayerCard key={`red-player-${i}`} player={player} color="red" />
-              ))}
-              {makeEmptyPlayer(emptyPlayerCount[0])}
-              {makeXPlayer(xPlayerCount[0])}
-            </TeamGrid>
-          </TeamSection>
-        </MainSection>
+            <TeamSection>
+              <Team>빨간팀</Team>
+              <TeamGrid>
+                {roomData.redPlayers.map((player, i) => (
+                  <PlayerCard key={`red-player-${i}`} player={player} color="red" />
+                ))}
+                {makeEmptyPlayer(emptyPlayerCount[0])}
+                {makeXPlayer(xPlayerCount[0])}
+              </TeamGrid>
+            </TeamSection>
+          </MainSection>
 
-        <PuzzleDetails>
-          <PuzzleImage>
-            <img
-              src="https://images.unsplash.com/photo-1731413263252-cbce5c09f8c2?q=80&w=2940&auto=format&fit=crop"
-              alt="Puzzle"
-            />
-          </PuzzleImage>
-          <Details>
-            <Title>{roomData.roomName}</Title>
-            <Typography variant="subtitle1">{roomData.gameMode}</Typography>
-            <Typography variant="subtitle1">{roomData.puzzlePiece} 피스</Typography>
-            <Typography variant="subtitle1">{roomData.nowPlayers}/{roomData.maxPlayers}</Typography>
-            <StartButton onClick={startGame}>시작</StartButton>
-          </Details>
-        </PuzzleDetails>
-      </Body>
-    </Wrapper>
-  );
-}
+          <PuzzleDetails>
+            <PuzzleImage>
+              <img
+                src="https://images.unsplash.com/photo-1731413263252-cbce5c09f8c2?q=80&w=2940&auto=format&fit=crop"
+                alt="Puzzle"
+              />
+            </PuzzleImage>
+            <Details>
+              <Title>{roomData.roomName}</Title>
+              <Typography variant="subtitle1">{roomData.gameMode}</Typography>
+              <Typography variant="subtitle1">{roomData.puzzlePiece} 피스</Typography>
+              <StartButton onClick={startGame}>시작</StartButton>
+            </Details>
+          </PuzzleDetails>
+        </Body>
+      </Wrapper>
+    );
+  }
+
 
 const Wrapper = styled.div`
   height: 100%;
