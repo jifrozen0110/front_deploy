@@ -42,6 +42,23 @@ export default function BattleGameWaitingPage() {
     playerImage,
     playerName
   });
+  
+  const enterRoom = (roomId) => {
+    console.log("방 입장~");
+    send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const exitRoom = () => {
+    console.log("방 나가기~");
+    send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const switchTeam = () => {
+    console.log("팀 바꾸기~");
+    send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const startGame = () => {
+    console.log("게임 시작~");
+    send(`/pub/room/${roomId}/start`, {}, JSON.stringify(createPlayerRequest()));
+  }
 
   const makeEmptyPlayer = (count) => {
     return Array(count)
@@ -60,9 +77,8 @@ export default function BattleGameWaitingPage() {
       console.log(roomId);
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
 
-      subscribe(`/topic/room${roomId}`, (entranceMessage) => {
-        console.log(entranceMessage)
-
+      subscribe(`/topic/room/${roomId}`, (entranceMessage) => {
+        setRoomData(JSON.parse(entranceMessage.body));
         // if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
         //   data.blueTeam.players.forEach((player) => {
         //     console.log(player);
@@ -83,11 +99,11 @@ export default function BattleGameWaitingPage() {
         //     "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
         //   );
         // } else {
-        //   setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
-        // }
-      });
-      enterRoom(roomId);
-
+          //   setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
+          // }
+        });
+        enterRoom(roomId);
+        
       // subscribe(`/topic/chat/room/${roomId}`, (message) => {
       //   const data = JSON.parse(message.body);
       //   const { userid, chatMessage, time } = data;
@@ -109,6 +125,11 @@ export default function BattleGameWaitingPage() {
   const initialize = async () => {
     try {
       const response = await authRequest().get(`/api/rooms/${roomId}`);
+      if (response.data.maxPlayers <= response.data.nowPlayers){
+        alert("방이 꽉 찼습니다.");
+        setTimeout(() => navigate("/game/battle"), 100);
+      }
+
       const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
       setRoomData(response.data);
       setEmptyPlayerCount([
@@ -116,7 +137,6 @@ export default function BattleGameWaitingPage() {
         Math.max(0, halfPlayers - response.data.bluePlayers.length),
       ]);
       setXPlayerCount([Math.max(0, 4 - halfPlayers), Math.max(0, 4 - halfPlayers)]);
-      console.log(response.data);
   
       // WebSocket 연결 시도
       await connectSocket(response.data.roomId);
@@ -130,6 +150,10 @@ export default function BattleGameWaitingPage() {
 
   useEffect(() => {
     initialize();
+
+    return() => {
+      exitRoom();
+    }
   }, [roomId]);
 
   if (isLoading) {
@@ -142,30 +166,13 @@ export default function BattleGameWaitingPage() {
     );
   }
 
-  const enterRoom = (roomId) => {
-    console.log("방 입장~");
-    send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
-  }
-  const exitRoom = () => {
-    console.log("방 나가기~");
-    setTimeout(() => navigate("/game/battle"), 100);
-    send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
-  }
-  const switchTeam = () => {
-    console.log("팀 바꾸기~");
-    send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
-  }
-  const startGame = () => {
-    console.log("게임 시작~");
-    send(`/pub/room/${roomId}/start`, {}, JSON.stringify(createPlayerRequest()));
-  }
 
 
   return (
     <Wrapper>
       <Top>
         <ButtonGroup>
-          <TopButton onClick={exitRoom}>
+          <TopButton onClick={() => setTimeout(() => navigate("/game/battle"), 100)}>
             <div style={{ textAlign: "center" }}>
               <img src={LeftArrow} alt="나가기" className="icon" style={{ display: "block", margin: "0 auto" }} />
               나가기
