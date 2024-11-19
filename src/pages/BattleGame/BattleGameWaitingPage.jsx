@@ -55,11 +55,12 @@ export default function BattleGameWaitingPage() {
       .map((_, i) => <XPlayerCard key={`xplayer-${i}`} />);
   };
 
-  const connectSocket = async () => {  
+  const connectSocket = async (roomId) => {  
     connect(() => {
+      console.log(roomId);
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
 
-      subscribe(`/topic/room`, (entranceMessage) => {
+      subscribe(`/topic/room${roomId}`, (entranceMessage) => {
         console.log(entranceMessage)
 
         // if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
@@ -85,28 +86,28 @@ export default function BattleGameWaitingPage() {
         //   setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
         // }
       });
+      enterRoom(roomId);
 
-      subscribe(`/topic/chat/room/${roomId}`, (message) => {
-        const data = JSON.parse(message.body);
-        const { userid, chatMessage, time } = data;
-        const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
-        setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
-      });
+      // subscribe(`/topic/chat/room/${roomId}`, (message) => {
+      //   const data = JSON.parse(message.body);
+      //   const { userid, chatMessage, time } = data;
+      //   const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
+      //   setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
+      // });
 
-      // 서버로 메시지 전송
-      send(
-        "/app/room/enter",
-        {},
-        JSON.stringify({
-          roomId: getRoomId(),
-        }),
-      );
+      // // 서버로 메시지 전송
+      // send(
+      //   "/app/room/enter",
+      //   {},
+      //   JSON.stringify({
+      //     roomId: getRoomId(),
+      //   }),
+      // );
     });
   };
 
   const initialize = async () => {
     try {
-      // enterRoom();
       const response = await authRequest().get(`/api/rooms/${roomId}`);
       const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
       setRoomData(response.data);
@@ -118,7 +119,7 @@ export default function BattleGameWaitingPage() {
       console.log(response.data);
   
       // WebSocket 연결 시도
-      await connectSocket();
+      await connectSocket(response.data.roomId);
     } catch (e) {
       if (isAxiosError(e) && e.response?.status >= 400) {
         console.error("방 정보를 불러오지 못했습니다.", e.message);
@@ -141,13 +142,23 @@ export default function BattleGameWaitingPage() {
     );
   }
 
-  const enterRoom = () => send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
+  const enterRoom = (roomId) => {
+    console.log("방 입장~");
+    send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
+  }
   const exitRoom = () => {
+    console.log("방 나가기~");
     setTimeout(() => navigate("/game/battle"), 100);
     send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
   }
-  const switchTeam = () => send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
-  const startGame = () => send(`/pub/room/${roomId}/start`, {}, JSON.stringify(createPlayerRequest()));
+  const switchTeam = () => {
+    console.log("팀 바꾸기~");
+    send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const startGame = () => {
+    console.log("게임 시작~");
+    send(`/pub/room/${roomId}/start`, {}, JSON.stringify(createPlayerRequest()));
+  }
 
 
   return (

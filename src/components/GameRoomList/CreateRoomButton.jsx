@@ -16,12 +16,13 @@ import {
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import { request } from "@/apis/requestBuilder";
+import { authRequest } from "../../apis/requestBuilder";
 
 export default function CreateRoomButton({ category }) {
   const navigate = useNavigate();
   const [roomName, setRoomName] = useState("퍼즐 한 판 !!");
   const [gameMode, setGameMode] = useState("battle"); // Default value
-  const [puzzleImage, setPuzzleImage] = useState("default-image.png"); // Default image
+  const [puzzleImage, setPuzzleImage] = useState("https://images.unsplash.com/photo-1731413263252-cbce5c09f8c2?q=80&w=2940&auto=format&fit=crop"); // Default image
   const [puzzlePiece, setPuzzlePiece] = useState(100); // Default puzzle pieces
   const [maxPlayers, setMaxPlayers] = useState(4); // Default max players
   const [isOpenedModal, setIsOpenedModal] = useState(false);
@@ -73,8 +74,9 @@ export default function CreateRoomButton({ category }) {
     console.log(requestData);
 
     try {
-      const { data } = await request.post("/api/rooms", requestData);
+      const { data } = await authRequest().post("/api/rooms", requestData);
       const { roomId } = data; // Assume roomId is returned
+      console.log(`${roomId} : 방 만들기 성공`);
       navigate(`/game/${category}/waiting/${roomId}`);
     } catch (error) {
       console.error("방 생성에 실패했습니다.", error);

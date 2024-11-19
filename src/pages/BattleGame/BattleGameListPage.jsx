@@ -14,6 +14,7 @@ import { socket } from "../../socket-utils/socket2";
 import { setRoomId, setSender, setTeam } from "../../socket-utils/storage";
 import { deepPurple } from "@mui/material/colors";
 import UserListSidebar from "../../components/GameRoomList/UserListSidebar";
+import { authRequest } from "../../apis/requestBuilder";
 
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -96,7 +97,7 @@ export default function BattleGameListPage() {
   };
 
   const fetchAllRoom = async () => {
-    const res = await request.get(`/api/rooms?page=${pageNumber}`);
+    const res = await authRequest().get(`/api/rooms?page=${pageNumber}`);
     const { data: fetchedRoomList } = res;
     setRoomList(fetchedRoomList);
   };

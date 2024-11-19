@@ -13,7 +13,7 @@ export default function GameCard({ room, category }) {
     <StyledCard onClick={handleCardClick}>
       <CardMedia
         component="img"
-        image="https://via.placeholder.com/151" // 이미지 경로 수정
+        image={room.puzzleImage} // 이미지 경로 수정
         sx={{ width: 100, height: 100, marginLeft: "10px", borderRadius: "8px" }}
       />
       <CardContent
