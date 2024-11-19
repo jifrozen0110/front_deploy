@@ -80,31 +80,43 @@ export default function BattleGameWaitingPage() {
 
       subscribe(`/topic/room/${roomId}`, (message) => {
         const data = JSON.parse(message.body);
+        const halfPlayers = Math.ceil(data.maxPlayers / 2);
+        setRoomData(data);
+        setPlayerCount(data.nowPlayers);
+        setEmptyPlayerCount([
+          Math.max(0, halfPlayers - data.redPlayers.length),
+          Math.max(0, halfPlayers - data.bluePlayers.length),
+        ]);
+        setXPlayerCount([Math.max(0, 4 - halfPlayers), Math.max(0, 4 - halfPlayers)]);
 
         console.log(data);
 
-        if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
-          data.blueTeam.players.forEach((player) => {
-            console.log(player);
-            if (player.id === getSender()) {
-              setTeam("blue");
-            }
-          });
-        }
+        // if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
+        //   data.blueTeam.players.forEach((player) => {
+        //     console.log(player);
+        //     if (player.id === getSender()) {
+        //       setTeam("blue");
+        //     }
+        //   });
+        // }
 
+      });
+
+      subscribe(`/topic/room/${roomId}/game`, message => {
+        const data = JSON.parse(message.body);
         console.log(data.gameId);
         console.log(data.gameId && Boolean(data.isStarted) && !Boolean(data.isFinished));
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (data.gameId && Boolean(data.isStarted) && !Boolean(data.isFinished)) {
+          setGameData(data);
+  
+          setImage(
+            "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+          );
           window.location.replace(`/game/battle/ingame/${data.gameId}`);
           return;
         }
-        setGameData(data);
-
-        setImage(
-          "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
-        );
-      });
+      })
       enterRoom(roomId);
 
       // subscribe(`/topic/chat/room/${roomId}`, (message) => {
@@ -174,7 +186,7 @@ export default function BattleGameWaitingPage() {
     <Wrapper>
       <Top>
         <ButtonGroup>
-          <TopButton onClick={exitRoom}>
+          <TopButton onClick={() => navigate("/game/battle")}>
             <div style={{ textAlign: "center" }}>
               <img
                 src={LeftArrow}
