@@ -21,6 +21,7 @@ import LeftArrow from "@/assets/icons/gameRoom/left_arrow.png";
 import Gear from "@/assets/icons/gameRoom/gear.png";
 import Invite from "@/assets/icons/gameRoom/invite.png";
 import TeamChange from "@/assets/icons/gameRoom/team_change.png";
+import { setTeam } from "../../socket-utils/storage";
 
 const { connect, send, subscribe } = socket;
 
@@ -114,6 +115,7 @@ export default function BattleGameWaitingPage() {
             "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
           );
           window.location.replace(`/game/battle/ingame/${data.gameId}`);
+          // window.location.replace(`/game/battle/ingame/${roomId}`);
           return;
         }
       })

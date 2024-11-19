@@ -109,7 +109,7 @@ const moveTile = () => {
 
       // socket 전송
       send(
-        "/app/game/puzzle",
+        "/pub/game/puzzle",
         {},
         JSON.stringify({
           type: "GAME",
@@ -155,7 +155,7 @@ const findNearTileGroup = () => {
       const puzzleGroup = getPuzzleGroup(event);
       // socket 전송
       send(
-        "/app/game/puzzle",
+        "/pub/game/puzzle",
         {},
         JSON.stringify({
           type: "GAME",
@@ -392,7 +392,7 @@ export const uniteTiles = (
 ) => {
   if (isSender) {
     send(
-      "/app/game/puzzle",
+      "/pub/game/puzzle",
       {},
       JSON.stringify({
         type: "GAME",

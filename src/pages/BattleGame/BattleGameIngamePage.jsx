@@ -27,13 +27,14 @@ import { createPortal } from "react-dom";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { useInventory } from "../../hooks/useInventory";
 import { useSnackbar2 } from "../../hooks/useSnackbar2";
+import { setRoomId, setTeam } from "../../socket-utils/storage";
 
 const { connect, send, subscribe, disconnect } = socket;
 const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece } = configStore;
 
 export default function BattleGameIngamePage() {
   const navigate = useNavigate();
-  const { roomId } = useParams();
+  const { roomId: gameId } = useParams();
   const [gameData, setGameData] = useState(null);
   const [isOpenedDialog, setIsOpenedDialog] = useState(false);
 
@@ -95,6 +96,8 @@ export default function BattleGameIngamePage() {
   };
 
   const initializeGame = (data) => {
+    setTeam(data.blueTeam.some(p => p.playerId === Number(getSender())) ? 'blue' : 'red')
+    setRoomId(data.gameId)
     setGameData(data);
     console.log("gamedata is here!", gameData, data);
   };
@@ -115,7 +118,7 @@ export default function BattleGameIngamePage() {
     connect(
       () => {
         console.log("@@@@@@@@@@@@@@@@ 인게임 소켓 연결 @@@@@@@@@@@@@@@@@@");
-        subscribe(`/topic/game/room/${roomId}`, (message) => {
+        subscribe(`/topic/game/room/${gameId}`, (message) => {
           const data = JSON.parse(message.body);
           console.log(data);
 
@@ -224,7 +227,7 @@ export default function BattleGameIngamePage() {
         });
 
         // 채팅
-        subscribe(`/topic/chat/room/${roomId}`, (message) => {
+        subscribe(`/topic/chat/room/${gameId}`, (message) => {
           const data = JSON.parse(message.body);
           console.log("채팅왔다", data);
           const { userid, chatMessage, time, teamColor } = data;
@@ -234,13 +237,16 @@ export default function BattleGameIngamePage() {
           }
         });
 
+        subscribe(`/topic/game/room/${gameId}/init`, (message) => {
+          const data = JSON.parse(message.body);
+          initializeGame(data);
+        })
+
         // 서버로 메시지 전송
         send(
-          "/app/room/enter",
+          `/pub/${gameId}/game/enter`,
           {},
-          JSON.stringify({
-            roomId: getRoomId(),
-          }),
+          JSON.stringify({}),
         );
       },
       () => {
