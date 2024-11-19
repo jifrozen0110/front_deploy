@@ -55,36 +55,55 @@ export default function BattleGameWaitingPage() {
       .map((_, i) => <XPlayerCard key={`xplayer-${i}`} />);
   };
 
+  const enterRoom = (roomId) => {
+    console.log("방 입장~");
+    send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const exitRoom = () => {
+    console.log("방 나가기~");
+    setTimeout(() => navigate("/game/battle"), 100);
+    send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const switchTeam = () => {
+    console.log("팀 바꾸기~");
+    send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
+  }
+  const startGame = () => {
+    console.log("게임 시작~");
+    send(`/pub/room/${roomId}/start`, {}, JSON.stringify(createPlayerRequest()));
+  }
+
   const connectSocket = async (roomId) => {  
     connect(() => {
       console.log(roomId);
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
 
-      subscribe(`/topic/room${roomId}`, (entranceMessage) => {
+      subscribe(`/topic/room/${roomId}`, (entranceMessage) => {
         console.log(entranceMessage)
+        const data = JSON.parse(entranceMessage.body)
 
-        // if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
-        //   data.blueTeam.players.forEach((player) => {
-        //     console.log(player);
-        //     if (player.id === getSender()) {
-        //       setTeam("blue");
-        //     }
-        //   });
-        // }
+        if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
+          data.blueTeam.players.forEach((player) => {
+            console.log(player);
+            if (player.id === getSender()) {
+              setTeam("blue");
+            }
+          });
+        }
 
         // // 1. 게임이 시작되면 인게임 화면으로 보낸다.
-        // if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
-        //   window.location.replace(`/game/battle/ingame/${data.gameId}`);
-        //   return;
-        // }
-        // setGameData(data);
-        // if (data.picture.encodedString === "짱구.jpg") {
-        //   setImage(
-        //     "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
-        //   );
-        // } else {
-        //   setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
-        // }
+        if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
+          window.location.replace(`/game/battle/ingame/${data.gameId}`);
+          return;
+        }
+        setGameData(data);
+        if (data.picture.encodedString === "짱구.jpg") {
+          setImage(
+            "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+          );
+        } else {
+          setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
+        }
       });
       enterRoom(roomId);
 
@@ -141,25 +160,6 @@ export default function BattleGameWaitingPage() {
       </Wrapper>
     );
   }
-
-  const enterRoom = (roomId) => {
-    console.log("방 입장~");
-    send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
-  }
-  const exitRoom = () => {
-    console.log("방 나가기~");
-    setTimeout(() => navigate("/game/battle"), 100);
-    send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
-  }
-  const switchTeam = () => {
-    console.log("팀 바꾸기~");
-    send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
-  }
-  const startGame = () => {
-    console.log("게임 시작~");
-    send(`/pub/room/${roomId}/start`, {}, JSON.stringify(createPlayerRequest()));
-  }
-
 
   return (
     <Wrapper>
