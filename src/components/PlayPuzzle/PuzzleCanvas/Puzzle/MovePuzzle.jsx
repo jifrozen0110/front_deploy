@@ -60,7 +60,7 @@ const moveTile = () => {
 
       // socket 전송
       send(
-        "/app/game/puzzle",
+        "/pub/game/puzzle",
         {},
         JSON.stringify({
           type: "GAME",
