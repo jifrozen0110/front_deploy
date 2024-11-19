@@ -28,6 +28,7 @@ export default function BattleGameWaitingPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [roomData, setRoomData] = useState(null);
+  const [playerCount, setPlayerCount] = useState(1);
   const [emptyPlayerCount, setEmptyPlayerCount] = useState([0, 0]);
   const [xPlayerCount, setXPlayerCount] = useState([0, 0]);
 
@@ -81,6 +82,7 @@ export default function BattleGameWaitingPage() {
         const data = JSON.parse(entranceMessage.body);
         const halfPlayers = Math.ceil(data.maxPlayers / 2);
         setRoomData(data);
+        setPlayerCount(data.nowPlayers);
         setEmptyPlayerCount([
           Math.max(0, halfPlayers - data.redPlayers.length),
           Math.max(0, halfPlayers - data.bluePlayers.length),
@@ -139,6 +141,7 @@ export default function BattleGameWaitingPage() {
 
       const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
       setRoomData(response.data);
+      setPlayerCount(response.data.nowPlayers);
       setEmptyPlayerCount([
         Math.max(0, halfPlayers - response.data.redPlayers.length),
         Math.max(0, halfPlayers - response.data.bluePlayers.length),
@@ -241,7 +244,6 @@ export default function BattleGameWaitingPage() {
               <Title>{roomData.roomName}</Title>
               <Typography variant="subtitle1">{roomData.gameMode}</Typography>
               <Typography variant="subtitle1">{roomData.puzzlePiece} 피스</Typography>
-              <Typography variant="subtitle1">{roomData.nowPlayers}/{roomData.maxPlayers}</Typography>
               <StartButton onClick={startGame}>시작</StartButton>
             </Details>
           </PuzzleDetails>
@@ -250,6 +252,7 @@ export default function BattleGameWaitingPage() {
     );
   }
 }
+
 const Wrapper = styled.div`
   height: 100%;
   background-image: url(${backgroundPath});
