@@ -169,6 +169,8 @@ const Wrapper = styled.div`
     }
   }};
   border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.6); /* 반투명 배경 */
+  backdrop-filter: blur(40px); /* 블러 효과 */
 
   overflow-y: hidden;
 `;

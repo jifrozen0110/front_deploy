@@ -299,9 +299,9 @@ export default function BattleGameIngamePage() {
 
   return (
     <Wrapper>
-      {/* <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} /> */}
       <LeftSidebar>
-        <Chatting />
+      <Chatting2 chatHistory={chatHistory} isIngame={true} isBattle={true} />
+        {/* <Chatting /> */}
       </LeftSidebar>
       <Row style={{padding: "10px 10px 10px 0", width: "80%"}}>
         <Board id="gameBoard">
@@ -337,17 +337,17 @@ export default function BattleGameIngamePage() {
               </ProgressWrapper>
             </ProgressContainer>
             <Col>
+              <Timer num={time} />
               <ItemContainer>
                 <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
                   아이템
                 </div>
                 </ItemContainer>
-              <Timer num={time} />
-              <MiniMap>
+              {/* <MiniMap>
                 <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
                   미니맵
                 </div>
-              </MiniMap>
+              </MiniMap> */}
             </Col>
           </Row>
         </GameInfo>
