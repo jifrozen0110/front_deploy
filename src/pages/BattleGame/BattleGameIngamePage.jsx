@@ -101,16 +101,20 @@ export default function BattleGameIngamePage() {
     setGameData(data);
     console.log("gamedata is here!", gameData, data);
   };
-
+  
   const changePercent = (data) => {
+    const roundTo = (num, decimals) => {
+      return parseFloat(num.toFixed(decimals));
+    };
+
     if (getTeam() === "red") {
-      setOurPercent(data.redProgressPercent);
-      setEnemyPercent(data.blueProgressPercent);
+      setOurPercent(roundTo(data.redProgressPercent, 2));  // 소수점 두 번째 자리까지 반올림
+      setEnemyPercent(roundTo(data.blueProgressPercent, 2));
     } else {
-      setOurPercent(data.blueProgressPercent);
-      setEnemyPercent(data.redProgressPercent);
+      setOurPercent(roundTo(data.blueProgressPercent, 2));
+      setEnemyPercent(roundTo(data.redProgressPercent, 2));
     }
-  };
+};
 
   // const temp = true;
 
@@ -123,21 +127,21 @@ export default function BattleGameIngamePage() {
           console.log(data);
 
           // console.log(
-          //   data.finished,
-          //   Boolean(data.finished),
+          //   data.isFinished,
+          //   Boolean(data.isFinished),
           //   data.redProgressPercent === 100,
           //   data.blueProgressPercent === 100,
           //   data.time,
           // );
           // console.log(
-          //   Boolean(data.finished) ||
+          //   Boolean(data.isFinished) ||
           //     data.redProgressPercent === 100 ||
           //     data.blueProgressPercent === 100 ||
           //     (data.time !== undefined && data.time <= 0),
           // );
-
+          
           // 매번 게임이 끝났는지 체크
-          if (data.finished === true) {
+          if (data.isFinished === true) {
             // if (temp === true) {
             // disconnect();
             console.log("게임 끝남 !"); // TODO : 게임 끝났을 때 effect
