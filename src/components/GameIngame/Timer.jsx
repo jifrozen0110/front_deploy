@@ -19,11 +19,12 @@ export default function Timer({ num, isCooperation = false }) {
     return tempSec <= 9 ? `0${tempSec}` : String(tempSec);
   }, [num]);
 
-  const teamColor = isCooperation ? deepPurple[300] : getTeam() === "red" ? red[300] : blue[300];
+  const teamColor = isCooperation ? deepPurple[300] : getTeam() === "red" ? red[400] : blue[400];
 
   const TypoStyle = {
-    color: isPressing ? "tomato" : teamColor,
-    fontWeight: isPressing ? 800 : 500,
+    color: isPressing ? "orange" : teamColor,
+    fontWeight: 800,
+    WebkitTextStroke: "2px white", // 글자 테두리
   };
 
   const theme = createTheme({
@@ -44,5 +45,10 @@ export default function Timer({ num, isCooperation = false }) {
 }
 
 const Wrapper = styled.div`
-  margin-bottom: 20px;
+  width: 100%;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.4); /* 반투명 배경 */
+  backdrop-filter: blur(40px); /* 블러 효과 */
+  padding: 25px 0 30px;
+  border-radius: 10px;
 `;

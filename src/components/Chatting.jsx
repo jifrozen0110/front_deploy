@@ -58,7 +58,6 @@ function ChatComponent({chatList, path, defualtData = {}}) {
                 src={ChatSend}
                 alt="채팅"
                 className="icon"
-                style={{ display: "block", margin: "0 auto" }}
             />
         </ChatButton>
       </ChatInputContainer>
@@ -68,7 +67,8 @@ function ChatComponent({chatList, path, defualtData = {}}) {
 
 // 스타일 컴포넌트 정의
 const ChatContainer = styled.div`
-  flex: 0 0 300px; /* 고정된 너비 300px */
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -99,15 +99,17 @@ const Message = styled.div`
 const ChatInputContainer = styled.div`
   display: flex;
   border-top: 1px solid #ddd;
+  box-sizing: border-box;
+  width: 100%;
   padding: 5px;
   background-color: #C6E7FF;
   border-radius: 5px;
 `;
 
 const ChatInput = styled.input`
-  flex: 1;
   box-sizing: border-box;
   height: 30px;
+  width: 100%;
   padding: 8px;
   border-radius: 5px;
   border: 2px solid white;
@@ -119,20 +121,17 @@ const ChatInput = styled.input`
   }
 `;
 
-
 const ChatButton = styled(Button)`
-  margin-left: 10px;
-  padding: 6px;
+  margin-left: 5px;
+  width: 30px;
+  min-width: 10px;
+  padding: 6;
   background-color: white;
   color: black;
   cursor: pointer;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   &:hover {
-    background-color: orange;
-    color: white;
-    .icon {
-      filter: brightness(0) invert(1); /* 흰색으로 변경 */
-    }
+    background-color: rgba(255,255,255, 0.75);
   }
 `;
 

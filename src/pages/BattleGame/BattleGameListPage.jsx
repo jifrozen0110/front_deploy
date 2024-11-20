@@ -187,12 +187,12 @@ export default function BattleGameListPage() {
               <CreateRoomButtonContainer>
                 <CreateRoomButton category="battle" style={{width: "100%"}} />
               </CreateRoomButtonContainer>
-              <ChattingContainer>
-                <Chatting chatList={chatList} path={"/pub/chat/main"}/>
-              </ChattingContainer>
+              <Chatting chatList={chatList} path={"/pub/chat/main"}/>
             </LeftSidebar>
             <GameRoomListBoard category="battle" roomList={roomList} />
-            <UserListSidebar />
+            <RightSidebar>
+              <UserListSidebar />
+            </RightSidebar>
           </ContentContainer>
         </Wrapper>
       )}
@@ -226,8 +226,8 @@ const Wrapper = styled.div`
 
 const CreateRoomButtonContainer = styled.div`
   display: flex;
-  background-color: rgba(255, 255, 255, 0.6); /* 반투명 배경 */
-  backdrop-filter: blur(40px); /* 블러 효과 */
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(40px);
   flex-direction: column;
   padding: 15px; 10px;
   gap: 15px;
@@ -237,18 +237,18 @@ const ContentContainer = styled.div`
   display: flex;
   justify-content: space-between;
   height: calc(100vh - 66px);
-  flex: 1; /* 남은 공간을 채우도록 설정 */
 `;
 
 const LeftSidebar = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%; /* 부모 높이 상속 */
-  flex: 0 0 300px; /* 고정된 너비 */
+  height: 100%;
+  width: 25%;
 `;
 
-const ChattingContainer = styled.div`
+const RightSidebar = styled.div`
   display: flex;
-  height: calc(100vh - 155px);
-  overflow-y: auto; /* 스크롤 가능 */
+  flex-direction: column;
+  height: 100%;
+  width: 25%;
 `;
