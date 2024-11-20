@@ -1,6 +1,5 @@
 import { useMemo, useEffect } from "react";
 import styled from "styled-components";
-
 import { PlayerCard } from "@/components/GameWaiting/PlayerCard";
 import { getTeam, getRoomId } from "@/socket-utils/storage";
 import { addAudio } from "@/puzzle-core/attackItem";
@@ -13,6 +12,7 @@ import loseAudioPath from "@/assets/audio/lose.mp3";
 
 import {
   Box,
+  Button,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -78,29 +78,30 @@ export default function ResultModal({
           <Wrapper>
             <ResultCard
               color={"red"}
-              numOfUsingPositiveItem={numOfUsingItemRed.positiveItem.current}
-              numOfUsingAttackItem={numOfUsingItemRed.attackItem.current}
+              // numOfUsingPositiveItem={numOfUsingItemRed.positiveItem.current}
+              // numOfUsingAttackItem={numOfUsingItemRed.attackItem.current}
               image={image}
               ourPercent={ourPercent}
               enemyPercent={enemyPercent}
             />
             <ResultCard
               color={"blue"}
-              numOfUsingPositiveItem={numOfUsingItemBlue.positiveItem.current}
-              numOfUsingAttackItem={numOfUsingItemBlue.attackItem.current}
+              // numOfUsingPositiveItem={numOfUsingItemBlue.positiveItem.current}
+              // numOfUsingAttackItem={numOfUsingItemBlue.attackItem.current}
               image={image}
               ourPercent={ourPercent}
               enemyPercent={enemyPercent}
             />
           </Wrapper>
           {/* 버튼 추가 */}
-          <button 
+          <Button 
             variant="contained" 
             color="primary"
+            sx={{ width: "100%", height: "50px", padding: "2%", margin: "15% auto" }}
             onClick={navigateToWaitingPage} // Room ID를 포함하여 이동
           >
             게임 대기실로 가기
-          </button>
+          </Button>
           {/* <Grid container sx={{ width: "300px", height: "600px" }}>
             {ourTeam.map((player) => {
               <Grid item xs={3}>
