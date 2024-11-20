@@ -34,7 +34,7 @@ export default function ResultModal({
   numOfUsingItemBlue,
 }) {
   const { image } = useGameInfo();
-
+  const roomId = localStorage.getItem('roomId');
   const theme = createTheme({
     typography: {
       fontFamily: "'Galmuri11', sans-serif",
@@ -65,7 +65,9 @@ export default function ResultModal({
       }
     }
   }, [isOpenedDialog]);
-
+  const navigateToWaitingPage = () => {
+    window.location.replace(`/game/battle/waiting/${roomId}`);
+  }; 
   return (
     <ThemeProvider theme={theme}>
       <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
@@ -91,6 +93,14 @@ export default function ResultModal({
               enemyPercent={enemyPercent}
             />
           </Wrapper>
+          {/* 버튼 추가 */}
+          <button 
+            variant="contained" 
+            color="primary"
+            onClick={navigateToWaitingPage} // Room ID를 포함하여 이동
+          >
+            게임 대기실로 가기
+          </button>
           {/* <Grid container sx={{ width: "300px", height: "600px" }}>
             {ourTeam.map((player) => {
               <Grid item xs={3}>
@@ -142,7 +152,7 @@ function ResultCard({
           alignItems: "center",
         }}
       >
-        <CardHeader $color={color}>{color} Team</CardHeader>
+        {/* <CardHeader $color={color}>{color} Team</CardHeader>
         <CardContent>
           <p>
             <NumSpan>{numOfUsingPositiveItem}번</NumSpan> 도움 아이템 (힌트, 자석, 액자)를
@@ -152,7 +162,7 @@ function ResultCard({
             <NumSpan>{numOfUsingAttackItem}번</NumSpan> 방해 아이템 (불 지르기, 로켓, 회오리)를
             사용했어요!
           </p>
-        </CardContent>
+        </CardContent> */}
       </Card>
     </CardWrapper>
   );
