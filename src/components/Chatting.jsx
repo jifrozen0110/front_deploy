@@ -55,8 +55,6 @@ const ChatContainer = styled.div`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  height: 100%; /* 화면 전체 높이 */
-  width: 300px;
   overflow: hidden;
   padding: 15px 10px;
   background-color: rgba(255, 255, 255, 0.6); /* 반투명 배경 */

@@ -85,16 +85,12 @@ export default function GameRoomListBoard({ category, roomList }) {
 
 const Wrapper = styled.div`
   width: 950px;
-  margin: 1% auto 5% auto;
-  background-color: rgba(255, 255, 255, 0.6);
   border-radius: 20px;
-  padding: 3%;
-  padding-bottom: 2%;
-  border: 1px solid #ccc;
+  padding: 20px 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 10px;
 `;
 
 const EmptyCard = styled(Card)`
