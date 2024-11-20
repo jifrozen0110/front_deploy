@@ -19,11 +19,12 @@ export default function Timer({ num, isCooperation = false }) {
     return tempSec <= 9 ? `0${tempSec}` : String(tempSec);
   }, [num]);
 
-  const teamColor = isCooperation ? deepPurple[300] : getTeam() === "red" ? red[300] : blue[300];
+  const teamColor = isCooperation ? deepPurple[300] : getTeam() === "red" ? red[400] : blue[400];
 
   const TypoStyle = {
-    color: isPressing ? "tomato" : teamColor,
-    fontWeight: isPressing ? 800 : 500,
+    color: isPressing ? "orange" : teamColor,
+    fontWeight: 800,
+    WebkitTextStroke: "2px white", // 글자 테두리
   };
 
   const theme = createTheme({

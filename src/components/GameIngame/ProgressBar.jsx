@@ -1,8 +1,10 @@
 import styled from "styled-components";
 import LinearProgress from "@mui/material/LinearProgress";
+import { getTeam } from "@/socket-utils/storage";
+import { red, blue, deepPurple } from "@mui/material/colors";
 
 export default function PrograssBar({ percent, isEnemy }) {
-  const barColor = isEnemy ? "#FF8888" : "#FFDB95";
+  const barColor = getTeam() === "red" ? red[400] : blue[400];
 
   return (
     <BorderLinearProgress
