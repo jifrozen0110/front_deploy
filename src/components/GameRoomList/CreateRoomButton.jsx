@@ -64,9 +64,11 @@ export default function CreateRoomButton({ category }) {
 
     const requestData = {
       roomName,
-      gameMode,
+      // gameMode,
+      gameMode : 'battle',
       puzzleImage,
-      puzzlePiece,
+      // puzzlePiece,
+      puzzlePiece : 100,
       maxPlayers,
       playerId,
       playerImage,
@@ -201,7 +203,7 @@ export default function CreateRoomButton({ category }) {
                 sx={{ width: "100%" }}
               />
             </Grid>
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <FormControl>
                 <FormLabel id="radio-game-mode">게임 모드</FormLabel>
                 <RadioGroup row value={gameMode} onChange={handleGameMode}>
@@ -222,7 +224,7 @@ export default function CreateRoomButton({ category }) {
                   <FormControlLabel value={500} control={<Radio />} label="500" />
                 </RadioGroup>
               </FormControl>
-            </Grid>
+            </Grid> */}
             <Grid item xs={9}>
               <FormControl>
                 <FormLabel id="radio-room-size">최대 인원수</FormLabel>

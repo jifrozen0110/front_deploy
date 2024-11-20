@@ -1,4 +1,4 @@
-import { useEffect, useState,useMemo } from "react";
+import { useEffect, useState,useMemo, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { IconButton, Button, createTheme, ThemeProvider } from "@mui/material";
@@ -16,6 +16,7 @@ import { setRoomId, setSender, setTeam } from "../../socket-utils/storage";
 import { deepPurple } from "@mui/material/colors";
 import UserListSidebar from "../../components/GameRoomList/UserListSidebar";
 import { authRequest } from "../../apis/requestBuilder";
+import music from "@/assets/audio/wait_game.mp3"
 
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -93,7 +94,8 @@ export default function BattleGameListPage() {
   const [roomList, setRoomList] = useState(null);
   const [pageNumber, setPageNumber] = useState(0);
   const isLoading = useMemo(() => roomList === null, [roomList]);
-
+  const audioTag = useRef(null)
+  const [chatList, setChatList] = useState([])
 
   const refetchAllRoom = () => {
     fetchAllRoom();
@@ -107,6 +109,13 @@ export default function BattleGameListPage() {
 
   useEffect(() => {
     fetchAllRoom();
+    audioTag.current.muted = false
+    connect(() => {
+      subscribe('/topic/chat/main', message => {
+        const data = JSON.parse(message.body)
+        setChatList(preChatList => [...preChatList, data])
+      })
+    })
   }, []);
 
   useEffect(() => {
@@ -163,6 +172,7 @@ export default function BattleGameListPage() {
   };
   return (
     <>
+      <audio ref={audioTag} src={music} autoPlay loop muted></audio>
       {isLoading ? (
         <Wrapper>
           <Header />
@@ -178,7 +188,7 @@ export default function BattleGameListPage() {
                 <CreateRoomButton category="battle" style={{width: "100%"}} />
               </CreateRoomButtonContainer>
               <ChattingContainer>
-                <Chatting />
+                <Chatting chatList={chatList} path={"/pub/chat/main"}/>
               </ChattingContainer>
             </LeftSidebar>
             <GameRoomListBoard category="battle" roomList={roomList} />

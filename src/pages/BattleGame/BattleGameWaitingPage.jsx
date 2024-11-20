@@ -39,6 +39,7 @@ export default function BattleGameWaitingPage() {
   const playerName = localStorage.getItem("userName");
   const { setImage } = useGameInfo();
   const isLoading = useMemo(() => roomData === null, [roomData]);
+  const [chatList, setChatList] = useState([])
 
   const createPlayerRequest = () => ({
     playerId,
@@ -109,7 +110,7 @@ export default function BattleGameWaitingPage() {
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (data.gameId && Boolean(data.isStarted) && !Boolean(data.isFinished)) {
           setGameData(data);
-  
+          
           setImage(
             "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
           );
@@ -119,6 +120,12 @@ export default function BattleGameWaitingPage() {
           return;
         }
       })
+
+      subscribe(`/topic/chat/room/${roomId}`, message => {
+        const data = JSON.parse(message.body)
+        setChatList(preChatList => [...preChatList, data])
+      })
+
       enterRoom(roomId);
 
       // subscribe(`/topic/chat/room/${roomId}`, (message) => {
@@ -187,7 +194,9 @@ export default function BattleGameWaitingPage() {
   return (
     <Wrapper>
       {/* 왼쪽 채팅 */}
-      <Chatting />
+      <Chatting chatList={chatList} 
+                path={"/pub/chat/room"} 
+                defualtData={{roomId, roomName:roomData.roomName}}/>
   
       {/* 나머지 콘텐츠 */}
       <div style={{ padding: "60px 30px", height: "100%", boxSizing: "border-box"}}>
