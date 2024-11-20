@@ -154,7 +154,7 @@ export default function CreateRoomButton({ category }) {
   });
 
   return (
-    <ThemeProvider theme={theme} style={{width: "100%"}}>
+    <ThemeProvider theme={theme}>
       <CreateButton onClick={() => setIsOpenedModal(true)}>
         방 만들기
       </CreateButton>
@@ -253,6 +253,7 @@ export default function CreateRoomButton({ category }) {
 const CreateButton = styled(Button)`
   height: 60px;
   background-color: orange;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   color: white;
   &:hover {
     background-color: darkorange;

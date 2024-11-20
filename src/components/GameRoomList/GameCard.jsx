@@ -14,7 +14,7 @@ export default function GameCard({ room, category }) {
       <CardMedia
         component="img"
         image={room.puzzleImage} // 이미지 경로 수정
-        sx={{ width: 100, height: 100, marginLeft: "10px", borderRadius: "8px" }}
+        sx={{ width: 80, height: 80, marginLeft: "10px", borderRadius: "8px" }}
       />
       <CardContent
         sx={{
@@ -53,8 +53,9 @@ export default function GameCard({ room, category }) {
 
 const StyledCard = styled(Button)`
   display: flex;
-  padding: 25px 20px;
+  padding: 15px 10px;
   width: 100%;
+  height: 100%;
   background-color: #42a5f5; // 파란색 배경
   border-radius: 8px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);

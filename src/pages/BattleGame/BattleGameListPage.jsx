@@ -204,7 +204,7 @@ const Wrapper = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    backdrop-filter: blur(20px); /* 블러 효과 추가 */
+    backdrop-filter: blur(5px); /* 블러 효과 추가 */
     z-index: 0; /* 배경 위에 위치 */
   }
 
@@ -225,6 +225,8 @@ const CreateRoomButtonContainer = styled.div`
 
 const ContentContainer = styled.div`
   display: flex;
+  justify-content: space-between;
+  height: calc(100vh - 66px);
   flex: 1; /* 남은 공간을 채우도록 설정 */
 `;
 

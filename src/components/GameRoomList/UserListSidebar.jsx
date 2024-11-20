@@ -20,6 +20,7 @@ const SidebarButton = styled(Button)`
   cursor: pointer;
   font-size: 1rem;
   width: 100%;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   
   &:hover {
     background-color: darkorange;
@@ -52,7 +53,6 @@ const RightSidebar = styled.div`
   backdrop-filter: blur(40px); /* 블러 효과 */
   padding: 20px;
   box-sizing: border-box;
-  height: 840px;
   width: 360px;
 `;
 
@@ -60,7 +60,6 @@ const UserListSidebar = ({ selectedCategory, setSelectedCategory }) => {
   return (
     <RightSidebar>
       <div style={{display : "flex", gap:"10px"}}>
-      <SidebarButton>유저 목록</SidebarButton>
       <SidebarButton>친구 목록</SidebarButton>
       </div>
       <CategoryList>
