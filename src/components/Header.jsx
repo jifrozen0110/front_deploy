@@ -94,5 +94,4 @@ export default function Header({parentUpdate}) {
 const HeaderBar = styled(AppBar)`
   position: static;
   background-color: /* #c4b6fb */ white;
-  margin-bottom:20px;
 `;

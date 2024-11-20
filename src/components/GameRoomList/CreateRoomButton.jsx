@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import {
   Button,
   Modal,
@@ -154,9 +155,9 @@ export default function CreateRoomButton({ category }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <Button variant="outlined" onClick={() => setIsOpenedModal(true)}>
+      <CreateButton onClick={() => setIsOpenedModal(true)}>
         방 만들기
-      </Button>
+      </CreateButton>
       <Modal
         open={isOpenedModal}
         onClose={handleClose}
@@ -248,3 +249,13 @@ export default function CreateRoomButton({ category }) {
     </ThemeProvider>
   );
 }
+
+const CreateButton = styled(Button)`
+  height: 60px;
+  background-color: orange;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+  color: white;
+  &:hover {
+    background-color: darkorange;
+  }
+`;
