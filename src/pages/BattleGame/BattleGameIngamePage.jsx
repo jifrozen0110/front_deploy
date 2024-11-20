@@ -6,7 +6,8 @@ import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";
 import Timer from "@/components/GameIngame/Timer";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
-import Chatting from "@/components/GameWaiting/Chatting";
+import Chatting2 from "@/components/GameWaiting/Chatting";
+import Chatting from "@/components/Chatting";
 import ResultModal from "@/components/GameIngame/ResultModal";
 
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
@@ -15,8 +16,7 @@ import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { configStore } from "@/puzzle-core";
 import { updateGroupByBundles } from "@/puzzle-core/utils";
 
-import redTeamBackgroundPath from "@/assets/backgrounds/background.png";
-import blueTeamBackgroundPath from "@/assets/backgrounds/background.gif";
+import BackgroundPath from "@/assets/backgrounds/background2.png";
 
 import { Box, Dialog, DialogTitle, DialogContent, Snackbar } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -295,37 +295,59 @@ export default function BattleGameIngamePage() {
 
   return (
     <Wrapper>
-      <Board id="gameBoard">
-        <PlayPuzzle
-          category="battle"
-          shapes={parsePuzzleShapes(
-            gameData[`${getTeam()}Puzzle`].board,
-            gameData.picture.widthPieceCnt,
-            gameData.picture.lengthPieceCnt,
-          )}
-          board={gameData[`${getTeam()}Puzzle`].board}
-          picture={gameData.picture}
-        />
-        <Row>
-          <ProgressWrapper>
-            <PrograssBar percent={ourPercent} isEnemy={false} />
-          </ProgressWrapper>
-          <ProgressWrapper>
-            <PrograssBar percent={enemyPercent} isEnemy={true} />
-          </ProgressWrapper>
-        </Row>
-
-        <Col>
-          <Timer num={time} />
-          <h3>이 그림을 맞춰주세요!</h3>
+      {/* <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} /> */}
+      <LeftSidebar>
+        <Chatting />
+      </LeftSidebar>
+      <Row style={{padding: "10px 10px 10px 0", width: "80%"}}>
+        <Board id="gameBoard">
+          <PlayPuzzle
+            category="battle"
+            shapes={parsePuzzleShapes(
+              gameData[`${getTeam()}Puzzle`].board,
+              gameData.picture.widthPieceCnt,
+              gameData.picture.lengthPieceCnt,
+            )}
+            board={gameData[`${getTeam()}Puzzle`].board}
+            picture={gameData.picture}
+          />
+        </Board>
+        <GameInfo>
           <img
             src={pictureSrc}
             alt="퍼즐 그림"
-            style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
+            style={{ width: "100%" }}
           />
-          <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} />
-        </Col>
-      </Board>
+          <OtherTeam>
+            <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
+              상대팀 화면
+            </div>
+          </OtherTeam>
+          <Row>
+            <ProgressContainer>
+              <ProgressWrapper>
+                <PrograssBar percent={ourPercent} isEnemy={false} />
+              </ProgressWrapper>
+              <ProgressWrapper>
+                <PrograssBar percent={enemyPercent} isEnemy={true} />
+              </ProgressWrapper>
+            </ProgressContainer>
+            <Col>
+              <ItemContainer>
+                <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
+                  아이템
+                </div>
+                </ItemContainer>
+              <Timer num={time} />
+              <MiniMap>
+                <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
+                  미니맵
+                </div>
+              </MiniMap>
+            </Col>
+          </Row>
+        </GameInfo>
+      </Row>
 
       {getTeam() === "red" ? (
         <>
@@ -398,43 +420,98 @@ export default function BattleGameIngamePage() {
 }
 
 const Wrapper = styled.div`
+  display: flex; /* Flex 컨테이너 */
+  justify-content: space-between;
   height: 100vh;
-  min-height: 1000px;
-  background-image: ${getTeam() === "red"
-    ? `url(${redTeamBackgroundPath})`
-    : `url(${blueTeamBackgroundPath})`};
+  background-image: url(${BackgroundPath});
+  background-size: cover;
+  background-attachment: fixed;
+  margin: 0 auto;
+  gap: 10px;
+  user-select: none; /* 텍스트 선택 금지 */
+`;
+
+const LeftSidebar = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 20%;
+`;
+
+const ProgressContainer = styled.div`
+  display: flex;
+  gap: 10px;
 `;
 
 const Row = styled(Box)`
   display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
   height: 100%;
-  margin-left: 10px;
+  width: 100%;
+  gap: 10px;
 `;
 
 const Col = styled(Box)`
   display: flex;
-  flex-grow: 1;
   flex-direction: column;
+  box-sizing: border-box;
+  gap: 10px;
+  flex-grow: 1;
   align-items: center;
-  margin-left: 10px;
+`;
+
+const GameInfo = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  gap: 10px;
+  width: 30%;
+  align-items: center;
+`;
+
+const OtherTeam = styled.div`
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  height: 300px;
+  background-color: white;
 `;
 
 const Board = styled.div`
-  width: 1320px;
-  height: 754px;
+  width: 70%;
+  height: 100%;
   display: flex;
-  position: relative;
-  top: 50px;
-  margin: auto;
-  padding: 2%;
-  padding-right: 1.5%;
-  border-radius: 20px;
-  border: 3px solid ${getTeam() === "red" ? red[400] : blue[400]};
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 6px solid ${getTeam() === "red" ? red[400] : blue[400]};
   background-color: rgba(255, 255, 255, 0.8);
 `;
 
+const ItemContainer = styled.div`
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 4px solid white;
+  background-color: ${getTeam() === "red" ? red[400] : blue[400]};
+`;
+
+const MiniMap = styled.div`
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  background-color: white;
+`
+
 const ProgressWrapper = styled(Box)`
-  margin: 0 1px;
   display: inline-block;
   transform: rotate(180deg);
 `;

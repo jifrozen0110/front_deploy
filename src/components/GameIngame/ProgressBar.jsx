@@ -9,8 +9,7 @@ export default function PrograssBar({ percent, isEnemy }) {
       variant="determinate"
       value={percent}
       sx={{
-        borderRadius: "8px",
-        backgroundColor: "#385682",
+        backgroundColor: "white",
         "& span.MuiLinearProgress-bar": {
           transform: `translateY(-${100 - percent}%) !important`,
           backgroundColor: barColor,
@@ -22,7 +21,6 @@ export default function PrograssBar({ percent, isEnemy }) {
 }
 
 const BorderLinearProgress = styled(LinearProgress)`
-  width: 40px;
-  height: 750px;
-  border-radius: 8px;
+  width: 20px;
+  height: 100%;
 `;

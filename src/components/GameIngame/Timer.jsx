@@ -44,5 +44,10 @@ export default function Timer({ num, isCooperation = false }) {
 }
 
 const Wrapper = styled.div`
-  margin-bottom: 20px;
+  width: 100%;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.4); /* 반투명 배경 */
+  backdrop-filter: blur(40px); /* 블러 효과 */
+  padding: 25px 0 30px;
+  border-radius: 10px;
 `;
