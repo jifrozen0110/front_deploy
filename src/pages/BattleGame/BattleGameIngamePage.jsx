@@ -330,10 +330,10 @@ export default function BattleGameIngamePage() {
           <Row>
             <ProgressContainer>
               <ProgressWrapper>
-                <PrograssBar percent={ourPercent} isEnemy={false} />
+                <PrograssBar percent={ourPercent} teamColor={getTeam() === "red"? "red":"blue"} />
               </ProgressWrapper>
               <ProgressWrapper>
-                <PrograssBar percent={enemyPercent} isEnemy={true} />
+                <PrograssBar percent={enemyPercent} teamColor={getTeam() !== "red"? "red":"blue"} />
               </ProgressWrapper>
             </ProgressContainer>
             <Col>

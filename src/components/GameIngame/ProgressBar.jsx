@@ -3,8 +3,8 @@ import LinearProgress from "@mui/material/LinearProgress";
 import { getTeam } from "@/socket-utils/storage";
 import { red, blue, deepPurple } from "@mui/material/colors";
 
-export default function PrograssBar({ percent, isEnemy }) {
-  const barColor = getTeam() === "red" ? red[400] : blue[400];
+export default function PrograssBar({ percent, teamColor }) {
+  const barColor = teamColor === "red" ? red[400] : blue[400];
 
   return (
     <BorderLinearProgress
