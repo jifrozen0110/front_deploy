@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import Button from "@mui/material/Button";
+import ChatSend from "@/assets/icons/chat_send.png";
 
 function ChatComponent() {
   const [messages, setMessages] = useState([]); // 메시지 목록
@@ -35,7 +36,14 @@ function ChatComponent() {
           onChange={(e) => setInput(e.target.value)}
           placeholder="메시지를 입력하세요..."
         />
-        <ChatButton onClick={handleSendMessage}>전송</ChatButton>
+        <ChatButton onClick={handleSendMessage}>
+            <img
+                src={ChatSend}
+                alt="채팅"
+                className="icon"
+                style={{ display: "block", margin: "0 auto" }}
+            />
+        </ChatButton>
       </ChatInputContainer>
     </ChatContainer>
   );
@@ -46,6 +54,7 @@ const ChatContainer = styled.div`
   flex: 0 0 300px; /* 고정된 너비 300px */
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
   height: 100%; /* 화면 전체 높이 */
   width: 300px;
   overflow: hidden;
@@ -82,21 +91,33 @@ const ChatInputContainer = styled.div`
 
 const ChatInput = styled.input`
   flex: 1;
+  box-sizing: border-box;
+  height: 30px;
   padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
+  border-radius: 5px;
+  border: 2px solid white;
+  transition: border-color 0.3s ease; /* 부드러운 전환 효과 */
+
+  &:focus {
+    border-color: orange; /* 포커스 상태에서 테두리 색 변경 */
+    outline: none; /* 기본 outline 제거 */
+  }
 `;
+
 
 const ChatButton = styled(Button)`
   margin-left: 10px;
-  padding: 8px 12px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
+  padding: 6px;
+  background-color: white;
+  color: black;
   cursor: pointer;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   &:hover {
-    background-color: #007bff;
+    background-color: orange;
+    color: white;
+    .icon {
+      filter: brightness(0) invert(1); /* 흰색으로 변경 */
+    }
   }
 `;
 

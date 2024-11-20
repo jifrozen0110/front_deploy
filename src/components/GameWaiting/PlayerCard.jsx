@@ -10,9 +10,9 @@ function PlayerCard(props) {
   console.log(player);
 
   return (
-    <WrapperCard sx={{ height: "80%" }} className={color}>
+    <WrapperCard className={color}>
       <CardMedia
-        sx={{ width: "100px", height: "100px" }}
+        sx={{ width: "60px", height: "60px" }}
         component="img"
         alt={player.playerName}
         image={player.playerImage}
@@ -43,9 +43,9 @@ function EmptyPlayerCard() {
 function XPlayerCard() {
   return (
     <WrapperCard sx={{backgroundColor: "rgba(0,0,0,0.7)"}}>
-      <CardContent sx={{margin: "auto", color: "#C9C9C9", fontWeight: "bold", fontsize: 500}}>
+      <XContent>
         X
-      </CardContent>
+      </XContent>
     </WrapperCard>
   );
 }
@@ -54,10 +54,11 @@ const WrapperCard = styled(Card)`
   display: flex;
   justify-content: space-between;
   width: 100%;
-  height: 100px;
+  max-width: 400px;
+  height: 60px;
   background: "rgba(0, 0, 0, 0.7)";
   align-items: center;
-  padding: 20px;
+  padding: 10px;
   border-radius: 10px;
 
   & img {
@@ -76,7 +77,7 @@ const WrapperCard = styled(Card)`
 const Nickname = styled(Typography)`
   color: white;
   font-weight: bold;
-  font-size: 30px;
+  font-size: 20px;
 `
 
 const Content = styled.div`
@@ -88,6 +89,17 @@ const Content = styled.div`
   &:last-child {
     padding: 0;
   }
+`;
+
+const XContent = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  color: #C9C9C9;
+  line-height: 1;
+  padding-bottom: 5px;
+  font-size: 40px;
 `;
 
 const State = styled.div`
