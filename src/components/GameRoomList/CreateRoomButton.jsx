@@ -23,7 +23,7 @@ export default function CreateRoomButton({ category }) {
   const navigate = useNavigate();
   const [roomName, setRoomName] = useState("퍼즐 한 판 !!");
   const [gameMode, setGameMode] = useState("battle"); // Default value
-  const [puzzleImage, setPuzzleImage] = useState("https://images.unsplash.com/photo-1731413263252-cbce5c09f8c2?q=80&w=2940&auto=format&fit=crop"); // Default image
+  const [puzzleImage, setPuzzleImage] = useState("https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp"); // Default image
   const [puzzlePiece, setPuzzlePiece] = useState(100); // Default puzzle pieces
   const [maxPlayers, setMaxPlayers] = useState(4); // Default max players
   const [isOpenedModal, setIsOpenedModal] = useState(false);
