@@ -53,16 +53,14 @@ export default function GameRoomListBoard({ category, roomList }) {
   return (
     <ThemeProvider theme={theme}>
       <Wrapper>
-        <Grid container spacing={2}>
-          {rooms.map((room) => {
-            return (
-              <Grid item xs={6} key={room.roomId}>
-                <GameCard room={room} category={category} />
-              </Grid>
-            );
-          })}
+        <GridContainer>
+          {rooms.map((room) => (
+            <Grid item xs={6} key={room.roomId}>
+              <GameCard room={room} category={category} />
+            </Grid>
+          ))}
           {makeEmptyRooms(rooms)}
-        </Grid>
+        </GridContainer>
         <Pagination
           page={page}
           count={totalPage}
@@ -72,8 +70,9 @@ export default function GameRoomListBoard({ category, roomList }) {
           renderItem={(item) => (
             <PaginationItem
               component={Link}
-              to={`/game/${category}${item.page === 1 ? "" : `?page=${item.page-1}`}`}
-              // to={`/api/rooms${page === 0 ? "" : `?page=${page}`}`}
+              to={`/game/${category}${
+                item.page === 1 ? "" : `?page=${item.page - 1}`
+              }`}
               {...item}
             />
           )}
@@ -84,21 +83,39 @@ export default function GameRoomListBoard({ category, roomList }) {
 }
 
 const Wrapper = styled.div`
-  width: 950px;
-  margin: 1% auto 5% auto;
-  background-color: rgba(255, 255, 255, 0.6);
+  width: 100%;
+  height: 100%;
   border-radius: 20px;
-  padding: 3%;
-  padding-bottom: 2%;
-  border: 1px solid #ccc;
+  padding: 20px 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 10px;
+  box-sizing: border-box;
+`;
+
+const GridContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2개의 열 */
+  grid-auto-rows: 1fr; /* 행 높이를 유연하게 설정 */
+  gap: 10px;
+  width: 100%;
+  height: 100%; /* 부모 컨테이너 높이를 채움 */
 `;
 
 const EmptyCard = styled(Card)`
-  width: 460px;
-  height: 150px;
-  background-color: rgba(238, 238, 238, 0.2);
+  width: 100%;
+  height: 100%; /* 부모 컨테이너의 높이를 채움 */
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.2); /* 반투명 배경 */
+  backdrop-filter: blur(40px); /* 블러 효과 */
+`;
+
+const GameCardStyled = styled(Card)`
+  width: 100%;
+  height: 100%; /* 부모 컨테이너의 높이를 채움 */
+  background-color: #42a5f5;
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 `;

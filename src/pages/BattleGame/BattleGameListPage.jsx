@@ -5,6 +5,7 @@ import { IconButton, Button, createTheme, ThemeProvider } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Chatting from "@/components/Chatting";
 import CreateRoomButton from "@/components/GameRoomList/CreateRoomButton";
 import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
 import { request } from "@/apis/requestBuilder";
@@ -162,35 +163,82 @@ export default function BattleGameListPage() {
   };
   return (
     <>
-    {isLoading
-    ? <Wrapper>
-        <Header />
-        <div>Loading...</div>
-        <Footer />
-      </Wrapper>
-    : <Wrapper>
-        <Header />
-        <div style={{ display: "flex", alignItems: "center", width: "950px", margin: "3% auto 0 auto" }}>
-          <h1>배틀 플레이</h1>
-          <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginRight: "auto" }}>
-            <RefreshIcon />
-          </IconButton>
-
-          <CreateRoomButton category="battle" />
-        </div>
-        <div style={{display : "flex"}}>
-          <GameRoomListBoard category="battle" roomList={roomList} />
-          <UserListSidebar />
-        </div>
-        <Footer />
-      </Wrapper>}
+      {isLoading ? (
+        <Wrapper>
+          <Header />
+          <div>Loading...</div>
+          <Footer />
+        </Wrapper>
+      ) : (
+        <Wrapper>
+          <Header />
+          <ContentContainer>
+            <LeftSidebar>
+              <CreateRoomButtonContainer>
+                <CreateRoomButton category="battle" style={{width: "100%"}} />
+              </CreateRoomButtonContainer>
+              <ChattingContainer>
+                <Chatting />
+              </ChattingContainer>
+            </LeftSidebar>
+            <GameRoomListBoard category="battle" roomList={roomList} />
+            <UserListSidebar />
+          </ContentContainer>
+        </Wrapper>
+      )}
     </>
-  );
+  );  
 }
 
 const Wrapper = styled.div`
-  height: 100%;
+  position: relative;
+  height: 100vh;
   background-image: url(${backgroundPath});
   background-size: cover;
   background-attachment: fixed;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    backdrop-filter: blur(5px); /* 블러 효과 추가 */
+    z-index: 0; /* 배경 위에 위치 */
+  }
+
+  > * {
+    position: relative; /* 자식 요소를 블러 바깥으로 제외 */
+    z-index: 1;
+  }
+`;
+
+const CreateRoomButtonContainer = styled.div`
+  display: flex;
+  background-color: rgba(255, 255, 255, 0.6); /* 반투명 배경 */
+  backdrop-filter: blur(40px); /* 블러 효과 */
+  flex-direction: column;
+  padding: 15px; 10px;
+  gap: 15px;
+`
+
+const ContentContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  height: calc(100vh - 66px);
+  flex: 1; /* 남은 공간을 채우도록 설정 */
+`;
+
+const LeftSidebar = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* 부모 높이 상속 */
+  flex: 0 0 300px; /* 고정된 너비 */
+`;
+
+const ChattingContainer = styled.div`
+  display: flex;
+  height: calc(100vh - 155px);
+  overflow-y: auto; /* 스크롤 가능 */
 `;

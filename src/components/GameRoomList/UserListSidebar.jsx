@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import Button from "@mui/material/Button";
 
 const CATEGORIES = [
   { id: "moon", label: "문어" },
@@ -9,8 +10,8 @@ const CATEGORIES = [
   { id: "inuyasha", label: "이누야샤" },
 ];
 
-const SidebarButton = styled.button`
-  background-color: #f2994a;
+const SidebarButton = styled(Button)`
+  background-color: orange;
   color: white;
   padding: 10px;
   border: none;
@@ -19,9 +20,10 @@ const SidebarButton = styled.button`
   cursor: pointer;
   font-size: 1rem;
   width: 100%;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   
   &:hover {
-    background-color: #e07b24;
+    background-color: darkorange;
   }
 `;
 
@@ -47,16 +49,17 @@ const CategoryButton = styled.button`
 `;
 
 const RightSidebar = styled.div`
-  background-color: #f0f0f0;
+  background-color: rgba(255, 255, 255, 0.6); /* 반투명 배경 */
+  backdrop-filter: blur(40px); /* 블러 효과 */
   padding: 20px;
-  border-radius: 8px;
+  box-sizing: border-box;
+  width: 360px;
 `;
 
 const UserListSidebar = ({ selectedCategory, setSelectedCategory }) => {
   return (
     <RightSidebar>
       <div style={{display : "flex", gap:"10px"}}>
-      <SidebarButton>유저 목록</SidebarButton>
       <SidebarButton>친구 목록</SidebarButton>
       </div>
       <CategoryList>
