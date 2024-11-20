@@ -227,14 +227,10 @@ export default function BattleGameIngamePage() {
         });
 
         // 채팅
-        subscribe(`/topic/chat/room/${gameId}`, (message) => {
+        subscribe(`/topic/chat/game/${gameId}/${getTeam()}`, (message) => {
           const data = JSON.parse(message.body);
           console.log("채팅왔다", data);
-          const { userid, chatMessage, time, teamColor } = data;
-          if (teamColor === getTeam().toUpperCase()) {
-            const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
-            setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
-          }
+          setChatHistory((prevChat) => [...prevChat, data]); // 채팅 기록에 새로운 채팅 추가
         });
 
         subscribe(`/topic/game/room/${gameId}/init`, (message) => {
