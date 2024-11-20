@@ -5,6 +5,7 @@ import { isAxiosError } from "axios";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Chatting from "@/components/Chatting";
 
 import Grid from "@mui/material/Unstable_Grid2";
 import Button from "@mui/material/Button";
@@ -186,107 +187,111 @@ export default function BattleGameWaitingPage() {
 
   return (
     <Wrapper>
-      <Top>
-        <ButtonGroup>
-          <TopButton onClick={() => navigate("/game/battle")}>
-            <div style={{ textAlign: "center" }}>
-              <img
-                src={LeftArrow}
-                alt="나가기"
-                className="icon"
-                style={{ display: "block", margin: "0 auto" }}
-              />
-              나가기
-            </div>
-          </TopButton>
-          <TopButton onClick={switchTeam}>
-            <div style={{ textAlign: "center" }}>
-              <img
-                src={TeamChange}
-                alt="이동"
-                className="icon"
-                style={{ display: "block", margin: "0 auto" }}
-              />
-              이동
-            </div>
-          </TopButton>
-          <TopButton>
-            <div style={{ textAlign: "center" }}>
-              <img
-                src={Gear}
-                alt="설정"
-                className="icon"
-                style={{ display: "block", margin: "0 auto" }}
-              />
-              설정
-            </div>
-          </TopButton>
-          <TopButton>
-            <div style={{ textAlign: "center" }}>
-              <img
-                src={Invite}
-                alt="초대"
-                className="icon"
-                style={{ display: "block", margin: "0 auto" }}
-              />
-              초대
-            </div>
-          </TopButton>
-        </ButtonGroup>
-      </Top>
-      <Body>
-        <MainSection>
-          <TeamSection>
-            <Team>파란팀</Team>
-            <TeamGrid>
-              {roomData.bluePlayers.map((player, i) => (
-                <PlayerCard key={`blue-player-${i}`} player={player} color="blue" />
-              ))}
-              {makeEmptyPlayer(emptyPlayerCount[1])}
-              {makeXPlayer(xPlayerCount[1])}
-            </TeamGrid>
-          </TeamSection>
-
-          <Versus>VS</Versus>
-
-          <TeamSection>
-            <Team>빨간팀</Team>
-            <TeamGrid>
-              {roomData.redPlayers.map((player, i) => (
-                <PlayerCard key={`red-player-${i}`} player={player} color="red" />
-              ))}
-              {makeEmptyPlayer(emptyPlayerCount[0])}
-              {makeXPlayer(xPlayerCount[0])}
-            </TeamGrid>
-          </TeamSection>
-        </MainSection>
-
-        <PuzzleDetails>
-          <PuzzleImage>
-            <img
-              src="https://images.unsplash.com/photo-1731413263252-cbce5c09f8c2?q=80&w=2940&auto=format&fit=crop"
-              alt="Puzzle"
-            />
-          </PuzzleImage>
-          <Details>
-            <Title>{roomData.roomName}</Title>
-            <Typography variant="subtitle1">{roomData.gameMode}</Typography>
-            <Typography variant="subtitle1">{roomData.puzzlePiece} 피스</Typography>
-            <StartButton onClick={startGame}>시작</StartButton>
-          </Details>
-        </PuzzleDetails>
-      </Body>
+      {/* 왼쪽 채팅 */}
+      <Chatting />
+  
+      {/* 나머지 콘텐츠 */}
+      <div style={{ flex: 1, padding: "60px 30px"}}>
+        <Top>
+          <ButtonGroup>
+            <TopButton onClick={() => navigate("/game/battle")}>
+              <div style={{ textAlign: "center" }}>
+                <img
+                  src={LeftArrow}
+                  alt="나가기"
+                  className="icon"
+                  style={{ display: "block", margin: "0 auto" }}
+                />
+                나가기
+              </div>
+            </TopButton>
+            <TopButton onClick={switchTeam}>
+              <div style={{ textAlign: "center" }}>
+                <img
+                  src={TeamChange}
+                  alt="이동"
+                  className="icon"
+                  style={{ display: "block", margin: "0 auto" }}
+                />
+                이동
+              </div>
+            </TopButton>
+            <TopButton>
+              <div style={{ textAlign: "center" }}>
+                <img
+                  src={Gear}
+                  alt="설정"
+                  className="icon"
+                  style={{ display: "block", margin: "0 auto" }}
+                />
+                설정
+              </div>
+            </TopButton>
+            <TopButton>
+              <div style={{ textAlign: "center" }}>
+                <img
+                  src={Invite}
+                  alt="초대"
+                  className="icon"
+                  style={{ display: "block", margin: "0 auto" }}
+                />
+                초대
+              </div>
+            </TopButton>
+          </ButtonGroup>
+        </Top>
+        <Body>
+          <MainSection>
+            {/* 팀 정보 */}
+            <TeamSection>
+              <Team>파란팀</Team>
+              <TeamGrid>
+                {roomData.bluePlayers.map((player, i) => (
+                  <PlayerCard key={`blue-player-${i}`} player={player} color="blue" />
+                ))}
+                {makeEmptyPlayer(emptyPlayerCount[1])}
+                {makeXPlayer(xPlayerCount[1])}
+              </TeamGrid>
+            </TeamSection>
+  
+            <Versus>VS</Versus>
+  
+            <TeamSection>
+              <Team>빨간팀</Team>
+              <TeamGrid>
+                {roomData.redPlayers.map((player, i) => (
+                  <PlayerCard key={`red-player-${i}`} player={player} color="red" />
+                ))}
+                {makeEmptyPlayer(emptyPlayerCount[0])}
+                {makeXPlayer(xPlayerCount[0])}
+              </TeamGrid>
+            </TeamSection>
+          </MainSection>
+  
+          <PuzzleDetails>
+            <PuzzleImage>
+              <img src={roomData.puzzleImage} alt="Puzzle" />
+            </PuzzleImage>
+            <Details>
+              <Title>{roomData.roomName}</Title>
+              <Typography variant="subtitle1">{roomData.gameMode}</Typography>
+              <Typography variant="subtitle1">{roomData.puzzlePiece} 피스</Typography>
+              <StartButton onClick={startGame}>시작</StartButton>
+            </Details>
+          </PuzzleDetails>
+        </Body>
+      </div>
     </Wrapper>
-  );
+  );  
 }
 
 const Wrapper = styled.div`
-  height: 100%;
+  display: flex; /* Flex 컨테이너 */
+  height: 100vh;
   background-image: url(${backgroundPath});
   background-size: cover;
   background-attachment: fixed;
   margin: 0 auto;
-  padding: 60px 30px;
   user-select: none; /* 텍스트 선택 금지 */
 `;
 
@@ -308,8 +313,8 @@ const Top = styled.div`
 const TopButton = styled(Button)`
   background-color: white;
   color: black;
-  height: 100px;
-  padding: 0 40px;
+  height: 80px;
+  padding: 0 30px;
   position: relative;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
 
