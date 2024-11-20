@@ -1,16 +1,17 @@
 import styled from "styled-components";
 import LinearProgress from "@mui/material/LinearProgress";
+import { getTeam } from "@/socket-utils/storage";
+import { red, blue, deepPurple } from "@mui/material/colors";
 
-export default function PrograssBar({ percent, isEnemy }) {
-  const barColor = isEnemy ? "#FF8888" : "#FFDB95";
+export default function PrograssBar({ percent, teamColor }) {
+  const barColor = teamColor === "red" ? red[400] : blue[400];
 
   return (
     <BorderLinearProgress
       variant="determinate"
       value={percent}
       sx={{
-        borderRadius: "8px",
-        backgroundColor: "#385682",
+        backgroundColor: "white",
         "& span.MuiLinearProgress-bar": {
           transform: `translateY(-${100 - percent}%) !important`,
           backgroundColor: barColor,
@@ -22,7 +23,6 @@ export default function PrograssBar({ percent, isEnemy }) {
 }
 
 const BorderLinearProgress = styled(LinearProgress)`
-  width: 40px;
-  height: 750px;
-  border-radius: 8px;
+  width: 20px;
+  height: 100%;
 `;

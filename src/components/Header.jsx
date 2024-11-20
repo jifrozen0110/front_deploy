@@ -71,12 +71,10 @@ export default function Header({parentUpdate}) {
   return (
     <HeaderBar>
       <Toolbar sx={{ flexWrap: "wrap" }}>
-        <ImageIcon imageSource={Logo} size="lg" onClick={() => navigate("/")} />
+        <ImageIcon imageSource={Logo} size="lg" onClick={() => navigate("/home")} />
         <GamePageNavigation />
 
         <nav style={{ display: "flex", gap: "20px" }}>
-          <ImageIcon imageSource={HeaderPuzzleImage} size="md" onClick={() => navigate("/game")} />
-          <ImageIcon imageSource={HeaderRankImage} size="md" onClick={() => navigate("/rank")} />
           <ThemeProvider theme={theme}>
               <Button variant="text" size="large" onClick={moveProfile}>
                 mypage

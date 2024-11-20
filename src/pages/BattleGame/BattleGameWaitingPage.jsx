@@ -187,10 +187,12 @@ export default function BattleGameWaitingPage() {
   return (
     <Wrapper>
       {/* 왼쪽 채팅 */}
-      <Chatting />
+      <LeftSidebar>
+        <Chatting />
+      </LeftSidebar>
   
       {/* 나머지 콘텐츠 */}
-      <div style={{ padding: "60px 30px", height: "100%", boxSizing: "border-box"}}>
+      <Content>
         <Top>
           <ButtonGroup>
             <TopButton onClick={() => navigate("/game/battle")}>
@@ -280,7 +282,7 @@ export default function BattleGameWaitingPage() {
             </Details>
           </PuzzleDetails>
         </Body>
-      </div>
+      </Content>
     </Wrapper>
   );  
 }
@@ -295,13 +297,23 @@ const Wrapper = styled.div`
   user-select: none; /* 텍스트 선택 금지 */
 `;
 
-const ChatContainer = styled.div`
-  flex: 0 0 300px; /* 고정된 너비 300px */
+const LeftSidebar = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%; /* 화면 전체 높이 */
-  overflow: hidden;
+  height: 100%;
+  width: 20%;
 `;
+
+const Content = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-item: center;
+  padding: 0 30px;
+  boxSizing: border-box;
+  width: 80%;
+  height: 100%;
+`
 
 const Team = styled.div`
   max-width: 400px;

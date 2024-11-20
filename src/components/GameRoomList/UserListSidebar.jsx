@@ -53,7 +53,8 @@ const RightSidebar = styled.div`
   backdrop-filter: blur(40px); /* 블러 효과 */
   padding: 20px;
   box-sizing: border-box;
-  width: 360px;
+  width: 100%;
+  height: 100%;
 `;
 
 const UserListSidebar = ({ selectedCategory, setSelectedCategory }) => {
