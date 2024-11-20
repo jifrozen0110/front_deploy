@@ -106,8 +106,6 @@ export default function BattleGameWaitingPage() {
 
       subscribe(`/topic/room/${roomId}/game`, message => {
         const data = JSON.parse(message.body);
-        console.log(data.gameId);
-        console.log(data.gameId && Boolean(data.isStarted) && !Boolean(data.isFinished));
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (data.gameId && Boolean(data.isStarted) && !Boolean(data.isFinished)) {
           setGameData(data);
@@ -115,6 +113,7 @@ export default function BattleGameWaitingPage() {
           setImage(
             "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
           );
+          localStorage.setItem('roomId', roomId);
           window.location.replace(`/game/battle/ingame/${data.gameId}`);
           // window.location.replace(`/game/battle/ingame/${roomId}`);
           return;
