@@ -215,11 +215,11 @@ export default function CreateRoomButton({ category }) {
               <FormControl>
                 <FormLabel id="radio-puzzle-piece">퍼즐 조각 수</FormLabel>
                 <RadioGroup row value={puzzlePiece} onChange={handlePuzzlePiece}>
+                  <FormControlLabel value={20} control={<Radio />} label="20" />
+                  <FormControlLabel value={50} control={<Radio />} label="50" />
+                  <FormControlLabel value={80} control={<Radio />} label="80" />
                   <FormControlLabel value={100} control={<Radio />} label="100" />
-                  <FormControlLabel value={200} control={<Radio />} label="200" />
-                  <FormControlLabel value={300} control={<Radio />} label="300" />
-                  <FormControlLabel value={400} control={<Radio />} label="400" />
-                  <FormControlLabel value={500} control={<Radio />} label="500" />
+                  <FormControlLabel value={150} control={<Radio />} label="150" />
                 </RadioGroup>
               </FormControl>
             </Grid>
@@ -227,10 +227,10 @@ export default function CreateRoomButton({ category }) {
               <FormControl>
                 <FormLabel id="radio-room-size">최대 인원수</FormLabel>
                 <RadioGroup row value={maxPlayers} onChange={handleRoomSize}>
-                  <FormControlLabel value={2} control={<Radio />} label="1:1" />
-                  <FormControlLabel value={4} control={<Radio />} label="2:2" />
-                  <FormControlLabel value={6} control={<Radio />} label="3:3" />
-                  <FormControlLabel value={8} control={<Radio />} label="4:4" />
+                  <FormControlLabel value={2} control={<Radio />} label="2" />
+                  <FormControlLabel value={4} control={<Radio />} label="4" />
+                  <FormControlLabel value={6} control={<Radio />} label="6" />
+                  <FormControlLabel value={8} control={<Radio />} label="8" />
                 </RadioGroup>
               </FormControl>
             </Grid>
