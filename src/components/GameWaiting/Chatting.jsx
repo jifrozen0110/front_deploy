@@ -17,13 +17,15 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
     e.preventDefault();
     if (getSender() && message) {
       send(
-        `/app/game/chat`,
+        `/pub/game/chat`,
         {},
         JSON.stringify({
-          roomId: getRoomId(),
-          sender: getSender(),
+          gameId: getRoomId(),
+          userId: getSender(),
+          userName: localStorage.getItem('userName'),
+          team: getTeam(),
           message,
-          type: "CHAT",
+          // type: "CHAT",
         }),
       );
       setMessage("");
@@ -113,23 +115,18 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
             )}
 
             {/* 채팅 기록을 화면에 출력 */}
-            {chatHistory.map((chat, index) => {
-              if (chat.userid === getSender()) {
-                return (
-                  <MyChatDiv key={index} $color={currentChatTheme}>
-                    <strong>{chat.userid}: </strong>
-                    {chat.chatMessage}
+            {chatHistory.map((chat, index) => (
+              <>
+                {chat.userId == getSender()
+                ? <MyChatDiv key={index} $color={currentChatTheme}>
+                    <strong>{chat.userName}: </strong>
+                    {chat.message}
                   </MyChatDiv>
-                );
-              } else {
-                return (
-                  <ChatDiv key={index} $color={currentChatTheme}>
-                    <strong>{chat.userid}: </strong>
-                    {chat.chatMessage}
-                  </ChatDiv>
-                );
-              }
-            })}
+                : <ChatDiv key={index} $color={currentChatTheme}>
+                    {chat.userName}: {chat.message}
+                  </ChatDiv>}
+              </>
+            ))}
           </div>
         )}
 
