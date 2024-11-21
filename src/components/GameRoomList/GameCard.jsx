@@ -1,12 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { CardContent, CardMedia, Typography, Box, Divider, Chip, CardActionArea, Snackbar, Button } from "@mui/material";
 import styled from "styled-components";
+import { isAxiosError } from "axios";
 
 export default function GameCard({ room, category }) {
   const navigate = useNavigate();
 
-  const handleCardClick = () => {
-    navigate(`/game/${category}/waiting/${room.roomId}`);
+  const handleCardClick = async () => {
+    if (room.maxPlayers <= room.nowPlayers) {
+      alert("방이 꽉 찼습니다.");
+    } else {
+      navigate(`/game/${category}/waiting/${room.roomId}`);
+    }
   };
 
   return (

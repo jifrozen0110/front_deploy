@@ -149,11 +149,6 @@ export default function BattleGameWaitingPage() {
   const initialize = async () => {
     try {
       const response = await authRequest().get(`/api/rooms/${roomId}`);
-      if (response.data.maxPlayers <= response.data.nowPlayers) {
-        alert("방이 꽉 찼습니다.");
-        setTimeout(() => navigate("/game/battle"), 100);
-      }
-
       const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
       setRoomData(response.data);
       setPlayerCount(response.data.nowPlayers);
