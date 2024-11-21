@@ -186,6 +186,9 @@ export default function BattleGameListPage() {
             <LeftSidebar>
               <CreateRoomButtonContainer>
                 <CreateRoomButton category="battle" style={{width: "100%"}} />
+                <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginLeft: "auto" }}>
+                  <RefreshIcon />
+                </IconButton>
               </CreateRoomButtonContainer>
               <Chatting chatList={chatList} path={"/pub/chat/main"}/>
             </LeftSidebar>
