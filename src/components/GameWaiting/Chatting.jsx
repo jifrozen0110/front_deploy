@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { getSender, getRoomId, getTeam } from "@/socket-utils/storage";
+import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
 import { socket } from "@/socket-utils/socket2";
 import { TextField, Button, Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -22,7 +23,7 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
         JSON.stringify({
           gameId: getRoomId(),
           userId: getSender(),
-          userName: localStorage.getItem('userName'),
+          userName: localStorage.getItem("userName"),
           team: getTeam(),
           message,
           // type: "CHAT",
@@ -117,20 +118,31 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
             {/* 채팅 기록을 화면에 출력 */}
             {chatHistory.map((chat, index) => (
               <>
-                {chat.userId == getSender()
-                ? <MyChatDiv key={index} $color={currentChatTheme}>
+                {chat.userId == getSender() ? (
+                  <MyChatDiv key={index} $color={currentChatTheme}>
                     <strong>{chat.userName}: </strong>
                     {chat.message}
                   </MyChatDiv>
-                : <ChatDiv key={index} $color={currentChatTheme}>
+                ) : (
+                  <ChatDiv key={index} $color={currentChatTheme}>
                     {chat.userName}: {chat.message}
-                  </ChatDiv>}
+                  </ChatDiv>
+                )}
               </>
             ))}
           </div>
         )}
 
         <Form onSubmit={handleMessageSend}>
+          {isIngame ? (
+            <GameOpenVidu
+              gameId={`${getRoomId()}_${getTeam()}`}
+              playerName={getSender()}
+              color={currentTheme}
+            />
+          ) : (
+            <GameOpenVidu gameId={getRoomId()} playerName={getSender()} />
+          )}
           <ChatInput
             type="text"
             placeholder="채팅"
