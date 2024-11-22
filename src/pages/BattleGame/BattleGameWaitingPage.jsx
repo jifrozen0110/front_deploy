@@ -76,6 +76,20 @@ export default function BattleGameWaitingPage() {
       .map((_, i) => <XPlayerCard key={`xplayer-${i}`} />);
   };
 
+  const isNotInRoom = () => {
+    const playerId = parseInt(localStorage.getItem("userId"), 10); // 현재 사용자 ID
+  
+    if (!roomData || !Array.isArray(roomData.redPlayers) || !Array.isArray(roomData.bluePlayers)) {
+      return true; // roomData가 없거나 플레이어 정보가 없으면 방에 없다고 판단
+    }
+  
+    // 플레이어가 redPlayers나 bluePlayers에 존재하는지 확인
+    const isInRedTeam = roomData.redPlayers.some(player => player.playerId === playerId);
+    const isInBlueTeam = roomData.bluePlayers.some(player => player.playerId === playerId);
+  
+    return !(isInRedTeam || isInBlueTeam); // 둘 중 하나라도 true면 방에 있음 -> 반대로 반환
+  };  
+
   const connectSocket = async (roomId) => {
     connect(() => {
       console.log(roomId);
@@ -149,6 +163,7 @@ export default function BattleGameWaitingPage() {
   const initialize = async () => {
     try {
       const response = await authRequest().get(`/api/rooms/${roomId}`);
+
       const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
       setRoomData(response.data);
       setPlayerCount(response.data.nowPlayers);
@@ -184,6 +199,9 @@ export default function BattleGameWaitingPage() {
         <Footer />
       </Wrapper>
     );
+  } else if (roomData.maxPlayers <= roomData.nowPlayers && isNotInRoom()) {
+    alert("방이 꽉 찼습니다.");
+    setTimeout(() => navigate("/game/battle"), 100);
   }
 
   return (

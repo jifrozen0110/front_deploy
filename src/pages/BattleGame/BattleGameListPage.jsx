@@ -177,7 +177,6 @@ export default function BattleGameListPage() {
         <Wrapper>
           <Header />
           <div>Loading...</div>
-          <Footer />
         </Wrapper>
       ) : (
         <Wrapper>
