@@ -18,7 +18,7 @@ import { updateGroupByBundles } from "@/puzzle-core/utils";
 
 import BackgroundPath from "@/assets/backgrounds/background2.png";
 
-import { Box, Dialog, DialogTitle, DialogContent, Snackbar } from "@mui/material";
+import { Box, Dialog, DialogTitle, DialogContent, Snackbar, Button, ButtonBase } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
 import { useHint } from "@/hooks/useHint";
@@ -28,6 +28,7 @@ import { useSnackbar } from "../../hooks/useSnackbar";
 import { useInventory } from "../../hooks/useInventory";
 import { useSnackbar2 } from "../../hooks/useSnackbar2";
 import { setRoomId, setTeam } from "../../socket-utils/storage";
+import Inventory from "../../components/GameIngame/Inventory";
 
 const { connect, send, subscribe, disconnect } = socket;
 const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece } = configStore;
@@ -318,16 +319,14 @@ export default function BattleGameIngamePage() {
           />
         </Board>
         <GameInfo>
+          <OutButton onClick={() => {}}>
+            나가기
+          </OutButton>
           <img
             src={pictureSrc}
             alt="퍼즐 그림"
             style={{ width: "100%" }}
           />
-          <OtherTeam>
-            <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
-              상대팀 화면
-            </div>
-          </OtherTeam>
           <Row>
             <ProgressContainer>
               <ProgressWrapper>
@@ -338,12 +337,18 @@ export default function BattleGameIngamePage() {
               </ProgressWrapper>
             </ProgressContainer>
             <Col>
+              <OtherTeam>
+                <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
+                  상대팀 화면
+                </div>
+              </OtherTeam>
               <Timer num={time} />
-              <ItemContainer>
+              <Inventory slots={Array(8).fill(0)} gameId={gameId} team={getTeam()}></Inventory>
+              {/* <ItemContainer>
                 <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
                   아이템
                 </div>
-                </ItemContainer>
+                </ItemContainer> */}
               {/* <MiniMap>
                 <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
                   미니맵
@@ -480,7 +485,7 @@ const OtherTeam = styled.div`
   align-items: center;
 
   width: 100%;
-  height: 300px;
+  height: 200px;
   background-color: white;
 `;
 
@@ -519,4 +524,18 @@ const MiniMap = styled.div`
 const ProgressWrapper = styled(Box)`
   display: inline-block;
   transform: rotate(180deg);
+`;
+
+const OutButton = styled.button`
+  background-color: orange;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  width: 100%;
+  font-size: 2.4em;
+  padding: 10px;
+  &:hover {
+    background-color: darkorange;
+  }
 `;
