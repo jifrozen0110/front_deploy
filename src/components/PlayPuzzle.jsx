@@ -15,8 +15,9 @@ const PlayPuzzle = ({ category, shapes, board, picture }) => {
   const initialize = useCallback(() => {
     const img =
       picture.encodedString === "짱구.jpg"
-        ? "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp"
-        : `data:image/jpeg;base64,${picture.encodedString}`;
+        ? "https://i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp"
+        // : `data:image/jpeg;base64,${picture.encodedString}`;
+        : picture.encodedString
     const res = {
       img,
       level: 1,
