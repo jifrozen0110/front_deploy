@@ -7,9 +7,7 @@ import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
-
 const OPENVIDU_SERVER_URL = import.meta.env.VITE_SERVER_END_POINT;
-const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
 const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
   const [mySessionId, setMySessionId] = useState(gameId);
@@ -48,11 +46,13 @@ const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
     const mySession = OV.initSession();
 
     mySession.on("streamCreated", (event) => {
+      console.log("streamCreated");
       const subscriber = mySession.subscribe(event.stream, undefined);
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
     });
 
     mySession.on("streamDestroyed", (event) => {
+      console.log("streamDestroyed");
       deleteSubscriber(event.stream.streamManager);
     });
 
@@ -162,13 +162,7 @@ async function createSession(sessionId) {
   return new Promise(async (resolve, reject) => {
     const data = { customSessionId: sessionId };
     try {
-      const response = await axios.post(OPENVIDU_SERVER_URL + "api/sessions", data, {
-        headers: {
-          Authorization: "Basic " + btoa("OPENVIDUAPP:" + OPENVIDU_SERVER_SECRET),
-          "Content-Type": "application/json",
-        },
-        withCredentials: false,
-      });
+      const response = await axios.post(OPENVIDU_SERVER_URL + "/api/sessions", data);
 
       setTimeout(() => {
         console.log("Forced return through developer settings");
@@ -188,14 +182,8 @@ async function createSession(sessionId) {
 
 async function createToken(sessionId) {
   const response = await axios.post(
-    OPENVIDU_SERVER_URL + "api/sessions/" + sessionId + "/connection",
+    OPENVIDU_SERVER_URL + "/api/sessions/" + sessionId + "/connection",
     {},
-    {
-      headers: {
-        Authorization: `Basic ${btoa(`OPENVIDUAPP:${OPENVIDU_SERVER_SECRET}`)}`,
-        "Content-Type": "application/json",
-      },
-    },
   );
   return response.data.token;
 }
