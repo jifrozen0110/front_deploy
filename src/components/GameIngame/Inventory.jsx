@@ -1,5 +1,9 @@
 ﻿import React, { useState } from "react";
 import "./Inventory.css";
+import firePath from "@/assets/effects/fire.gif";
+
+const itemImgs = [null, firePath]
+
 
 const Inventory = ({slots, useItem}) => {
   const onSlotClick = (index) => {
@@ -17,7 +21,12 @@ const Inventory = ({slots, useItem}) => {
           className={`slot ${item ? "filled" : "empty"}`}
           onClick={() => onSlotClick(index)}
         >
-          {item || "+"}
+          {item
+          ? <img src={itemImgs[item]} style={{
+            maxHeight:"100%",
+            maxWidth:"100%"
+          }}/>
+          : "+"}
         </div>
       ))}
     </div>
