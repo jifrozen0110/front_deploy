@@ -6,6 +6,7 @@ export const BackGround = styled.div`
     height: 100vh;
     background-image: url(background.png);
     background-size: cover;
+    background-attachment: fixed;
 `;
 
 export const PaddingDiv = styled.div`
