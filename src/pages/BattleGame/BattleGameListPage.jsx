@@ -121,55 +121,57 @@ export default function BattleGameListPage() {
   useEffect(() => {
     // 페이지 번호가 변경될 때 데이터 가져오기
     setPageNumber(parseInt(searchParams.get("page"), 10) || 0);
+    fetchAllRoom();
   }, [pageNumber]);
 
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-      return parts.pop().split(";").shift();
-    }
-  }
+  // function getCookie(name) {
+  //   const value = `; ${document.cookie}`;
+  //   const parts = value.split(`; ${name}=`);
+  //   if (parts.length === 2) {
+  //     return parts.pop().split(";").shift();
+  //   }
+  // }
 
-  const quickMatching = () => {
-    const sender = getCookie("userId");
-    if (!sender) {
-      alert("로그인한 유저만 이용할 수 있는 기능입니다.");
-      return;
-    }
+  // const quickMatching = () => {
+  //   const sender = getCookie("userId");
+  //   if (!sender) {
+  //     alert("로그인한 유저만 이용할 수 있는 기능입니다.");
+  //     return;
+  //   }
 
-    connect(() => {
-      //대기 큐 입장했다고 보내기
-      send(
-        "/app/game/message",
-        {},
-        JSON.stringify({
-          type: "QUICK",
-          sender: sender,
-          member: true,
-        }),
-      );
+  //   connect(() => {
+  //     //대기 큐 입장했다고 보내기
+  //     send(
+  //       "/app/game/message",
+  //       {},
+  //       JSON.stringify({
+  //         type: "QUICK",
+  //         sender: sender,
+  //         member: true,
+  //       }),
+  //     );
 
-      //랜덤 매칭 큐 소켓
-      subscribe(`/topic/game/room/quick/${sender}`, (message) => {
-        const data = JSON.parse(message.body);
-        if (data.message === "WAITING") {
-          alert("waiting");
-        } else if (data.message === "GAME_START") {
-          setRoomId(data.targets);
-          setSender(sender);
-          if (data.team === "RED") {
-            setTeam("red");
-          } else {
-            setTeam("blue");
-          }
-          window.location.replace(`/game/battle/ingame/${data.targets}`);
-        }
-      });
+  //     //랜덤 매칭 큐 소켓
+  //     subscribe(`/topic/game/room/quick/${sender}`, (message) => {
+  //       const data = JSON.parse(message.body);
+  //       if (data.message === "WAITING") {
+  //         alert("waiting");
+  //       } else if (data.message === "GAME_START") {
+  //         setRoomId(data.targets);
+  //         setSender(sender);
+  //         if (data.team === "RED") {
+  //           setTeam("red");
+  //         } else {
+  //           setTeam("blue");
+  //         }
+  //         window.location.replace(`/game/battle/ingame/${data.targets}`);
+  //       }
+  //     });
 
-      //응답 메시지 파싱
-    });
-  };
+  //     //응답 메시지 파싱
+  //   });
+  // };
+  
   return (
     <>
       <audio ref={audioTag} src={music} autoPlay loop muted></audio>
