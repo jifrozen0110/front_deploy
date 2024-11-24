@@ -14,7 +14,7 @@ import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { configStore } from "@/puzzle-core";
-import { updateGroupByBundles } from "@/puzzle-core/utils";
+import { getPuzzlePositionByIndex, updateGroupByBundles } from "@/puzzle-core/utils";
 
 import BackgroundPath from "@/assets/backgrounds/background2.png";
 
@@ -29,9 +29,13 @@ import { useInventory } from "../../hooks/useInventory";
 import { useSnackbar2 } from "../../hooks/useSnackbar2";
 import { setRoomId, setTeam } from "../../socket-utils/storage";
 import Inventory from "../../components/GameIngame/Inventory";
+import firePath from "@/assets/effects/fire.gif";
+import fireAudioPath from "@/assets/audio/fire.mp3";
+import { addAudio } from "../../puzzle-core/attackItem";
+
 
 const { connect, send, subscribe, disconnect } = socket;
-const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece } = configStore;
+const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, usingItemFire } = configStore;
 
 export default function BattleGameIngamePage() {
   const navigate = useNavigate();
@@ -44,6 +48,96 @@ export default function BattleGameIngamePage() {
   const [enemyPercent, setEnemyPercent] = useState(0);
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
+  const [slots, setSlots] = useState(Array(8).fill(0))
+  const itemFunc = useMemo(() => {
+    return {
+      FIRE(data){
+        const { targets, targetList } = data;
+        const bundles = targets === "RED" ? data.redBundles : data.blueBundles;
+        const fireImg = document.createElement("img");
+        const canvasContainer = document.getElementById("canvasContainer");
+        fireImg.src = firePath;
+
+        fireImg.style.zIndex = 100;
+        fireImg.style.position = "absolute";
+        fireImg.style.width = "100px";
+        fireImg.style.height = "150px";
+        fireImg.style.transform = "translate(-50%, -90%)";
+
+        // fire 당하는 팀의 효과
+        if (targets === getTeam().toUpperCase()) {
+          if (targetList === null || targetList.length === 0) {
+            // 해당되는 target이 없을 경우 알림 해야함
+            setSnackMessage("불 지르기가 왔는데 운 좋게도(?)... 불 지르기 당할 맞춰진 피스가 없군요.");
+            setSnackOpen(true);
+            return;
+          }
+
+          console.log("fire 맞을거임");
+
+          for (let i = 0; i < targetList.length; i++) {
+            const currentTargetIdx = targetList[i];
+            const [x, y] = getPuzzlePositionByIndex({
+              config: getConfig(),
+              puzzleIndex: currentTargetIdx,
+            });
+
+            console.log("x, y", x, y);
+
+            const fireImgCopy = fireImg.cloneNode();
+
+            fireImgCopy.style.left = `${x}px`;
+            fireImgCopy.style.top = `${y}px`;
+
+            canvasContainer.appendChild(fireImgCopy);
+            addAudio(fireAudioPath);
+
+            setTimeout(() => {
+              if (fireImgCopy.parentNode) {
+                console.log("불 효과 삭제");
+                fireImgCopy.parentNode.removeChild(fireImgCopy);
+              }
+            }, 2000);
+          }
+        } else {
+          // fire 발동하는 팀의 효과
+          console.log("fire 보낼거임");
+
+          fireImg.style.left = "1080px";
+          fireImg.style.top = "750px";
+
+          canvasContainer.appendChild(fireImg);
+          addAudio(fireAudioPath);
+
+          setTimeout(() => {
+            console.log("불 효과 삭제");
+            if (fireImg.parentNode) {
+              fireImg.parentNode.removeChild(fireImg);
+            }
+          }, 2000);
+        }
+
+        setTimeout(() => {
+          if (targetList && targets === getTeam().toUpperCase()) {
+            console.log("fire 발동 !!");
+            usingItemFire(bundles, targetList);
+          }
+        }, 2000);
+      },
+      MUD(){
+
+      },
+      TYPHOON(){
+
+      },
+      BROOMSTICK(){
+
+      },
+      FRAME(){
+
+      },
+    }
+  }, [])
 
   const { isShowSnackbar, setIsShowSnackbar, snackMessage, setSnackMessage } = useSnackbar({
     autoClosing: true,
@@ -97,9 +191,12 @@ export default function BattleGameIngamePage() {
   };
 
   const initializeGame = (data) => {
-    setTeam(data.blueTeam.some(p => p.playerId === Number(getSender())) ? 'blue' : 'red')
+    const isBlue = data.blueTeam.some(p => p.playerId === Number(getSender()))
+    setTeam(isBlue ? 'blue' : 'red')
     setRoomId(data.gameId)
     setGameData(data);
+    const targetSlot = isBlue ? data.bluePuzzle.inventory : data.redPuzzle.inventory
+    setSlots(targetSlot)
     console.log("gamedata is here!", gameData, data);
   };
   
@@ -170,6 +267,15 @@ export default function BattleGameIngamePage() {
             }, 400);
 
             return;
+          }
+
+          if(data.message in itemFunc){
+            itemFunc[data.message](data)
+            if(getTeam().toUpperCase() == "RED"){
+              setSlots(data.game.redPuzzle.inventory)
+            }else{
+              setSlots(data.game.bluePuzzle.inventory)
+            }
           }
 
           // 진행도
@@ -260,6 +366,18 @@ export default function BattleGameIngamePage() {
     );
   };
 
+  const useItem = useCallback((keyNumber) => {
+    send("/pub/game/puzzle", {},
+      JSON.stringify({
+        type: "GAME",
+        roomId: getRoomId(),
+        sender: getSender(),
+        message: "USE_ITEM",
+        targets: keyNumber,
+      }),
+    );
+  }, []);
+
   useEffect(() => {
     // if (roomId !== getRoomId() || !getSender()) {
     //   navigate("/game/battle", {
@@ -343,12 +461,7 @@ export default function BattleGameIngamePage() {
                 </div>
               </OtherTeam>
               <Timer num={time} />
-              <Inventory slots={Array(8).fill(0)} gameId={gameId} team={getTeam()}></Inventory>
-              {/* <ItemContainer>
-                <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
-                  아이템
-                </div>
-                </ItemContainer> */}
+              <Inventory slots={slots} useItem={useItem}></Inventory>
               {/* <MiniMap>
                 <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
                   미니맵
