@@ -70,7 +70,7 @@ export default function ResultModal({
   }; 
   return (
     <ThemeProvider theme={theme}>
-      <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
+      <Dialog open={isOpenedDialog} onClose={() => navigateToWaitingPage()}>
         <ResultStateWrapper>
           {resultState === "draw" ? <h1>DRAW</h1> : <img src={resultStateImgObject[resultState]} />}
         </ResultStateWrapper>
@@ -102,24 +102,6 @@ export default function ResultModal({
           >
             게임 대기실로 가기
           </Button>
-          {/* <Grid container sx={{ width: "300px", height: "600px" }}>
-            {ourTeam.map((player) => {
-              <Grid item xs={3}>
-                <PlayerCard player={player} color={getTeam()} gameId={getRoomId()} />
-              </Grid>;
-            })}
-          </Grid>
-          <Grid container>
-            {enemyTeam.map((player) => {
-              <Grid item xs={3}>
-                <PlayerCard
-                  player={player}
-                  color={getTeam() === "red" ? "red" : "blue"}
-                  gameId={getRoomId()}
-                />
-              </Grid>;
-            })}
-          </Grid> */}
         </DialogContent>
       </Dialog>
     </ThemeProvider>
