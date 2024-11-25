@@ -15,7 +15,7 @@ import { socket } from "@/socket-utils/socket2";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { configStore } from "@/puzzle-core";
 import { updateGroupByBundles } from "@/puzzle-core/utils";
-
+import { groupPuzzlePieces } from "@/puzzle-core/index";
 import BackgroundPath from "@/assets/backgrounds/background2.png";
 
 import { Box, Dialog, DialogTitle, DialogContent, Snackbar } from "@mui/material";
@@ -96,25 +96,25 @@ export default function BattleGameIngamePage() {
   };
 
   const initializeGame = (data) => {
-    setTeam(data.blueTeam.some(p => p.playerId === Number(getSender())) ? 'blue' : 'red')
-    setRoomId(data.gameId)
+    setTeam(data.blueTeam.some((p) => p.playerId === Number(getSender())) ? "blue" : "red");
+    setRoomId(data.gameId);
     setGameData(data);
     console.log("gamedata is here!", gameData, data);
   };
-  
+
   const changePercent = (data) => {
     const roundTo = (num, decimals) => {
       return parseFloat(num.toFixed(decimals));
     };
 
     if (getTeam() === "red") {
-      setOurPercent(roundTo(data.redProgressPercent, 2));  // 소수점 두 번째 자리까지 반올림
+      setOurPercent(roundTo(data.redProgressPercent, 2)); // 소수점 두 번째 자리까지 반올림
       setEnemyPercent(roundTo(data.blueProgressPercent, 2));
     } else {
       setOurPercent(roundTo(data.blueProgressPercent, 2));
       setEnemyPercent(roundTo(data.redProgressPercent, 2));
     }
-};
+  };
 
   // const temp = true;
 
@@ -139,7 +139,7 @@ export default function BattleGameIngamePage() {
           //     data.blueProgressPercent === 100 ||
           //     (data.time !== undefined && data.time <= 0),
           // );
-          
+
           // 매번 게임이 끝났는지 체크
           if (data.isFinished === true) {
             // if (temp === true) {
@@ -160,6 +160,8 @@ export default function BattleGameIngamePage() {
           // 게임정보 받기
           if (data.gameType && data.gameType === "BATTLE") {
             initializeGame(data);
+            console.log("bundle화");
+            console.log(data);
             setTimeout(() => {
               console.log("번들로 그룹화 해볼게", getConfig(), data[`${getTeam()}Puzzle`].bundles);
               updateGroupByBundles({
@@ -239,15 +241,15 @@ export default function BattleGameIngamePage() {
 
         subscribe(`/topic/game/room/${gameId}/init`, (message) => {
           const data = JSON.parse(message.body);
+          console.log("init");
+          console.log(data);
           initializeGame(data);
-        })
+          console.log("번들로 그룹화 해볼게", getConfig(), data[`${getTeam()}Puzzle`].bundles);
+          groupPuzzlePieces({ config: getConfig(), bundles: data[`${getTeam()}Puzzle`].bundles });
+        });
 
         // 서버로 메시지 전송
-        send(
-          `/pub/${gameId}/game/enter`,
-          {},
-          JSON.stringify({}),
-        );
+        send(`/pub/${gameId}/game/enter`, {}, JSON.stringify({}));
       },
       () => {
         console.log("@@@@@@@@@@@@@@@@@@@@@socket error 발생@@@@@@@@@@@@@@@@@@@@@");
@@ -300,10 +302,10 @@ export default function BattleGameIngamePage() {
   return (
     <Wrapper>
       <LeftSidebar>
-      <Chatting2 chatHistory={chatHistory} isIngame={true} isBattle={true} />
+        <Chatting2 chatHistory={chatHistory} isIngame={true} isBattle={true} />
         {/* <Chatting /> */}
       </LeftSidebar>
-      <Row style={{padding: "10px 10px 10px 0", width: "80%"}}>
+      <Row style={{ padding: "10px 10px 10px 0", width: "80%" }}>
         <Board id="gameBoard">
           <PlayPuzzle
             category="battle"
@@ -317,32 +319,30 @@ export default function BattleGameIngamePage() {
           />
         </Board>
         <GameInfo>
-          <img
-            src={pictureSrc}
-            alt="퍼즐 그림"
-            style={{ width: "100%" }}
-          />
+          <img src={pictureSrc} alt="퍼즐 그림" style={{ width: "100%" }} />
           <OtherTeam>
-            <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
-              상대팀 화면
-            </div>
+            <div style={{ width: "100%", textAlign: "center", fontSize: "50px" }}>상대팀 화면</div>
           </OtherTeam>
           <Row>
             <ProgressContainer>
               <ProgressWrapper>
-                <PrograssBar percent={ourPercent} teamColor={getTeam() === "red"? "red":"blue"} />
+                <PrograssBar
+                  percent={ourPercent}
+                  teamColor={getTeam() === "red" ? "red" : "blue"}
+                />
               </ProgressWrapper>
               <ProgressWrapper>
-                <PrograssBar percent={enemyPercent} teamColor={getTeam() !== "red"? "red":"blue"} />
+                <PrograssBar
+                  percent={enemyPercent}
+                  teamColor={getTeam() !== "red" ? "red" : "blue"}
+                />
               </ProgressWrapper>
             </ProgressContainer>
             <Col>
               <Timer num={time} />
               <ItemContainer>
-                <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
-                  아이템
-                </div>
-                </ItemContainer>
+                <div style={{ width: "100%", textAlign: "center", fontSize: "50px" }}>아이템</div>
+              </ItemContainer>
               {/* <MiniMap>
                 <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
                   미니맵
@@ -513,7 +513,7 @@ const MiniMap = styled.div`
   height: 100%;
   border-radius: 10px;
   background-color: white;
-`
+`;
 
 const ProgressWrapper = styled(Box)`
   display: inline-block;

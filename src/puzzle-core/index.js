@@ -12,6 +12,88 @@ import {
 import { setMoveEvent } from "./setMoveEvent";
 import { uniteTiles } from "./uniteTiles";
 import { cleanBorderStyle, switchDirection } from "./utils";
+export const groupPuzzlePieces = ({ config, bundles }) => {
+  const attachPieces = ({ fromIndex, toIndex, direction }) => {
+    // 두 퍼즐 조각을 방향에 따라 결합합니다.
+    const unitedConfig = uniteTiles2({
+      config,
+      preIndex: fromIndex,
+      nowIndex: toIndex,
+      direction: switchDirection(direction),
+    });
+    // 번들 정보를 업데이트합니다.
+    const updatedConfig = updateGroupByBundles({ config: unitedConfig, bundles });
+    // 퍼즐 테두리 스타일을 정리합니다.
+    config = cleanBorderStyle({ config: updatedConfig });
+  };
+
+  const visited = new Set(); // 이미 처리한 퍼즐 인덱스를 저장합니다.
+  const isSameBundle = (bundleSet, puzzleIndex) => bundleSet.has(puzzleIndex);
+
+  // 번들 내의 퍼즐 조각들을 BFS로 순회하며 연결합니다.
+  const processBundle = (bundle) => {
+    const bundleSet = new Set(bundle.map((puzzle) => puzzle.index));
+    const queue = [];
+
+    for (const puzzle of bundle) {
+      if (!visited.has(puzzle.index)) {
+        visited.add(puzzle.index);
+        queue.push(puzzle);
+      }
+
+      while (queue.length > 0) {
+        const currentPuzzle = queue.shift();
+        const {
+          index: currentIndex,
+          correctTopIndex,
+          correctRightIndex,
+          correctBottomIndex,
+          correctLeftIndex,
+        } = currentPuzzle;
+
+        // 주변 퍼즐 인덱스를 가져옵니다 (상, 우, 하, 좌 순서)
+        const neighborIndices = [
+          correctTopIndex,
+          correctRightIndex,
+          correctBottomIndex,
+          correctLeftIndex,
+        ];
+
+        for (let direction = 0; direction < 4; direction += 1) {
+          const neighborIndex = neighborIndices[direction];
+
+          // 유효하지 않거나, 같은 번들에 속하지 않거나, 이미 방문한 퍼즐이면 건너뜁니다.
+          if (
+            neighborIndex === -1 ||
+            !isSameBundle(bundleSet, neighborIndex) ||
+            visited.has(neighborIndex)
+          ) {
+            continue;
+          }
+
+          visited.add(neighborIndex);
+          const neighborPuzzle = bundle.find((p) => p.index === neighborIndex);
+          queue.push(neighborPuzzle);
+
+          // 현재 퍼즐과 이웃 퍼즐을 연결합니다.
+          attachPieces({
+            fromIndex: neighborIndex,
+            toIndex: currentIndex,
+            direction,
+          });
+        }
+      }
+    }
+  };
+
+  // 각 번들을 순회하며 퍼즐 조각들을 그룹화합니다.
+  for (const bundle of bundles) {
+    processBundle(bundle);
+  }
+
+  // 그룹화된 퍼즐 상태를 가진 config를 반환합니다.
+  return config;
+};
 
 const createPuzzleConfig = () => {
   let config = {};
@@ -87,6 +169,9 @@ const createPuzzleConfig = () => {
     // const updatedConfig = updateGroupByBundles({ config: nextConfig, bundles }); // 콤보랑 같이 쓰면 버그가..
     // config = cleanBorderStyle({ config: updatedConfig });
   };
+// 필요한 유틸리티 함수들이 정의되어 있다고 가정합니다.
+// uniteTiles2, updateGroupByBundles, switchDirection, cleanBorderStyle
+
 
   // 공격형 아이템 fire
   const usingItemFire = (bundles, targetList) => {
