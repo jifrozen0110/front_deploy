@@ -1,8 +1,9 @@
 ﻿import React, { useState } from "react";
 import "./Inventory.css";
 import firePath from "@/assets/effects/fire.gif";
+import mudPath from "@/assets/effects/mud.png";
 
-const itemImgs = [null, firePath]
+const itemImgs = [null, firePath, mudPath]
 
 
 const Inventory = ({slots, useItem}) => {
