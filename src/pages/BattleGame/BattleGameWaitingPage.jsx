@@ -23,7 +23,9 @@ import Gear from "@/assets/icons/gameRoom/gear.png";
 import Invite from "@/assets/icons/gameRoom/invite.png";
 import TeamChange from "@/assets/icons/gameRoom/team_change.png";
 import { setTeam } from "../../socket-utils/storage";
-
+import InviteModal from "@/components/GameWaiting/InviteModal";
+import InviteAlertModal from "@/components/GameWaiting/InviteAlertModal";
+import { parse } from "dotenv";
 const { connect, send, subscribe } = socket;
 
 export default function BattleGameWaitingPage() {
@@ -40,12 +42,41 @@ export default function BattleGameWaitingPage() {
   const { setImage } = useGameInfo();
   const isLoading = useMemo(() => roomData === null, [roomData]);
   const [chatList, setChatList] = useState([])
-
+  // 초대 버튼 모달창
+  const [isInviteModalOpen, setInviteModalOpen] = useState(false);
+  
+  // InviteAlertModal을 상태로 관리
+  const [isInviteAlertOpen, setInviteAlertOpen] = useState(false);
+  const [invitingPlayer, setInvitingPlayer] = useState(null);
+  const [inviteRoomId, setInviteRoomId] = useState("")
   const createPlayerRequest = () => ({
     playerId,
     playerImage,
     playerName,
   });
+
+  // 초대 수락 처리 함수
+  const handleInviteAccept = () => {
+  // 초대 수락 시 처리할 로직
+  console.log(`${invitingPlayer.playerName}의 초대를 수락`);
+  // 예: 서버에 초대 수락을 알리거나, 소켓으로 통지
+  setInviteAlertOpen(false);  // 모달 닫기
+  exitRoom();
+  enterRoom(inviteRoomId);
+  navigate(`/game/battle/waiting/${inviteRoomId}`);
+};
+
+  const handleInviteDecline = () => {
+    // 초대 거절 시 처리할 로직
+    console.log(`${invitingPlayer.playerName}의 초대를 거절`);
+    // 예: 서버에 초대 거절을 알리거나, 소켓으로 통지
+    setInviteAlertOpen(false);  // 모달 닫기
+  };
+
+  // 초대 버튼 클릭 핸들러
+  const handleInviteClick = () => {
+    setInviteModalOpen(true);
+  };
 
   const enterRoom = (roomId) => {
     console.log("방 입장~");
@@ -133,11 +164,23 @@ export default function BattleGameWaitingPage() {
           // window.location.replace(`/game/battle/ingame/${roomId}`);
           return;
         }
-      })
+      });
 
       subscribe(`/topic/chat/room/${roomId}`, message => {
         const data = JSON.parse(message.body)
         setChatList(preChatList => [...preChatList, data])
+      });
+
+      subscribe(`/topic/invite/${playerId}`, message => {
+         // JSON 문자열을 객체로 변환
+        const parsedMessage = JSON.parse(message.body);
+        // 필요한 필드에 접근
+        const fromPlayer = parsedMessage.fromPlayerId;
+        const toPlayer = parsedMessage.toPlayerId;
+        const fromUserName = parsedMessage.fromUserName;
+        setInvitingPlayer(fromUserName);  // 초대한 플레이어 정보 설정
+        setInviteAlertOpen(true);  // 초대 알림 모달 열기
+        setInviteRoomId(parsedMessage.roomId)
       })
 
       enterRoom(roomId);
@@ -250,7 +293,7 @@ export default function BattleGameWaitingPage() {
                 설정
               </div>
             </TopButton>
-            <TopButton>
+            <TopButton onClick={handleInviteClick}>
               <div style={{ textAlign: "center" }}>
                 <img
                   src={Invite}
@@ -305,6 +348,19 @@ export default function BattleGameWaitingPage() {
           </PuzzleDetails>
         </Body>
       </Content>
+      <InviteModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+        roomId = {roomId}
+      />
+      <InviteAlertModal
+        isOpen={isInviteAlertOpen}
+        onClose={() => setInviteAlertOpen(false)}
+        roomId={roomId}
+        inviter = {invitingPlayer}
+        onAccept={handleInviteAccept}
+        onDecline={handleInviteDecline}
+      />
     </Wrapper>
   );  
 }
