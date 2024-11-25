@@ -15,10 +15,18 @@ import { socket } from "@/socket-utils/socket2";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { configStore } from "@/puzzle-core";
 import { getPuzzlePositionByIndex, updateGroupByBundles } from "@/puzzle-core/utils";
-
+import { groupPuzzlePieces } from "@/puzzle-core/index";
 import BackgroundPath from "@/assets/backgrounds/background2.png";
 
-import { Box, Dialog, DialogTitle, DialogContent, Snackbar, Button, ButtonBase } from "@mui/material";
+import {
+  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Snackbar,
+  Button,
+  ButtonBase,
+} from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
 import { useHint } from "@/hooks/useHint";
@@ -40,7 +48,6 @@ import mudAudioPath from "@/assets/audio/mud.wav";
 import tornadoAudioPath from "@/assets/audio/tornado.mp3";
 
 import './ani.css';
-
 
 const { connect, send, subscribe, disconnect } = socket;
 const { 
@@ -64,10 +71,10 @@ export default function BattleGameIngamePage() {
   const [enemyPercent, setEnemyPercent] = useState(0);
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
-  const [slots, setSlots] = useState(Array(8).fill(0))
+  const [slots, setSlots] = useState(Array(8).fill(0));
   const itemFunc = useMemo(() => {
     return {
-      FIRE(data){
+      FIRE(data) {
         const { targets, targetList } = data;
         const bundles = targets === "RED" ? data.redBundles : data.blueBundles;
         const fireImg = document.createElement("img");
@@ -116,13 +123,10 @@ export default function BattleGameIngamePage() {
         } else {
           // fire 발동하는 팀의 효과
           // console.log("fire 보낼거임");
-
           // fireImg.style.left = "1080px";
           // fireImg.style.top = "750px";
-
           // canvasContainer.appendChild(fireImg);
           // addAudio(fireAudioPath);
-
           // setTimeout(() => {
           //   console.log("불 효과 삭제");
           //   if (fireImg.parentNode) {
@@ -138,22 +142,22 @@ export default function BattleGameIngamePage() {
           }
         }, 2000);
       },
-      MUD(data){
-        const { targets } = data
+      MUD(data) {
+        const { targets } = data;
         if (getTeam().toUpperCase() !== targets) {
-          return
+          return;
         }
         const mudImg = document.createElement("img");
         mudImg.src = mudPath;
         mudImg.style.zIndex = 100;
         mudImg.style.position = "absolute";
-        mudImg.style['-webkit-user-drag'] = "none";
-        mudImg.style['-khtml-user-drag'] = "none";
-        mudImg.style['-moz-user-drag'] = "none";
-        mudImg.style['-o-user-drag'] = "none";
-        mudImg.style['user-drag'] = "none";
-        mudImg.style['pointer-events'] = 'none';
-        mudImg.style['max-height'] = '100%';
+        mudImg.style["-webkit-user-drag"] = "none";
+        mudImg.style["-khtml-user-drag"] = "none";
+        mudImg.style["-moz-user-drag"] = "none";
+        mudImg.style["-o-user-drag"] = "none";
+        mudImg.style["user-drag"] = "none";
+        mudImg.style["pointer-events"] = "none";
+        mudImg.style["max-height"] = "100%";
 
         const gameBoard = document.getElementById("gameBoard");
 
@@ -165,7 +169,6 @@ export default function BattleGameIngamePage() {
             mudImg.parentNode.removeChild(mudImg);
           }
         }, 5000);
-
       },
       TYPHOON(data){
         const { targets, targetList } = data
@@ -261,28 +264,28 @@ export default function BattleGameIngamePage() {
   };
 
   const initializeGame = (data) => {
-    const isBlue = data.blueTeam.some(p => p.playerId === Number(getSender()))
-    setTeam(isBlue ? 'blue' : 'red')
-    setRoomId(data.gameId)
+    const isBlue = data.blueTeam.some((p) => p.playerId === Number(getSender()));
+    setTeam(isBlue ? "blue" : "red");
+    setRoomId(data.gameId);
     setGameData(data);
-    const targetSlot = isBlue ? data.bluePuzzle.inventory : data.redPuzzle.inventory
-    setSlots(targetSlot)
+    const targetSlot = isBlue ? data.bluePuzzle.inventory : data.redPuzzle.inventory;
+    setSlots(targetSlot);
     console.log("gamedata is here!", gameData, data);
   };
-  
+
   const changePercent = (data) => {
     const roundTo = (num, decimals) => {
       return parseFloat(num.toFixed(decimals));
     };
 
     if (getTeam() === "red") {
-      setOurPercent(roundTo(data.redProgressPercent, 2));  // 소수점 두 번째 자리까지 반올림
+      setOurPercent(roundTo(data.redProgressPercent, 2)); // 소수점 두 번째 자리까지 반올림
       setEnemyPercent(roundTo(data.blueProgressPercent, 2));
     } else {
       setOurPercent(roundTo(data.blueProgressPercent, 2));
       setEnemyPercent(roundTo(data.redProgressPercent, 2));
     }
-};
+  };
 
   // const temp = true;
 
@@ -307,7 +310,7 @@ export default function BattleGameIngamePage() {
           //     data.blueProgressPercent === 100 ||
           //     (data.time !== undefined && data.time <= 0),
           // );
-          
+
           // 매번 게임이 끝났는지 체크
           if (data.isFinished === true) {
             // if (temp === true) {
@@ -328,6 +331,8 @@ export default function BattleGameIngamePage() {
           // 게임정보 받기
           if (data.gameType && data.gameType === "BATTLE") {
             initializeGame(data);
+            console.log("bundle화");
+            console.log(data);
             setTimeout(() => {
               console.log("번들로 그룹화 해볼게", getConfig(), data[`${getTeam()}Puzzle`].bundles);
               updateGroupByBundles({
@@ -339,12 +344,12 @@ export default function BattleGameIngamePage() {
             return;
           }
 
-          if(data.message in itemFunc){
-            itemFunc[data.message](data)
-            if(getTeam().toUpperCase() == "RED"){
-              setSlots(data.game.redPuzzle.inventory)
-            }else{
-              setSlots(data.game.bluePuzzle.inventory)
+          if (data.message in itemFunc) {
+            itemFunc[data.message](data);
+            if (getTeam().toUpperCase() == "RED") {
+              setSlots(data.game.redPuzzle.inventory);
+            } else {
+              setSlots(data.game.bluePuzzle.inventory);
             }
           }
 
@@ -416,15 +421,15 @@ export default function BattleGameIngamePage() {
 
         subscribe(`/topic/game/room/${gameId}/init`, (message) => {
           const data = JSON.parse(message.body);
+          console.log("init");
+          console.log(data);
           initializeGame(data);
-        })
+          console.log("번들로 그룹화 해볼게", getConfig(), data[`${getTeam()}Puzzle`].bundles);
+          groupPuzzlePieces({ config: getConfig(), bundles: data[`${getTeam()}Puzzle`].bundles });
+        });
 
         // 서버로 메시지 전송
-        send(
-          `/pub/${gameId}/game/enter`,
-          {},
-          JSON.stringify({}),
-        );
+        send(`/pub/${gameId}/game/enter`, {}, JSON.stringify({}));
       },
       () => {
         console.log("@@@@@@@@@@@@@@@@@@@@@socket error 발생@@@@@@@@@@@@@@@@@@@@@");
@@ -437,7 +442,9 @@ export default function BattleGameIngamePage() {
   };
 
   const useItem = useCallback((keyNumber) => {
-    send("/pub/game/puzzle", {},
+    send(
+      "/pub/game/puzzle",
+      {},
       JSON.stringify({
         type: "GAME",
         roomId: getRoomId(),
@@ -466,8 +473,8 @@ export default function BattleGameIngamePage() {
       const tempSrc =
         gameData.picture.encodedString === "짱구.jpg"
           ? "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp"
-          // : `data:image/jpeg;base64,${gameData.picture.encodedString}`;
-          :gameData.picture.encodedString
+          : // : `data:image/jpeg;base64,${gameData.picture.encodedString}`;
+            gameData.picture.encodedString;
 
       setPictureSrc(tempSrc);
     }
@@ -490,10 +497,10 @@ export default function BattleGameIngamePage() {
   return (
     <Wrapper>
       <LeftSidebar>
-      <Chatting2 chatHistory={chatHistory} isIngame={true} isBattle={true} />
+        <Chatting2 chatHistory={chatHistory} isIngame={true} isBattle={true} />
         {/* <Chatting /> */}
       </LeftSidebar>
-      <Row style={{padding: "10px 10px 10px 0", width: "80%"}}>
+      <Row style={{ padding: "10px 10px 10px 0", width: "80%" }}>
         <Board id="gameBoard">
           <PlayPuzzle
             category="battle"
@@ -507,31 +514,30 @@ export default function BattleGameIngamePage() {
           />
         </Board>
         <GameInfo>
-          <OutButton onClick={() => {}}>
-            나가기
-          </OutButton>
-          <img
-            src={pictureSrc}
-            alt="퍼즐 그림"
-            style={{ width: "100%" }}
-          />
+          <img src={pictureSrc} alt="퍼즐 그림" style={{ width: "100%" }} />
+          <OtherTeam>
+            <div style={{ width: "100%", textAlign: "center", fontSize: "50px" }}>상대팀 화면</div>
+          </OtherTeam>
           <Row>
             <ProgressContainer>
               <ProgressWrapper>
-                <PrograssBar percent={ourPercent} teamColor={getTeam() === "red"? "red":"blue"} />
+                <PrograssBar
+                  percent={ourPercent}
+                  teamColor={getTeam() === "red" ? "red" : "blue"}
+                />
               </ProgressWrapper>
               <ProgressWrapper>
-                <PrograssBar percent={enemyPercent} teamColor={getTeam() !== "red"? "red":"blue"} />
+                <PrograssBar
+                  percent={enemyPercent}
+                  teamColor={getTeam() !== "red" ? "red" : "blue"}
+                />
               </ProgressWrapper>
             </ProgressContainer>
             <Col>
-              <OtherTeam>
-                <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
-                  상대팀 화면
-                </div>
-              </OtherTeam>
               <Timer num={time} />
-              <Inventory slots={slots} useItem={useItem}></Inventory>
+              <ItemContainer>
+                <div style={{ width: "100%", textAlign: "center", fontSize: "50px" }}>아이템</div>
+              </ItemContainer>
               {/* <MiniMap>
                 <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
                   미니맵
@@ -703,7 +709,7 @@ const MiniMap = styled.div`
   height: 100%;
   border-radius: 10px;
   background-color: white;
-`
+`;
 
 const ProgressWrapper = styled(Box)`
   display: inline-block;
