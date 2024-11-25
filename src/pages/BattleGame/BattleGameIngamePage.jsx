@@ -42,12 +42,14 @@ import firePath from "@/assets/effects/fire.gif";
 import mudPath from "@/assets/effects/mud.png";
 import tornadoPath from "@/assets/effects/tornado.gif";
 import bloomPath from "@/assets/effects/blooming.gif";
+import twinklePath from "@/assets/effects/twinkle.gif";
 
 import { addAudio } from "../../puzzle-core/attackItem";
 import fireAudioPath from "@/assets/audio/fire.mp3";
 import mudAudioPath from "@/assets/audio/mud.wav";
 import tornadoAudioPath from "@/assets/audio/tornado.mp3";
 import bloomAudioPath from "@/assets/audio/blooming.mp3";
+import frameAudioPath from "@/assets/audio/frame2.mp3";
 
 import './ani.css';
 
@@ -60,6 +62,7 @@ const {
   addPiece, 
   usingItemFire,
   usingItemTyphoon,
+  usingItemFrame,
 } = configStore;
 
 export default function BattleGameIngamePage() {
@@ -185,6 +188,7 @@ export default function BattleGameIngamePage() {
 
         tornadoImg.style.zIndex = 100;
         tornadoImg.style.position = "absolute";
+        tornadoImg.style["pointer-events"] = "none";
         tornadoImg.style.width = "40%";
         tornadoImg.style.height = "45%";
 
@@ -220,6 +224,7 @@ export default function BattleGameIngamePage() {
 
         bloomImg.style.zIndex = 100;
         bloomImg.style.position = "absolute";
+        bloomImg.style["pointer-events"] = "none";
         bloomImg.style.width = "75%";
         bloomImg.style.height = "75%";
 
@@ -233,8 +238,32 @@ export default function BattleGameIngamePage() {
           }
         }, 2000);
       },
-      FRAME(){
+      FRAME(data){
+        const { targets, targetList } = data
+        const bundles = targets === "RED" ? data.redBundles : data.blueBundles;
+        if (getTeam().toUpperCase() !== targets) {
+          return
+        }
 
+        const twinkleImg = document.createElement("img");
+        const gameBoard = document.getElementById("gameBoard");
+        twinkleImg.src = twinklePath;
+
+        twinkleImg.style.zIndex = 100;
+        twinkleImg.style.position = "absolute";
+        twinkleImg.style["pointer-events"] = "none";
+        twinkleImg.style.width = "100%";
+        twinkleImg.style.height = "100%";
+
+        addAudio(frameAudioPath);
+        gameBoard.appendChild(twinkleImg);
+        
+        setTimeout(() => usingItemFrame(targetList, bundles), 1000);
+        setTimeout(() => {
+          if (twinkleImg.parentNode) {
+            twinkleImg.parentNode.removeChild(twinkleImg);
+          }
+        }, 2000);
       },
     }
   }, [])
@@ -322,21 +351,9 @@ export default function BattleGameIngamePage() {
         console.log("@@@@@@@@@@@@@@@@ 인게임 소켓 연결 @@@@@@@@@@@@@@@@@@");
         subscribe(`/topic/game/room/${gameId}`, (message) => {
           const data = JSON.parse(message.body);
-          console.log(data);
-
-          // console.log(
-          //   data.isFinished,
-          //   Boolean(data.isFinished),
-          //   data.redProgressPercent === 100,
-          //   data.blueProgressPercent === 100,
-          //   data.time,
-          // );
-          // console.log(
-          //   Boolean(data.isFinished) ||
-          //     data.redProgressPercent === 100 ||
-          //     data.blueProgressPercent === 100 ||
-          //     (data.time !== undefined && data.time <= 0),
-          // );
+          if(data.message !== 'MOVE'){
+            console.log(data);
+          }
 
           // 매번 게임이 끝났는지 체크
           if (data.isFinished === true) {
@@ -355,22 +372,6 @@ export default function BattleGameIngamePage() {
             setTime(data.time);
           }
 
-          // 게임정보 받기
-          if (data.gameType && data.gameType === "BATTLE") {
-            initializeGame(data);
-            console.log("bundle화");
-            console.log(data);
-            setTimeout(() => {
-              console.log("번들로 그룹화 해볼게", getConfig(), data[`${getTeam()}Puzzle`].bundles);
-              updateGroupByBundles({
-                config: getConfig(),
-                bundles: data[`${getTeam()}Puzzle`].bundles,
-              });
-            }, 400);
-
-            return;
-          }
-
           if (data.message in itemFunc) {
             itemFunc[data.message](data);
             if (getTeam().toUpperCase() == "RED") {
@@ -384,7 +385,6 @@ export default function BattleGameIngamePage() {
           // ATTACK일때 2초 뒤(효과 지속 시간과 동일) 반영
           // MIRROR일때 3초 뒤(효과 지속 시간과 동일) 반영
           if (data.redProgressPercent >= 0 && data.blueProgressPercent >= 0) {
-            console.log("진행도?", data.redProgressPercent, data.blueProgressPercent);
             if (data.message && data.message === "ATTACK") {
               setTimeout(() => {
                 changePercent(data);
@@ -450,9 +450,8 @@ export default function BattleGameIngamePage() {
           const data = JSON.parse(message.body);
           console.log("init");
           console.log(data);
-          initializeGame(data);
-          console.log("번들로 그룹화 해볼게", getConfig(), data[`${getTeam()}Puzzle`].bundles);
-          groupPuzzlePieces({ config: getConfig(), bundles: data[`${getTeam()}Puzzle`].bundles });
+          initializeGame(data.game);
+          changePercent(data)
         });
 
         // 서버로 메시지 전송
@@ -538,6 +537,7 @@ export default function BattleGameIngamePage() {
             )}
             board={gameData[`${getTeam()}Puzzle`].board}
             picture={gameData.picture}
+            bundles={Object.values(gameData[`${getTeam()}Puzzle`].bundles)}
           />
         </Board>
         <GameInfo>

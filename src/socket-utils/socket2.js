@@ -25,7 +25,7 @@ function createSocket() {
       onStompError: (frame) => {
         console.error("STOMP 오류:", frame.headers["message"]);
       },
-      debug: (msg) => console.log("DEBUG: ", msg), // 디버깅 로그 활성화
+      // debug: (msg) => console.log("DEBUG: ", msg), // 디버깅 로그 활성화
     });
 
     stomp.activate();

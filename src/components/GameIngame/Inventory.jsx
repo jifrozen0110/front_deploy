@@ -4,9 +4,9 @@ import firePath from "@/assets/effects/fire.gif";
 import mudPath from "@/assets/effects/mud.png";
 import tornadoPath from "@/assets/effects/tornado.gif";
 import bloomPath from "@/assets/effects/blooming.gif";
+import twinklePath from "@/assets/effects/twinkle.gif";
 
-const itemImgs = [null, firePath, mudPath, tornadoPath, bloomPath]
-
+const itemImgs = [null, firePath, mudPath, tornadoPath, bloomPath, twinklePath]
 
 const Inventory = ({slots, useItem}) => {
   const onSlotClick = (index) => {

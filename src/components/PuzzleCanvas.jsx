@@ -2,17 +2,16 @@ import { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { configStore } from "../puzzle-core";
 
-const { initializePuzzle } = configStore;
+const { initializePuzzle, groupPuzzlePieces, getConfig } = configStore;
 
-export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture }) {
+export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture, bundles }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     if (canvasRef.current) {
       initializePuzzle({ canvasRef, puzzleImg, level, shapes, board, picture });
+      groupPuzzlePieces({ config: getConfig(), bundles })
     }
-
-    // eslint-disable-next-line
   }, [canvasRef]);
 
   return (
