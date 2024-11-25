@@ -1,0 +1,16 @@
+﻿/* Animation definition */
+@keyframes moveAround {
+    0% {
+        top: 80%;
+        /* Start at the bottom-left */
+        left: 0%;
+        transform: translate(-50%, -60%);
+    }
+
+    100% {
+        top: 0%;
+        /* Return to the bottom-left */
+        left: 100%;
+        transform: translate(-50%, -50%);
+    }
+}

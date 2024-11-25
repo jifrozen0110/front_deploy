@@ -36,15 +36,29 @@ import { useSnackbar } from "../../hooks/useSnackbar";
 import { useInventory } from "../../hooks/useInventory";
 import { useSnackbar2 } from "../../hooks/useSnackbar2";
 import { setRoomId, setTeam } from "../../socket-utils/storage";
+
 import Inventory from "../../components/GameIngame/Inventory";
 import firePath from "@/assets/effects/fire.gif";
 import mudPath from "@/assets/effects/mud.png";
+import tornadoPath from "@/assets/effects/tornado.gif";
+
+import { addAudio } from "../../puzzle-core/attackItem";
 import fireAudioPath from "@/assets/audio/fire.mp3";
 import mudAudioPath from "@/assets/audio/mud.wav";
-import { addAudio } from "../../puzzle-core/attackItem";
+import tornadoAudioPath from "@/assets/audio/tornado.mp3";
+
+import './ani.css';
 
 const { connect, send, subscribe, disconnect } = socket;
-const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, usingItemFire } = configStore;
+const { 
+  getConfig, 
+  lockPuzzle, 
+  movePuzzle, 
+  unLockPuzzle, 
+  addPiece, 
+  usingItemFire,
+  usingItemTyphoon,
+} = configStore;
 
 export default function BattleGameIngamePage() {
   const navigate = useNavigate();
@@ -97,6 +111,7 @@ export default function BattleGameIngamePage() {
 
             canvasContainer.appendChild(fireImgCopy);
             addAudio(fireAudioPath);
+            usingItemTyphoon()
 
             setTimeout(() => {
               if (fireImgCopy.parentNode) {
@@ -155,11 +170,47 @@ export default function BattleGameIngamePage() {
           }
         }, 5000);
       },
-      TYPHOON() {},
-      BROOMSTICK() {},
-      FRAME() {},
-    };
-  }, []);
+      TYPHOON(data){
+        const { targets, targetList } = data
+        const bundles = targets === "RED" ? data.redBundles : data.blueBundles;
+        if (getTeam().toUpperCase() !== targets) {
+          return
+        }
+
+        const tornadoImg = document.createElement("img");
+        const gameBoard = document.getElementById("gameBoard");
+        tornadoImg.src = tornadoPath;
+
+        tornadoImg.style.zIndex = 100;
+        tornadoImg.style.position = "absolute";
+        tornadoImg.style.width = "40%";
+        tornadoImg.style.height = "45%";
+
+        if (targetList === null || targetList.length === 0) {
+          return;
+        }
+
+        tornadoImg.style.animation = "moveAround 1.2s linear infinite";
+
+        addAudio(tornadoAudioPath);
+        gameBoard.appendChild(tornadoImg);
+        usingItemTyphoon(targetList, bundles)
+
+        setTimeout(() => {
+          if (tornadoImg.parentNode) {
+            tornadoImg.parentNode.removeChild(tornadoImg);
+          }
+        }, 1200);
+
+      },
+      BROOMSTICK(){
+
+      },
+      FRAME(){
+
+      },
+    }
+  }, [])
 
   const { isShowSnackbar, setIsShowSnackbar, snackMessage, setSnackMessage } = useSnackbar({
     autoClosing: true,

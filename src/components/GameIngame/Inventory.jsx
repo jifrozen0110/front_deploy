@@ -2,8 +2,9 @@
 import "./Inventory.css";
 import firePath from "@/assets/effects/fire.gif";
 import mudPath from "@/assets/effects/mud.png";
+import tornadoPath from "@/assets/effects/tornado.gif";
 
-const itemImgs = [null, firePath, mudPath]
+const itemImgs = [null, firePath, mudPath, tornadoPath]
 
 
 const Inventory = ({slots, useItem}) => {

@@ -201,15 +201,16 @@ const createPuzzleConfig = () => {
   };
 
   // 공격형 아이템 earthquake
-  const usingItemEarthquake = (targetList, deleted) => {
-    console.log(targetList, deleted);
+  const usingItemTyphoon = (targetList, bundles) => {
+    const targetSet = new Set(targetList)
 
-    config.groupTiles.forEach((gtile) => {
-      if (targetList.includes(gtile[2])) {
-        const position = deleted[gtile[2]];
-        config.tiles[gtile[2]].position = new Point(position[0], position[1]);
-      }
-    });
+    bundles.forEach(bundle => {
+      bundle.forEach(({ index, position_x, position_y }) => {
+        if (targetSet.has(index)) {
+          config.tiles[index].position = new Point(position_x, position_y)
+        }
+      })
+    })
   };
 
   const usingItemFrame = (targetList, bundles = []) => {
@@ -233,7 +234,7 @@ const createPuzzleConfig = () => {
     addCombo,
     usingItemFire,
     usingItemRocket,
-    usingItemEarthquake,
+    usingItemTyphoon,
     usingItemFrame,
     usingItemMagnet,
   };
