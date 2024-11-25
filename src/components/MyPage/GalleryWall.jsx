@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { X, Handshake, Users } from 'lucide-react';
+import { X, Users } from 'lucide-react';
 
-const GalleryWall = (count) => {
+const GalleryWall = ({count = 0}) => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   const images = [
@@ -99,13 +99,201 @@ const GalleryWall = (count) => {
         },
       ]
     },
+    {
+      id: 4,
+      url: 'https://i.namu.wiki/i/nOXgZWBRaZguCSSys7FwQEdEae7OIo3gU6kMwqQ-52ITBgrmTNxqaOVF68Arm5pxLGUAy08DWHLhZdn_6hyzdg.webp',
+      roomTitle: '퍼즐 한 판',
+      description: '추가적인 설명란 필요?',
+      piece: '300',
+      clearTime: '10:10',
+      date: '2024/11/25 10:00',
+      whos: [
+        {
+          id: 1,
+          name: "이누야샤",
+          avatar: "https://via.placeholder.com/50", // 유저 아바타 이미지
+        },
+        {
+          id: 2,
+          name: "카구라",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 3,
+          name: "셋쇼마루",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 4,
+          name: "미로쿠",
+          avatar: "https://via.placeholder.com/50",
+        },
+      ]
+    },
+    {
+      id: 5,
+      url: 'https://i.pinimg.com/originals/b5/9d/8f/b59d8f8cbb54368862109db8324dc6b8.jpg',
+      roomTitle: '너만 오면 고',
+      description: '추가적인 설명란 필요?',
+      piece: '500',
+      clearTime: '10:10',
+      date: '2024/11/25 10:00',
+      whos: [
+        {
+          id: 1,
+          name: "이누야샤",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 2,
+          name: "카구라",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 3,
+          name: "셋쇼마루",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 4,
+          name: "미로쿠",
+          avatar: "https://via.placeholder.com/50",
+        },
+      ]
+    },
+    {
+      id: 6,
+      url: 'https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp',
+      roomTitle: '짱구가 좋아',
+      description: '추가적인 설명란 필요?',
+      piece: '100',
+      clearTime: '10:10',
+      date: '2024/11/25 10:00',
+      whos: [
+        {
+          id: 1,
+          name: "이누야샤",
+          avatar: "https://via.placeholder.com/50", // 유저 아바타 이미지
+        },
+        {
+          id: 2,
+          name: "카구라",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 3,
+          name: "셋쇼마루",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 4,
+          name: "미로쿠",
+          avatar: "https://via.placeholder.com/50",
+        },
+      ]
+    },
+    {
+      id: 7,
+      url: 'https://i.namu.wiki/i/nOXgZWBRaZguCSSys7FwQEdEae7OIo3gU6kMwqQ-52ITBgrmTNxqaOVF68Arm5pxLGUAy08DWHLhZdn_6hyzdg.webp',
+      roomTitle: '퍼즐 한 판',
+      description: '추가적인 설명란 필요?',
+      piece: '300',
+      clearTime: '10:10',
+      date: '2024/11/25 10:00',
+      whos: [
+        {
+          id: 1,
+          name: "이누야샤",
+          avatar: "https://via.placeholder.com/50", // 유저 아바타 이미지
+        },
+        {
+          id: 2,
+          name: "카구라",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 3,
+          name: "셋쇼마루",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 4,
+          name: "미로쿠",
+          avatar: "https://via.placeholder.com/50",
+        },
+      ]
+    },
+    {
+      id: 8,
+      url: 'https://i.pinimg.com/originals/b5/9d/8f/b59d8f8cbb54368862109db8324dc6b8.jpg',
+      roomTitle: '너만 오면 고',
+      description: '추가적인 설명란 필요?',
+      piece: '500',
+      clearTime: '10:10',
+      date: '2024/11/25 10:00',
+      whos: [
+        {
+          id: 1,
+          name: "이누야샤",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 2,
+          name: "카구라",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 3,
+          name: "셋쇼마루",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 4,
+          name: "미로쿠",
+          avatar: "https://via.placeholder.com/50",
+        },
+      ]
+    },
+    {
+      id: 9,
+      url: 'https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp',
+      roomTitle: '짱구가 좋아',
+      description: '추가적인 설명란 필요?',
+      piece: '100',
+      clearTime: '10:10',
+      date: '2024/11/25 10:00',
+      whos: [
+        {
+          id: 1,
+          name: "이누야샤",
+          avatar: "https://via.placeholder.com/50", // 유저 아바타 이미지
+        },
+        {
+          id: 2,
+          name: "카구라",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 3,
+          name: "셋쇼마루",
+          avatar: "https://via.placeholder.com/50",
+        },
+        {
+          id: 4,
+          name: "미로쿠",
+          avatar: "https://via.placeholder.com/50",
+        },
+      ]
+    },
   ];
+
+  const limitedImages = count ? images.slice(0, count) : images;
 
   return (
     <Container>
       {/* 갤러리 그리드 */}
       <GalleryGrid>
-        {images.map((image) => (
+        {limitedImages.map((image) => (
           <ImageWrapper
             key={image.id}
             onClick={() => setSelectedImage(image)}
@@ -191,7 +379,7 @@ const ImageContainer = styled.div`
 `;
 
 const ImageContainerModal = styled.div`
-  margin: 15px auto 0;
+  margin: 0 auto;
   position: relative;
   overflow: hidden;
   border: 4px solid white;
@@ -294,9 +482,11 @@ const ModalCard = styled.div`
 
 
 const CloseButton = styled.button`
-  position: absolute;
-  top: 8px;
-  right: 5px;
+  position: sticky;
+  display: flex;
+  justify-content: end;
+  top: 5px;
+  width: 100%;
   background: none;
   border: none;
   cursor: pointer;
@@ -307,7 +497,7 @@ const CloseButton = styled.button`
 `;
 
 const ModalContent = styled.div`
-  padding: 24px;
+  padding: 0 24px 24px 24px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -352,7 +542,7 @@ const DescriptionHeader = styled.div`
 
 const UserList = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 10px;
   margin-top: 8px;
 `;
@@ -360,6 +550,7 @@ const UserList = styled.div`
 const UserCard = styled.div`
   display: flex;
   align-items: center;
+  min-width: 100px;
   gap: 8px;
   background: #f9f9f9;
   padding: 10px;

@@ -12,7 +12,7 @@ const width = 100
 export default function ProfilePage() {
   const [userData, setUserData] = useState({})
   const [forUpdate, setForUpdate] = useState(0)
-  const navi = useNavigate()
+  const navigate = useNavigate()
   const forceUpdate = () => setForUpdate(forUpdate + 1)
 
   const records = [
@@ -57,7 +57,7 @@ export default function ProfilePage() {
   }, [forUpdate])
 
   const moveGalleryWall = async () => {
-    navigate(`/user/GalleryWall`);
+    navigate(`/user/gallery`);
   };
 
   return (
@@ -171,6 +171,10 @@ const Profile = styled.div`
   gap: 35px;
   width: 100%;
   box-sizing: border-box;
+`
+
+const MoreButton = styled.button`
+
 `
 
 const Battle = styled.div`
