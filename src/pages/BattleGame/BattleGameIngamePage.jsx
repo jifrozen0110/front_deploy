@@ -30,7 +30,9 @@ import { useSnackbar2 } from "../../hooks/useSnackbar2";
 import { setRoomId, setTeam } from "../../socket-utils/storage";
 import Inventory from "../../components/GameIngame/Inventory";
 import firePath from "@/assets/effects/fire.gif";
+import mudPath from "@/assets/effects/mud.png";
 import fireAudioPath from "@/assets/audio/fire.mp3";
+import mudAudioPath from "@/assets/audio/mud.wav";
 import { addAudio } from "../../puzzle-core/attackItem";
 
 
@@ -67,9 +69,6 @@ export default function BattleGameIngamePage() {
         // fire 당하는 팀의 효과
         if (targets === getTeam().toUpperCase()) {
           if (targetList === null || targetList.length === 0) {
-            // 해당되는 target이 없을 경우 알림 해야함
-            setSnackMessage("불 지르기가 왔는데 운 좋게도(?)... 불 지르기 당할 맞춰진 피스가 없군요.");
-            setSnackOpen(true);
             return;
           }
 
@@ -101,20 +100,20 @@ export default function BattleGameIngamePage() {
           }
         } else {
           // fire 발동하는 팀의 효과
-          console.log("fire 보낼거임");
+          // console.log("fire 보낼거임");
 
-          fireImg.style.left = "1080px";
-          fireImg.style.top = "750px";
+          // fireImg.style.left = "1080px";
+          // fireImg.style.top = "750px";
 
-          canvasContainer.appendChild(fireImg);
-          addAudio(fireAudioPath);
+          // canvasContainer.appendChild(fireImg);
+          // addAudio(fireAudioPath);
 
-          setTimeout(() => {
-            console.log("불 효과 삭제");
-            if (fireImg.parentNode) {
-              fireImg.parentNode.removeChild(fireImg);
-            }
-          }, 2000);
+          // setTimeout(() => {
+          //   console.log("불 효과 삭제");
+          //   if (fireImg.parentNode) {
+          //     fireImg.parentNode.removeChild(fireImg);
+          //   }
+          // }, 2000);
         }
 
         setTimeout(() => {
@@ -124,7 +123,33 @@ export default function BattleGameIngamePage() {
           }
         }, 2000);
       },
-      MUD(){
+      MUD(data){
+        const { targets } = data
+        if (getTeam().toUpperCase() !== targets) {
+          return
+        }
+        const mudImg = document.createElement("img");
+        mudImg.src = mudPath;
+        mudImg.style.zIndex = 100;
+        mudImg.style.position = "absolute";
+        mudImg.style['-webkit-user-drag'] = "none";
+        mudImg.style['-khtml-user-drag'] = "none";
+        mudImg.style['-moz-user-drag'] = "none";
+        mudImg.style['-o-user-drag'] = "none";
+        mudImg.style['user-drag'] = "none";
+        mudImg.style['pointer-events'] = 'none';
+        mudImg.style['max-height'] = '100%';
+
+        const gameBoard = document.getElementById("gameBoard");
+
+        addAudio(mudAudioPath);
+        gameBoard.appendChild(mudImg);
+
+        setTimeout(() => {
+          if (mudImg.parentNode) {
+            mudImg.parentNode.removeChild(mudImg);
+          }
+        }, 5000);
 
       },
       TYPHOON(){
@@ -610,6 +635,7 @@ const Board = styled.div`
   border-radius: 10px;
   border: 6px solid ${getTeam() === "red" ? red[400] : blue[400]};
   background-color: rgba(255, 255, 255, 0.8);
+  position: relative;
 `;
 
 const ItemContainer = styled.div`
