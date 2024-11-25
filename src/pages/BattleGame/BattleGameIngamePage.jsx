@@ -41,11 +41,13 @@ import Inventory from "../../components/GameIngame/Inventory";
 import firePath from "@/assets/effects/fire.gif";
 import mudPath from "@/assets/effects/mud.png";
 import tornadoPath from "@/assets/effects/tornado.gif";
+import bloomPath from "@/assets/effects/blooming.gif";
 
 import { addAudio } from "../../puzzle-core/attackItem";
 import fireAudioPath from "@/assets/audio/fire.mp3";
 import mudAudioPath from "@/assets/audio/mud.wav";
 import tornadoAudioPath from "@/assets/audio/tornado.mp3";
+import bloomAudioPath from "@/assets/audio/blooming.mp3";
 
 import './ani.css';
 
@@ -201,10 +203,35 @@ export default function BattleGameIngamePage() {
             tornadoImg.parentNode.removeChild(tornadoImg);
           }
         }, 1200);
-
       },
-      BROOMSTICK(){
+      BROOMSTICK(data){
+        const { targets, targetList } = data
+        const bundles = targets === "RED" ? data.redBundles : data.blueBundles;
+        if (getTeam().toUpperCase() !== targets) {
+          return
+        }
+        if (targetList === null || targetList.length === 0) {
+          return;
+        }
 
+        const bloomImg = document.createElement("img");
+        const gameBoard = document.getElementById("gameBoard");
+        bloomImg.src = bloomPath;
+
+        bloomImg.style.zIndex = 100;
+        bloomImg.style.position = "absolute";
+        bloomImg.style.width = "75%";
+        bloomImg.style.height = "75%";
+
+        addAudio(bloomAudioPath);
+        gameBoard.appendChild(bloomImg);
+        
+        setTimeout(() => usingItemTyphoon(targetList, bundles), 1000);
+        setTimeout(() => {
+          if (bloomImg.parentNode) {
+            bloomImg.parentNode.removeChild(bloomImg);
+          }
+        }, 2000);
       },
       FRAME(){
 
@@ -514,10 +541,14 @@ export default function BattleGameIngamePage() {
           />
         </Board>
         <GameInfo>
-          <img src={pictureSrc} alt="퍼즐 그림" style={{ width: "100%" }} />
-          <OtherTeam>
-            <div style={{ width: "100%", textAlign: "center", fontSize: "50px" }}>상대팀 화면</div>
-          </OtherTeam>
+        <OutButton onClick={() => {}}>
+            나가기
+          </OutButton>
+          <img
+            src={pictureSrc}
+            alt="퍼즐 그림"
+            style={{ width: "100%" }}
+          />
           <Row>
             <ProgressContainer>
               <ProgressWrapper>
@@ -527,17 +558,17 @@ export default function BattleGameIngamePage() {
                 />
               </ProgressWrapper>
               <ProgressWrapper>
-                <PrograssBar
-                  percent={enemyPercent}
-                  teamColor={getTeam() !== "red" ? "red" : "blue"}
-                />
+              <PrograssBar percent={enemyPercent} teamColor={getTeam() !== "red"? "red":"blue"} />
               </ProgressWrapper>
             </ProgressContainer>
             <Col>
+              <OtherTeam>
+                <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
+                  상대팀 화면
+                </div>
+              </OtherTeam>
               <Timer num={time} />
-              <ItemContainer>
-                <div style={{ width: "100%", textAlign: "center", fontSize: "50px" }}>아이템</div>
-              </ItemContainer>
+              <Inventory slots={slots} useItem={useItem}></Inventory>
               {/* <MiniMap>
                 <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
                   미니맵
