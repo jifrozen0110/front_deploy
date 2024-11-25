@@ -1,45 +1,19 @@
 import { useMemo, useEffect } from "react";
 import { styled } from "styled-components";
-import { PlayerCard } from "@/components/GameWaiting/PlayerCard";
-import { getTeam, getRoomId } from "@/socket-utils/storage";
-import { addAudio } from "@/puzzle-core/attackItem";
 import { useGameInfo } from "@/hooks/useGameInfo";
-
-import winPath from "@/assets/effects/win.gif";
-import youLostPath from "@/assets/effects/youLose.png";
-import winAudioPath from "@/assets/audio/win.mp3";
-import loseAudioPath from "@/assets/audio/lose.mp3";
-
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Snackbar,
-  Grid,
-  Card,
-  CardContent,
-} from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 export default function ResultModal({
   isOpenedDialog,
   handleCloseGame,
-  ourPercent,
-  enemyPercent,
-  ourTeam,
-  enemyTeam,
+  ourPercent = 0, // 기본값 설정
+  enemyPercent = 0, // 기본값 설정
+  ourTeam = [], // 기본값 설정
+  enemyTeam = [], // 기본값 설정
   numOfUsingItemRed,
   numOfUsingItemBlue,
 }) {
   const { image } = useGameInfo();
   const roomId = localStorage.getItem('roomId');
-  const theme = createTheme({
-    typography: {
-      fontFamily: "'Galmuri11', sans-serif",
-    },
-  });
 
   const resultState = useMemo(() => {
     if (ourPercent > enemyPercent) {
@@ -51,186 +25,225 @@ export default function ResultModal({
     }
   }, [ourPercent, enemyPercent]);
 
-  const resultStateImgObject = {
-    win: winPath,
-    lose: youLostPath,
-  };
+  const resultText = resultState === "win" ? "WIN!!" : resultState === "lose" ? "LOSE!!" : "DRAW!!";
+  const resultTextColor = resultState === "win" ? "#ffc107" : resultState === "lose" ? "#373737" : "#a985ff";
 
-  useEffect(() => {
-    if (isOpenedDialog) {
-      if (resultState === "win") {
-        addAudio(winAudioPath);
-      } else {
-        addAudio(loseAudioPath);
-      }
-    }
-  }, [isOpenedDialog]);
   const navigateToWaitingPage = () => {
     window.location.replace(`/game/battle/waiting/${roomId}`);
-  }; 
+  };
+
+  ourTeam = [
+    {
+      id: 1,
+      name: "이누야샤",
+      avatar: "https://via.placeholder.com/50", // 유저 아바타 이미지
+    },
+    {
+      id: 2,
+      name: "카구라",
+      avatar: "https://via.placeholder.com/50",
+    }
+  ]
+  enemyTeam = [
+    {
+      id: 3,
+      name: "셋쇼마루",
+      avatar: "https://via.placeholder.com/50",
+    },
+    {
+      id: 4,
+      name: "미로쿠",
+      avatar: "https://via.placeholder.com/50",
+    },
+  ]
+
   return (
-    <ThemeProvider theme={theme}>
-      <Dialog open={isOpenedDialog} onClose={() => navigateToWaitingPage()}>
-        <ResultStateWrapper>
-          {resultState === "draw" ? <h1>DRAW</h1> : <img src={resultStateImgObject[resultState]} />}
-        </ResultStateWrapper>
-        <DialogContent>
-          <Wrapper>
-            <ResultCard
-              color={"red"}
-              // numOfUsingPositiveItem={numOfUsingItemRed.positiveItem.current}
-              // numOfUsingAttackItem={numOfUsingItemRed.attackItem.current}
-              image={image}
-              ourPercent={ourPercent}
-              enemyPercent={enemyPercent}
-            />
-            <ResultCard
-              color={"blue"}
-              // numOfUsingPositiveItem={numOfUsingItemBlue.positiveItem.current}
-              // numOfUsingAttackItem={numOfUsingItemBlue.attackItem.current}
-              image={image}
-              ourPercent={ourPercent}
-              enemyPercent={enemyPercent}
-            />
-          </Wrapper>
-          {/* 버튼 추가 */}
-          <Button 
-            variant="contained" 
-            color="primary"
-            sx={{ width: "100%", height: "50px", padding: "2%", margin: "15% auto" }}
-            onClick={navigateToWaitingPage} // Room ID를 포함하여 이동
-          >
-            게임 대기실로 가기
-          </Button>
-        </DialogContent>
-      </Dialog>
-    </ThemeProvider>
+    <Dialog open={isOpenedDialog}>
+      <DialogWrapper>
+        {/* 결과 텍스트 */}
+        <ResultText color={resultTextColor}>{resultText}</ResultText>
+
+        {/* 팀 정보 */}
+        <ResultContainer>
+          <TeamWrapper>
+            <TeamName color="#3b82f6">Blue</TeamName>
+            <TeamPercent color="#3b82f6">{ourPercent}%</TeamPercent>
+            <TeamPlayers>
+              {ourTeam.length > 0 ? (
+                ourTeam.map((player) => (
+                  <Player key={player.id}>
+                    <PlayerAvatar src={player.avatar} alt={player.name} />
+                    <PlayerName>{player.name}</PlayerName>
+                  </Player>
+                ))
+              ) : (
+                <NoPlayers>플레이어 정보가 없습니다</NoPlayers>
+              )}
+            </TeamPlayers>
+          </TeamWrapper>
+
+          <CenterContainer>
+            {/* 중앙 이미지 */}
+            <GameImageWrapper>
+              <GameImage src={image} alt="Game Result" />
+            </GameImageWrapper>
+
+            {/* 확인 버튼 */}
+            <ConfirmButton onClick={navigateToWaitingPage}>확인</ConfirmButton>
+          </CenterContainer>
+
+          <TeamWrapper>
+            <TeamName color="#ef4444">Red</TeamName>
+            <TeamPercent color="#ef4444">{enemyPercent}%</TeamPercent>
+            <TeamPlayers>
+              {enemyTeam.length > 0 ? (
+                enemyTeam.map((player) => (
+                  <Player key={player.id}>
+                    <PlayerAvatar src={player.avatar} alt={player.name} />
+                    <PlayerName>{player.name}</PlayerName>
+                  </Player>
+                ))
+              ) : (
+                <NoPlayers>플레이어 정보가 없습니다</NoPlayers>
+              )}
+            </TeamPlayers>
+          </TeamWrapper>
+        </ResultContainer>
+
+      </DialogWrapper>
+    </Dialog>
   );
 }
 
-function ResultCard({
-  color,
-  numOfUsingPositiveItem,
-  numOfUsingAttackItem,
-  image,
-  ourPercent,
-  enemyPercent,
-}) {
-  const percent = getTeam() === color ? ourPercent : enemyPercent;
-
-  return (
-    <CardWrapper>
-      <ImgWrapper>
-        <White $percent={percent}></White>
-        <CardImg src={image} />
-        <PercentText $color={color}>{percent}%</PercentText>
-      </ImgWrapper>
-
-      <Card
-        sx={{
-          backgroundColor: color === "red" ? "lightpink" : "lightblue",
-          margin: "2%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        {/* <CardHeader $color={color}>{color} Team</CardHeader>
-        <CardContent>
-          <p>
-            <NumSpan>{numOfUsingPositiveItem}번</NumSpan> 도움 아이템 (힌트, 자석, 액자)를
-            사용했어요!
-          </p>
-          <p>
-            <NumSpan>{numOfUsingAttackItem}번</NumSpan> 방해 아이템 (불 지르기, 로켓, 회오리)를
-            사용했어요!
-          </p>
-        </CardContent> */}
-      </Card>
-    </CardWrapper>
-  );
-}
-
-const ResultStateWrapper = styled.div`
-  margin: 5% auto 0 auto;
-
-  & img {
-    max-width: 250px;
-  }
-
-  -webkit-animation: bounce-in-bck 1.1s both;
-  animation: bounce-in-bck 1.1s both;
+const Dialog = styled.div`
+  display: ${(props) => (props.open ? "flex" : "none")};
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(7px);
 `;
 
-const Wrapper = styled.div`
+const DialogWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  padding: 0 50px;
+  text-align: center;
   display: flex;
+  flex-direction: column; /* 세로 방향으로 정렬 */
+  justify-content: space-between;
+  gap: 10px;
 `;
 
-const CardWrapper = styled.div`
+const CenterContainer = styled.div`
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
 `;
 
-const ImgWrapper = styled.div`
-  position: relative;
+const ResultText = styled.h1`
+  font-size: 140px;
+  font-weight: bold;
+  text-shadow: 0 0 100px white;
+
+  background: linear-gradient(to bottom, white 15%, ${(props) => props.color} 65%);
+  -webkit-text-stroke: 6px black;
+  -webkit-background-clip: text; /* 텍스트 부분만 배경을 보이게 함 */
+  -webkit-text-fill-color: transparent; /* 텍스트의 색상을 투명으로 설정 */
 `;
 
-const White = styled.div`
-  position: absolute;
+const GameImageWrapper = styled.div`
+
+`;
+
+const GameImage = styled.img`
+  max-width: 50vw;
+  max-height: 50vh;
+  object-fit: cover;
+  border: 4px solid white;
+`;
+
+const ResultContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
   width: 100%;
-  height: ${(props) => {
-    return `${100 - props.$percent}%`;
-  }};
-  background-color: rgba(255, 255, 255, 0.8);
+  gap: 50px;
+  flex-grow: 1; /* 부모 컨테이너의 남은 공간을 차지 */
 `;
 
-const CardImg = styled.img`
-  height: 100px;
-  border-radius: 5px;
+const TeamWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 30%;
 `;
 
-const PercentText = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: ${(props) => {
-    if (props.$color === "red") {
-      return "red";
-    } else {
-      return "blue";
-    }
-  }};
+const TeamName = styled.h2`
+  margin-top: -40px;
+  font-size: 100px;
   font-weight: bold;
+  color: ${(props) => props.color};
+  -webkit-text-stroke: 4px white;
+`;
+
+const TeamPercent = styled.div`
+  margin-top: -30px;
+  font-size: 70px;
+  font-weight: bold;
+  color: white;
+`;
+
+const TeamPlayers = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 50px auto 0;
+  padding-top: 20px;
+  width: 250px;
+  border-top: 1px solid white;
+`;
+
+const Player = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const PlayerAvatar = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+`;
+
+const PlayerName = styled.span`
   font-size: 30px;
-  font-family: "Galmuri11", sans-serif;
-`;
-
-const CardHeader = styled.div`
-  font-size: 22px;
-  width: 90%;
-  margin-top: 5%;
-  border-bottom: 1px solid
-    ${(props) => {
-      if (props.$color === "red") {
-        return "red";
-      } else {
-        return "blue";
-      }
-    }};
-  color: ${(props) => {
-    if (props.$color === "red") {
-      return "red";
-    } else {
-      return "blue";
-    }
-  }};
-`;
-
-const NumSpan = styled.span`
-  color: #fff;
   font-weight: bold;
-  font-size: 20px;
-  font-family: "Galmuri11", sans-serif;
+  color: #fff;
+`;
+
+const NoPlayers = styled.div`
+  font-size: 1rem;
+  color: #aaa;
+`;
+
+const ConfirmButton = styled.button`
+  padding: 15px 40px;
+  margin: 0 auto 70px;
+  font-size: 30px;
+  font-weight: bold;
+  background-color: #ff9800;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+
+  &:hover {
+    background-color: #e68a00;
+  }
 `;
