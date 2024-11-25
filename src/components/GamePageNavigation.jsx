@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import { Link, useLocation } from "react-router-dom";
 import { Box, Tabs, Tab } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";

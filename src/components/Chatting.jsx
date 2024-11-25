@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import Button from "@mui/material/Button";
 import ChatSend from "@/assets/icons/chat_send.png";
 import { socket } from "@/socket-utils/socket2"; // 소켓 유틸리티

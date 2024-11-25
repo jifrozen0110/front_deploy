@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { authRequest, SERVER_END_POINT } from "../apis/requestBuilder";
 import { BackGround, LoginButtonBox, MainBox, PaddingDiv } from "../components/styled/styled";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import GalleryWall from "@/components/MyPage/GalleryWall";
 import { Camera, ChevronRight, Swords, Handshake, User, Star } from 'lucide-react';
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { X, Users } from 'lucide-react';
 
 const GalleryWall = ({count = 0}) => {

@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import { isAxiosError } from "axios";
 
 import Header from "@/components/Header";

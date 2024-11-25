@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import { styled } from "styled-components";
 import { Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import loadingPath from "@/assets/loading.gif";

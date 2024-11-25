@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";

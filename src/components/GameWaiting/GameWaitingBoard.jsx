@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
 import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";

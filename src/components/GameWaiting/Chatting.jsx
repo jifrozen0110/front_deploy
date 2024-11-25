@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import { getSender, getRoomId, getTeam } from "@/socket-utils/storage";
 import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
 import { socket } from "@/socket-utils/socket2";

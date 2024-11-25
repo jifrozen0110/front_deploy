@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import { styled } from "styled-components";
 import LinearProgress from "@mui/material/LinearProgress";
 import { getTeam } from "@/socket-utils/storage";
 import { red, blue, deepPurple } from "@mui/material/colors";

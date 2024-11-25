@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import ImageIcon from "./ImageIcon";
 import HeaderPuzzleImage from "@/assets/icons/header_puzzle.png";
 import HeaderRankImage from "@/assets/icons/header_rank.png";
