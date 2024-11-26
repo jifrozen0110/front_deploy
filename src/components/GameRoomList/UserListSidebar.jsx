@@ -50,21 +50,18 @@ const FriendItem = styled(ListItem)`
   align-items: center;
 `;
 
-
-
-
 const UserListSidebar = () => {
   // State 관리
   const [friends, setFriends] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
-  const [userId, setUserId] = useState(1); // 예시로 사용자 ID를 설정
+  const [userId, setUserId] = useState(localStorage.getItem('userId')); // 예시로 사용자 ID를 설정
   const [showFriends, setShowFriends] = useState(true); // 친구 목록 보이기 상태
   const [showPendingRequests, setShowPendingRequests] = useState(true); // 대기 중인 목록 보이기 상태
 
   // 친구 목록 가져오기
-  const fetchFriends = async (user_id) => {
+  const fetchFriends = async () => {
     try {
-      const res = await authRequest().get(`/api/friend/${user_id}`);
+      const res = await authRequest().get(`/api/friend/${userId}`);
       setFriends(res.data.friends ?? []); // 친구 목록
       setPendingRequests(res.data.pendingRequests ?? []); // 친구 요청
     } catch(error){
@@ -86,7 +83,7 @@ const UserListSidebar = () => {
     try{
       const response = await authRequest().post(`/api/friend/accept?requesterId=${requesterId}&receiverId=${userId}`);
       alert(response.data); // 서버의 응답 데이터 출력
-      fetchFriends(userId); // 친구 목록 갱신
+      fetchFriends(); // 친구 목록 갱신
     } catch (error){
       console.error("친구 요청을 수락하는 중 오류 발생:",error);
     }
@@ -96,7 +93,7 @@ const UserListSidebar = () => {
     try{
       const response = await authRequest().delete(`/api/friend/reject?requesterId=${requesterId}&receiverId=${userId}`);
       alert(response.data);
-      fetchFriends(userId);
+      fetchFriends();
     } catch(error){
       console.error("친구 요청을 거절하는 중 오류 발생:",error)
     }
@@ -108,7 +105,7 @@ const UserListSidebar = () => {
       try {
         const response = await authRequest().delete(`/api/friend/remove?userId=${userId}&friendId=${friendId}`);
         alert(response.data); // 서버의 응답 데이터 출력
-        fetchFriends(userId); // 친구 목록 갱신
+        fetchFriends(); // 친구 목록 갱신
       } catch (error) {
         console.error("친구 삭제 중 오류 발생:", error);
       }
@@ -118,9 +115,9 @@ const UserListSidebar = () => {
 
   // 페이지가 로드될 때 친구 목록 불러오기
   useEffect(() => {
-    const user_id = localStorage.userId; // localStorage에서 id 가져오기
-    setUserId(user_id); // userId 업데이트
-    fetchFriends(user_id); // userId로 친구 목록 가져오기
+    //  ; // localStorage에서 id 가져오기
+    // setUserId(userId); // userId 업데이트
+    fetchFriends(); // userId로 친구 목록 가져오기
   }, []);
 
   return (
