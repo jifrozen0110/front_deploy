@@ -1,116 +1,87 @@
-import { useEffect, useState } from "react";
-import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
-import { request } from "../../apis/requestBuilder";
-import Button from "@mui/material/Button";
+import React, { useState } from 'react';
+import { styled } from 'styled-components';
+import Avatar from "@mui/material/Avatar";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
 import IconButton from "@mui/material/IconButton";
-import ChatIcon from "@mui/icons-material/Chat";
-import ContactEmergencyIcon from "@mui/icons-material/ContactEmergency";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TextField from "@mui/material/TextField";
-import UserAPI from "../../apis/CustomUserAPI";
-import { Stack, List, ListItem, ListItemText } from "@mui/material";
+import { authRequest } from "../../apis/requestBuilder";
 
-export default function FriendSearch() {
-  const navigate = useNavigate();
-  const [searchResultList, setSearchResultList] = useState([]);
-  const [searchString, setSearchString] = useState("");
+// 스타일링 컴포넌트들
+const StyledTextField = styled(TextField)`
+  margin-bottom: 15px;
+  width: 100%;
+`;
 
-  const fetchSearchResultList = async () => {
-    try {
-      const searchList = await UserAPI.searchUsersByNickName(searchString);
-      setSearchResultList(searchList);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+const FriendsList = styled.div`
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: white;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+`;
 
-  const getCookie = (name) => {
-    const cookies = document.cookie.split("; ");
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.startsWith(name + "=")) {
-        return cookie.substring(name.length + 1);
+const FriendItem = styled(ListItem)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const InviteButton = styled(IconButton)`
+  color: #3498db;
+`;
+
+const SearchUser = ({ onAddFriend }) => {
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
+  const handleSearchChange = async (e) => {
+    const userId = localStorage.userId
+    const keyword = e.target.value;
+    setSearchKeyword(keyword);
+    if (keyword.length > 0) {
+      try {
+        const res = await authRequest().get(`/api/friend/search?keyword=${keyword}`);
+        // 자기 자신은 검색에서 제외
+        const filteredResults = res.data.filter((user)=>user.userId !== parseInt(userId));
+        setSearchResults(filteredResults);
+      } catch (error) {
+        console.error("친구 검색 중 오류 발생:", error);
       }
-    }
-  };
-
-  const sendFriendRequest = async (toUser) => {
-    const userId = getCookie("userId");
-
-    if (!userId) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
-
-    const response = await request.post(`/friend`, {
-      from_user_id: userId, // 쿠키에서 꺼낸 userId
-      to_user_id: toUser.id, // 넘어온 userId
-      request_status: "requested",
-    });
-    console.log(response.data);
-    if (response.data) {
-      alert("친구 요청 완료!");
     } else {
-      alert("친구 요청에 실패했습니다.");
-    }
-  };
-
-  const handleSearchInputChange = (e) => {
-    setSearchString(e.target.value);
-  };
-
-  const handleEnterKeyPress = (e) => {
-    if (e.key === "Enter") {
-      fetchSearchResultList();
+      setSearchResults([]);
     }
   };
 
   return (
     <>
-      <Stack direction="row" spacing={2}>
-        <TextField
-          id="userSearchInput"
-          value={searchString}
-          onKeyDown={handleEnterKeyPress}
-          onChange={handleSearchInputChange}
-          label="검색할 닉네임을 입력하세요."
-          variant="standard"
-        />
-        <Button variant="outlined" onClick={fetchSearchResultList}>
-          SEARCH
-        </Button>
-      </Stack>
-      {searchResultList.length === 0 ? (
-        <p>퍼즐을 함께 즐길 플레이어를 찾아 보세요!</p>
-      ) : (
-        <List>
-          {searchResultList.map((user) => (
-            <ListItem key={user.id}>
-              <ProfileImage imgPath={user.img_path} />
-              <ListItemText primary={user.nickname} secondary={user.email} />
-
-              <IconButton aria-label="profileBtn" onClick={() => navigate(`/user/${user.id}`)}>
-                <ContactEmergencyIcon />
-              </IconButton>
-              <IconButton aria-label="friendRequestBtn" onClick={() => sendFriendRequest(user)}>
+      <StyledTextField
+        label="검색할 사용자 이름"
+        variant="outlined"
+        size="small"
+        value={searchKeyword}
+        onChange={handleSearchChange}
+      />
+      {searchResults.length > 0 && (
+        <FriendsList>
+          {searchResults.map((result) => (
+            <FriendItem key={result.userId}>
+              <ListItemAvatar>
+                <Avatar src={result.userImage} alt={result.userName} />
+              </ListItemAvatar>
+              <ListItemText primary={result.userName} secondary={result.email} />
+              <InviteButton onClick={() => onAddFriend(result.userId)}>
                 <PersonAddIcon />
-              </IconButton>
-            </ListItem>
+              </InviteButton>
+            </FriendItem>
           ))}
-        </List>
+        </FriendsList>
       )}
     </>
   );
-}
-
-const ProfileImage = ({ imgPath }) => {
-  return <StyledImage src={imgPath} alt="Profile" />;
 };
 
-const StyledImage = styled.img`
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  margin: 15px;
-`;
+export default SearchUser;
