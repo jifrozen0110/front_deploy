@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { styled } from "styled-components";
 
 import PlayPuzzle from "@/components/PlayPuzzle";
@@ -9,6 +9,7 @@ import PrograssBar from "@/components/GameIngame/ProgressBar";
 import Chatting2 from "@/components/GameWaiting/Chatting";
 import Chatting from "@/components/Chatting";
 import ResultModal from "@/components/GameIngame/ResultModal";
+import useExitRoom from "@/components/ExitRoom";
 
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
@@ -77,6 +78,9 @@ export default function BattleGameIngamePage() {
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
   const [slots, setSlots] = useState(Array(8).fill(0));
+
+  const isGameEndingRef = useRef(false);
+
   const itemFunc = useMemo(() => {
     return {
       FIRE(data) {
@@ -497,7 +501,6 @@ export default function BattleGameIngamePage() {
     );
   }, []);
 
-  const location = useLocation();
   const playerId = localStorage.getItem("userId");
   const playerImage = localStorage.getItem("image");
   const playerName = localStorage.getItem("userName");
@@ -508,37 +511,12 @@ export default function BattleGameIngamePage() {
   });
   const roomId = localStorage.getItem('roomId');
 
-  const exitRoom = useCallback(() => {
+  const exitRoom = () => {
     console.log("방 나가기~");
     send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
-  }, [roomId]);
+  };
 
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        console.log("탭 비활성화 또는 닫기 감지");
-        exitRoom();
-      }
-    };
-
-    const handleBeforeUnload = (event) => {
-      // 새로고침이 아닌 URL 변경 및 종료 시 실행
-      if (event.returnValue !== undefined) {
-        console.log("탭 종료 또는 URL 변경 감지");
-        exitRoom();
-      }
-    };
-
-    window.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      console.log("컴포넌트 언마운트");
-      exitRoom();
-      window.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [exitRoom, location]);
+  useExitRoom(exitRoom, isGameEndingRef);
 
   useEffect(() => {
     // if (roomId !== getRoomId() || !getSender()) {
@@ -704,6 +682,7 @@ export default function BattleGameIngamePage() {
         enemyTeam={getTeam() === "red" ? gameData.blueTeam.players : gameData.redTeam.players}
         numOfUsingItemRed={numOfUsingItemRed}
         numOfUsingItemBlue={numOfUsingItemBlue}
+        isGameEndingRef={isGameEndingRef}
       />
     </Wrapper>
   );
