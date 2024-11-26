@@ -25,4 +25,5 @@ export default function PrograssBar({ percent, teamColor }) {
 const BorderLinearProgress = styled(LinearProgress)`
   width: 20px;
   height: 100%;
+  border-radius: 8px;
 `;

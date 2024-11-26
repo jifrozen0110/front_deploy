@@ -98,8 +98,10 @@ export default function SelectImgAndPiece({ src, allowedPiece }) {
         "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
       );
     } else {
-      setSelectedImg(`data:image/jpeg;base64,${src}`);
-      setImage(`data:image/jpeg;base64,${src}`);
+      // setSelectedImg(`data:image/jpeg;base64,${src}`);
+      // setImage(`data:image/jpeg;base64,${src}`);
+      setSelectedImg(src);
+      setImage(src);
     }
   }, []);
 

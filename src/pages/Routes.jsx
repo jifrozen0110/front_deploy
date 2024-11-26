@@ -6,6 +6,7 @@ import RankPage from "./RankPage";
 // import ShopPage from "./ShopPage";
 // import OptionsPage from "./OptionsPage";
 import ProfilePage from "./ProfilePage";
+import Gallery from "./Gallery";
 import LoginPage from "./LoginPage";
 import LoginRedirect from "./login/LoginRedirect";
 
@@ -19,6 +20,7 @@ export function Routes() {
       {/* <Route path="/shop" element={<ShopPage />} /> */}
       {/* <Route path="/options" element={<OptionsPage />} /> */}
       <Route path="/user" element={<ProfilePage />} />
+      <Route path="/user/gallery" element={<Gallery />} />
       <Route path="/game/battle" element={<BattleGame.ListPage />} />
       <Route path="/game/battle/waiting/:roomId" element={<BattleGame.WaitingPage />} />
       <Route path="/game/battle/ingame/:roomId" element={<BattleGame.IngamePage />} />

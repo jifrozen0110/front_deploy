@@ -11,7 +11,11 @@ import {
 } from "./item";
 import { setMoveEvent } from "./setMoveEvent";
 import { uniteTiles } from "./uniteTiles";
-import { cleanBorderStyle, switchDirection } from "./utils";
+import { cleanBorderStyle, switchDirection, updateGroupByBundles } from "./utils";
+export const groupPuzzlePieces = ({ config, bundles }) => {
+  updateGroupByBundles({ config, bundles });
+  return config;
+};
 
 const createPuzzleConfig = () => {
   let config = {};
@@ -87,42 +91,21 @@ const createPuzzleConfig = () => {
     // const updatedConfig = updateGroupByBundles({ config: nextConfig, bundles }); // 콤보랑 같이 쓰면 버그가..
     // config = cleanBorderStyle({ config: updatedConfig });
   };
+  // 필요한 유틸리티 함수들이 정의되어 있다고 가정합니다.
+  // uniteTiles2, updateGroupByBundles, switchDirection, cleanBorderStyle
+
 
   // 공격형 아이템 fire
   const usingItemFire = (bundles, targetList) => {
-    config = itemFire({ config, bundles, targetList });
+    updateGroupByBundles({ config, bundles })
 
-    // bundles의 인덱스만 담은 object
-    // const bundlesIdxList = [];
-
-    // bundles.forEach((group) => {
-    //   const idxList = [];
-    //   group.forEach((g) => {
-    //     idxList.push(g.index);
-    //   });
-    //   bundlesIdxList.push(idxList);
-    // });
-
-    // // 불 지르기로 없어지는 타겟 list 그룹 해제
-    // config.groupTiles.forEach((gtile) => {
-    //   // 일단 모두 그룹 해제
-    //   gtile[1] = undefined;
-    //   // target이면 랜덤 위치에 떨어뜨림
-    //   if (targetList.includes(gtile[2])) {
-    //     const randomX = Math.random() * 960 + 20;
-    //     const randomY = Math.random() * 710 + 20;
-    //     config.tiles[gtile[2]].position = new Point(randomX, randomY);
-    //   }
-    // });
-
-    // // 남아있는 그룹 번호 다시 쓰기
-    // bundlesIdxList.forEach((list, groupNum) => {
-    //   console.log(groupNum, "번째 그룹", list);
-    //   list.forEach((i) => {
-    //     console.log(config.groupTiles[i]);
-    //     config.groupTiles[i][1] = groupNum;
-    //   });
-    // });
+    bundles.forEach(bundle => {
+      bundle.forEach(({ index, position_x, position_y }) => {
+        if (targetList.includes(index)) {
+          config.tiles[index].position = new Point(position_x, position_y)
+        }
+      })
+    })
   };
 
   // 공격형 아이템 rocket
@@ -140,21 +123,32 @@ const createPuzzleConfig = () => {
   };
 
   // 공격형 아이템 earthquake
-  const usingItemEarthquake = (targetList, deleted) => {
-    console.log(targetList, deleted);
+  const usingItemTyphoon = (targetList, bundles) => {
+    const targetSet = new Set(targetList)
 
-    config.groupTiles.forEach((gtile) => {
-      if (targetList.includes(gtile[2])) {
-        const position = deleted[gtile[2]];
-        config.tiles[gtile[2]].position = new Point(position[0], position[1]);
-      }
-    });
+    bundles.forEach(bundle => {
+      bundle.forEach(({ index, position_x, position_y }) => {
+        if (targetSet.has(index)) {
+          config.tiles[index].position = new Point(position_x, position_y)
+        }
+      })
+    })
   };
 
   const usingItemFrame = (targetList, bundles = []) => {
     // TODO: Toast를 통해 액자 아이템을 사용했다는 UI 보여주기
     // TODO: 액자를 사용할 곳이 없다면 UI 보여주기
-    config = itemFrame({ config, targetList, bundles });
+    const targetSet = new Set(targetList)
+
+    bundles.forEach(bundle => {
+      bundle.forEach(({ index, position_x, position_y }) => {
+        if (targetSet.has(index)) {
+          config.tiles[index].position = new Point(position_x, position_y)
+        }
+      })
+    })
+    updateGroupByBundles({ config, bundles })
+    // config = itemFrame({ config, targetList, bundles });
   };
 
   const usingItemMagnet = (targetList, bundles = []) => {
@@ -172,9 +166,10 @@ const createPuzzleConfig = () => {
     addCombo,
     usingItemFire,
     usingItemRocket,
-    usingItemEarthquake,
+    usingItemTyphoon,
     usingItemFrame,
     usingItemMagnet,
+    groupPuzzlePieces,
   };
 };
 

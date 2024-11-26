@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import PuzzleCanvas from "./PuzzleCanvas";
 
-const PlayPuzzle = ({ category, shapes, board, picture }) => {
+const PlayPuzzle = ({ category, shapes, board, picture, bundles }) => {
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef(null);
   const [puzzleInfo, setPuzzleInfo] = useState({
@@ -15,8 +15,9 @@ const PlayPuzzle = ({ category, shapes, board, picture }) => {
   const initialize = useCallback(() => {
     const img =
       picture.encodedString === "짱구.jpg"
-        ? "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp"
-        : `data:image/jpeg;base64,${picture.encodedString}`;
+        ? "https://i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp"
+        : // : `data:image/jpeg;base64,${picture.encodedString}`;
+          picture.encodedString;
     const res = {
       img,
       level: 1,
@@ -50,6 +51,7 @@ const PlayPuzzle = ({ category, shapes, board, picture }) => {
             shapes={shapes}
             board={board}
             picture={picture}
+            bundles={bundles}
           />
         )}
       </div>
