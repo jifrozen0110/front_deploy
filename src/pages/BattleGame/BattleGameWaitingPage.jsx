@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { styled } from "styled-components";
 import { isAxiosError } from "axios";
@@ -6,6 +6,7 @@ import { isAxiosError } from "axios";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Chatting from "@/components/Chatting";
+import useExitRoom from "@/components/ExitRoom";
 
 import Grid from "@mui/material/Unstable_Grid2";
 import Button from "@mui/material/Button";
@@ -56,6 +57,8 @@ export default function BattleGameWaitingPage() {
     playerName,
   });
 
+  const isGameStartingRef = useRef(false);
+
   // 초대 수락 처리 함수
   const handleInviteAccept = () => {
     // 초대 수락 시 처리할 로직
@@ -83,10 +86,10 @@ export default function BattleGameWaitingPage() {
     console.log("방 입장~");
     send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
   };
-  const exitRoom = useCallback(() => {
+  const exitRoom = () => {
     console.log("방 나가기~");
     send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
-  }, [roomId]);
+  };
   const switchTeam = () => {
     console.log("팀 바꾸기~");
     send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
@@ -159,8 +162,8 @@ export default function BattleGameWaitingPage() {
         const data = JSON.parse(message.body);
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (data.gameId && Boolean(data.isStarted) && !Boolean(data.isFinished)) {
+          isGameStartingRef.current = true;
           setGameData(data);
-
           setImage(
             "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
           );
@@ -231,36 +234,11 @@ export default function BattleGameWaitingPage() {
     }
   };
 
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        console.log("탭 비활성화 또는 닫기 감지");
-        exitRoom();
-      }
-    };
-
-    const handleBeforeUnload = (event) => {
-      // 새로고침이 아닌 URL 변경 및 종료 시 실행
-      if (event.returnValue !== undefined) {
-        console.log("탭 종료 또는 URL 변경 감지");
-        exitRoom();
-      }
-    };
-
-    window.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      console.log("컴포넌트 언마운트");
-      exitRoom();
-      window.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [exitRoom, location]);
+  useExitRoom(exitRoom, isGameStartingRef);
 
   useEffect(() => {
     initialize();
-  }, [roomId]);
+  }, []);
 
   if (isLoading) {
     return (

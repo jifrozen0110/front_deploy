@@ -12,7 +12,7 @@ function PlayerCard(props) {
   return (
     <WrapperCard className={color}>
       <CardMedia
-        sx={{ width: "60px", height: "60px" }}
+        sx={{ width: "60px", height: "60px", aspectRatio: "1 / 1" }}
         component="img"
         alt={player.playerName}
         image={player.playerImage}

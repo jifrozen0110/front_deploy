@@ -17,6 +17,7 @@ export default function ResultModal({
   enemyTeam = [], // 기본값 설정
   numOfUsingItemRed,
   numOfUsingItemBlue,
+  isGameEndingRef,
 }) {
   const bluePercent = getTeam() === "blue" ? ourPercent : enemyPercent;
   const redPercent = getTeam() === "red" ? ourPercent : enemyPercent;
@@ -38,6 +39,7 @@ export default function ResultModal({
   const roomId = localStorage.getItem('roomId');
 
   const navigateToWaitingPage = () => {
+    isGameEndingRef.current = true;
     window.location.replace(`/game/battle/waiting/${roomId}`);
   };
 
