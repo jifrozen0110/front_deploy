@@ -1,6 +1,9 @@
 import { useMemo, useEffect } from "react";
 import { styled } from "styled-components";
 import { useGameInfo } from "@/hooks/useGameInfo";
+import { socket } from "@/socket-utils/socket2";
+
+const { connect, send, subscribe, disconnect } = socket;
 
 export default function ResultModal({
   isOpenedDialog,
@@ -12,8 +15,8 @@ export default function ResultModal({
   numOfUsingItemRed,
   numOfUsingItemBlue,
 }) {
+
   const { image } = useGameInfo();
-  const roomId = localStorage.getItem('roomId');
 
   const resultState = useMemo(() => {
     if (ourPercent > enemyPercent) {
@@ -25,8 +28,9 @@ export default function ResultModal({
     }
   }, [ourPercent, enemyPercent]);
 
-  const resultText = resultState === "win" ? "WIN!!" : resultState === "lose" ? "LOSE!!" : "DRAW!!";
+  const resultText = resultState === "win" ? "WIN!!" : resultState === "lose" ? "LOSE" : "DRAW";
   const resultTextColor = resultState === "win" ? "#ffc107" : resultState === "lose" ? "#373737" : "#a985ff";
+  const roomId = localStorage.getItem('roomId');
 
   const navigateToWaitingPage = () => {
     window.location.replace(`/game/battle/waiting/${roomId}`);
@@ -61,7 +65,13 @@ export default function ResultModal({
     <Dialog open={isOpenedDialog}>
       <DialogWrapper>
         {/* 결과 텍스트 */}
-        <ResultText color={resultTextColor}>{resultText}</ResultText>
+        <ResultTextWrapper state={resultState} color={resultTextColor}>
+          {resultText.split("").map((char, index) => (
+            <AnimatedLetter key={index} index={index} state={resultState} color={resultTextColor}>
+              {char}
+            </AnimatedLetter>
+          ))}
+        </ResultTextWrapper>
 
         {/* 팀 정보 */}
         <ResultContainer>
@@ -89,7 +99,7 @@ export default function ResultModal({
             </GameImageWrapper>
 
             {/* 확인 버튼 */}
-            <ConfirmButton onClick={navigateToWaitingPage}>확인</ConfirmButton>
+            <ConfirmButton onClick={navigateToWaitingPage}>게임 대기실로 가기</ConfirmButton>
           </CenterContainer>
 
           <TeamWrapper>
@@ -134,7 +144,7 @@ const DialogWrapper = styled.div`
   padding: 0 50px;
   text-align: center;
   display: flex;
-  flex-direction: column; /* 세로 방향으로 정렬 */
+  flex-direction: column;
   justify-content: space-between;
   gap: 10px;
 `;
@@ -147,15 +157,85 @@ const CenterContainer = styled.div`
   gap: 15px;
 `;
 
-const ResultText = styled.h1`
+const ResultTextWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+`;
+
+const AnimatedLetter = styled.span`
   font-size: 140px;
   font-weight: bold;
   text-shadow: 0 0 100px white;
 
-  background: linear-gradient(to bottom, white 15%, ${(props) => props.color} 65%);
+  background: linear-gradient(to bottom, white 20%, ${(props) => props.color} 65%);
   -webkit-text-stroke: 6px black;
-  -webkit-background-clip: text; /* 텍스트 부분만 배경을 보이게 함 */
-  -webkit-text-fill-color: transparent; /* 텍스트의 색상을 투명으로 설정 */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+
+  animation: ${(props) =>
+    props.state === "win"
+      ? "winEffect 1.5s infinite"
+      : props.state === "lose"
+      ? "loseEffect 5s infinite"
+      : "drawEffect 1.5s infinite"};
+  animation-delay: ${(props) => props.state === "lose"? 0 : props.index * 0.1}s;
+
+  @keyframes winEffect {
+    0% {
+      transform: translateY(0);
+      text-shadow: 0 0 20px ${(props) => props.color}, 0 0 40px ${(props) => props.color};
+    }
+    50% {
+      transform: translateY(-15px);
+      text-shadow: 0 0 30px white, 0 0 60px ${(props) => props.color};
+    }
+    100% {
+      transform: translateY(0);
+      text-shadow: 0 0 20px ${(props) => props.color}, 0 0 40px ${(props) => props.color};
+    }
+  }
+
+  @keyframes loseEffect {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    20% {
+      transform: translateY(-5px) scale(1); /* 위로 살짝 올라감 */
+      opacity: 0.7;
+    }
+    60% {
+      transform: translateY(25px) scale(0.9); /* 더 아래로 내려감 */
+      opacity: 0.3;
+    }
+    100% {
+      transform: translateY(0) scale(1); /* 원래 위치로 복귀 */
+      opacity: 1;
+    }
+  }
+
+
+
+  @keyframes drawEffect {
+    0% {
+      transform: rotate(0);
+    }
+    25% {
+      transform: rotate(-3deg);
+    }
+    50% {
+      transform: rotate(3deg);
+    }
+    75% {
+      transform: rotate(-3deg);
+    }
+    100% {
+      transform: rotate(0);
+    }
+  }
 `;
 
 const GameImageWrapper = styled.div`

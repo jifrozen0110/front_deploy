@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { styled } from "styled-components";
 
 import PlayPuzzle from "@/components/PlayPuzzle";
@@ -481,6 +481,49 @@ export default function BattleGameIngamePage() {
       }),
     );
   }, []);
+
+  const location = useLocation();
+  const playerId = localStorage.getItem("userId");
+  const playerImage = localStorage.getItem("image");
+  const playerName = localStorage.getItem("userName");
+  const createPlayerRequest = () => ({
+    playerId,
+    playerImage,
+    playerName,
+  });
+  const roomId = localStorage.getItem('roomId');
+
+  const exitRoom = useCallback(() => {
+    console.log("방 나가기~");
+    send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
+  }, [roomId]);
+  
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        console.log("탭 비활성화 또는 닫기 감지");
+        exitRoom();
+      }
+    };
+
+    const handleBeforeUnload = (event) => {
+      // 새로고침이 아닌 URL 변경 및 종료 시 실행
+      if (event.returnValue !== undefined) {
+        console.log("탭 종료 또는 URL 변경 감지");
+        exitRoom();
+      }
+    };
+
+    window.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      console.log("컴포넌트 언마운트");
+      exitRoom();
+      window.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [exitRoom, location]);
 
   useEffect(() => {
     // if (roomId !== getRoomId() || !getSender()) {
