@@ -2,6 +2,7 @@ import { useMemo, useEffect } from "react";
 import { styled } from "styled-components";
 import { useGameInfo } from "@/hooks/useGameInfo";
 import { socket } from "@/socket-utils/socket2";
+import { getTeam } from "@/socket-utils/storage";
 
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -15,6 +16,8 @@ export default function ResultModal({
   numOfUsingItemRed,
   numOfUsingItemBlue,
 }) {
+  const bluePercent = getTeam() === "blue" ? ourPercent : enemyPercent;
+  const redPercent = getTeam() === "red" ? ourPercent : enemyPercent;
 
   const { image } = useGameInfo();
 
@@ -77,7 +80,7 @@ export default function ResultModal({
         <ResultContainer>
           <TeamWrapper>
             <TeamName color="#3b82f6">Blue</TeamName>
-            <TeamPercent color="#3b82f6">{ourPercent}%</TeamPercent>
+            <TeamPercent color="#3b82f6">{bluePercent}%</TeamPercent>
             <TeamPlayers>
               {ourTeam.length > 0 ? (
                 ourTeam.map((player) => (
@@ -104,7 +107,7 @@ export default function ResultModal({
 
           <TeamWrapper>
             <TeamName color="#ef4444">Red</TeamName>
-            <TeamPercent color="#ef4444">{enemyPercent}%</TeamPercent>
+            <TeamPercent color="#ef4444">{redPercent}%</TeamPercent>
             <TeamPlayers>
               {enemyTeam.length > 0 ? (
                 enemyTeam.map((player) => (
