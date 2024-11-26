@@ -497,7 +497,7 @@ export default function BattleGameIngamePage() {
     console.log("방 나가기~");
     send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
   }, [roomId]);
-  
+
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
@@ -567,10 +567,13 @@ export default function BattleGameIngamePage() {
   return (
     <Wrapper>
       <LeftSidebar>
+        <OutButton onClick={() => navigate("/game/battle")}>
+          나가기
+        </OutButton>
         <Chatting2 chatHistory={chatHistory} isIngame={true} isBattle={true} />
         {/* <Chatting /> */}
       </LeftSidebar>
-      <Row style={{ padding: "10px 10px 10px 0", width: "80%" }}>
+      <Row style={{ padding: "10px 10px 10px 0", width: "80%", boxSizing: "border-box" }}>
         <Board id="gameBoard">
           <PlayPuzzle
             category="battle"
@@ -584,9 +587,6 @@ export default function BattleGameIngamePage() {
           />
         </Board>
         <GameInfo>
-        <OutButton onClick={() => {}}>
-            나가기
-          </OutButton>
           <img
             src={pictureSrc}
             alt="퍼즐 그림"
@@ -693,13 +693,15 @@ export default function BattleGameIngamePage() {
 }
 
 const Wrapper = styled.div`
-  display: flex; /* Flex 컨테이너 */
-  justify-content: space-between;
+  position: relative;
   height: 100vh;
   background-image: url(${BackgroundPath});
   background-size: cover;
   background-attachment: fixed;
-  margin: 0 auto;
+  box-sizing: border-box;
+
+  display: flex; /* Flex 컨테이너 */
+  justify-content: space-between;
   gap: 10px;
   user-select: none; /* 텍스트 선택 금지 */
 `;
@@ -707,12 +709,14 @@ const Wrapper = styled.div`
 const LeftSidebar = styled.div`
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
   height: 100%;
   width: 20%;
 `;
 
 const ProgressContainer = styled.div`
   display: flex;
+  box-sizing: border-box;
   gap: 10px;
 `;
 
@@ -746,10 +750,10 @@ const GameInfo = styled(Box)`
 const OtherTeam = styled.div`
   display: flex;
   align-items: center;
-
   width: 100%;
   height: 200px;
-  background-color: white;
+  background-color: lightgrey;
+  aspect-ratio: 3 / 4;
 `;
 
 const Board = styled.div`
@@ -792,12 +796,14 @@ const ProgressWrapper = styled(Box)`
 const OutButton = styled.button`
   background-color: orange;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 0 0 10px 0;
   width: 100%;
   font-size: 2.4em;
   padding: 10px;
+  cursor: pointer;
   &:hover {
     background-color: darkorange;
   }
