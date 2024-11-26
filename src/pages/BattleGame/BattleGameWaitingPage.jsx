@@ -137,6 +137,11 @@ export default function BattleGameWaitingPage() {
           Math.max(0, halfPlayers - data.bluePlayers.length),
         ]);
         setXPlayerCount([Math.max(0, 4 - halfPlayers), Math.max(0, 4 - halfPlayers)]);
+        if (data.bluePlayers.map(p => p.playerId).includes(Number(playerId))) {
+          setTeam("blue")
+        } else if (data.redPlayers.map(p => p.playerId).includes(Number(playerId))) {
+          setTeam("red")
+        }
 
         console.log(data);
 
