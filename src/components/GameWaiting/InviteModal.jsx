@@ -25,9 +25,7 @@ export default function InviteModal({ isOpen, onClose, roomId }) {
 
   const inviteUser = async (toPlayerId) => {
     try {
-      console.log(roomId);
       send(`/pub/room/${roomId}/invite`, {}, JSON.stringify({ fromPlayerId: parseInt(user_id), toPlayerId, fromUserName }));
-
       alert("초대가 완료되었습니다.");
       onClose();
     } catch (e) {
@@ -73,6 +71,7 @@ export default function InviteModal({ isOpen, onClose, roomId }) {
     </ModalOverlay>
   );
 }
+
 
 // 스타일링 컴포넌트들
 const ModalOverlay = styled.div`
