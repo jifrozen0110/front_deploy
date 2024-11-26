@@ -13,7 +13,6 @@ export default function InviteModal({ isOpen, onClose, roomId }) {
   const [friends, setFriends] = useState([]);
   const user_id = localStorage.userId;
   const fromUserName = localStorage.userName;
-
   const fetchFriends = async () => {
     try {
       const res = await authRequest().get(`/api/friend/${user_id}`);
@@ -25,7 +24,13 @@ export default function InviteModal({ isOpen, onClose, roomId }) {
 
   const inviteUser = async (toPlayerId) => {
     try {
-      send(`/pub/room/${roomId}/invite`, {}, JSON.stringify({ fromPlayerId: parseInt(user_id), toPlayerId, fromUserName }));
+      console.log(roomId);
+      send(
+        `/pub/room/${roomId}/invite`,
+        {},
+        JSON.stringify({ fromPlayerId: parseInt(user_id), toPlayerId, fromUserName }),
+      );
+
       alert("초대가 완료되었습니다.");
       onClose();
     } catch (e) {

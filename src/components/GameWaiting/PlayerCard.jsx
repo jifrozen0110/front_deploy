@@ -32,8 +32,8 @@ function PlayerCard(props) {
 
 function EmptyPlayerCard() {
   return (
-    <WrapperCard sx={{backgroundColor: "rgba(0,0,0,0.7)"}}>
-      <CardContent sx={{margin: "auto", color: "#C9C9C9", fontWeight: "bold", fontsize: 20}}>
+    <WrapperCard sx={{ backgroundColor: "rgba(0,0,0,0.7)" }}>
+      <CardContent sx={{ margin: "auto", color: "#C9C9C9", fontWeight: "bold", fontsize: 20 }}>
         비어 있음
       </CardContent>
     </WrapperCard>
@@ -42,10 +42,8 @@ function EmptyPlayerCard() {
 
 function XPlayerCard() {
   return (
-    <WrapperCard sx={{backgroundColor: "rgba(0,0,0,0.7)"}}>
-      <XContent>
-        X
-      </XContent>
+    <WrapperCard sx={{ backgroundColor: "rgba(0,0,0,0.7)" }}>
+      <XContent>X</XContent>
     </WrapperCard>
   );
 }
@@ -78,7 +76,7 @@ const Nickname = styled(Typography)`
   color: white;
   font-weight: bold;
   font-size: 20px;
-`
+`;
 
 const Content = styled.div`
   width: 100%;
@@ -96,7 +94,7 @@ const XContent = styled.div`
   display: flex;
   flex-direction: column;
   text-align: center;
-  color: #C9C9C9;
+  color: #c9c9c9;
   line-height: 1;
   padding-bottom: 5px;
   font-size: 40px;

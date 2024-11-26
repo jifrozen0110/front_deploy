@@ -23,7 +23,9 @@ export default function CreateRoomButton({ category }) {
   const navigate = useNavigate();
   const [roomName, setRoomName] = useState("퍼즐 한 판 !!");
   const [gameMode, setGameMode] = useState("battle"); // Default value
-  const [puzzleImage, setPuzzleImage] = useState("https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp"); // Default image
+  const [puzzleImage, setPuzzleImage] = useState(
+    "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+  ); // Default image
   const [puzzlePiece, setPuzzlePiece] = useState(100); // Default puzzle pieces
   const [maxPlayers, setMaxPlayers] = useState(4); // Default max players
   const [isOpenedModal, setIsOpenedModal] = useState(false);
@@ -65,10 +67,10 @@ export default function CreateRoomButton({ category }) {
     const requestData = {
       roomName,
       // gameMode,
-      gameMode : 'battle',
+      gameMode: "battle",
       puzzleImage,
       // puzzlePiece,
-      puzzlePiece : 100,
+      puzzlePiece: 100,
       maxPlayers,
       playerId,
       playerImage,
@@ -157,9 +159,7 @@ export default function CreateRoomButton({ category }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <CreateButton onClick={() => setIsOpenedModal(true)}>
-        방 만들기
-      </CreateButton>
+      <CreateButton onClick={() => setIsOpenedModal(true)}>방 만들기</CreateButton>
       <Modal
         open={isOpenedModal}
         onClose={handleClose}
