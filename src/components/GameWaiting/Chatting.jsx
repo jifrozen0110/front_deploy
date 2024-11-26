@@ -101,19 +101,6 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
               scrollbarColor: `${currentScrollbarTheme} rgba(255, 255, 255, 0)`,
             }}
           >
-            {isIngame && (
-              <>
-                <ChatDiv $color={currentChatTheme}>
-                  <Typography variant="body2">게임 시작! 🧩</Typography>
-                </ChatDiv>
-                <ChatDiv $color={currentChatTheme}>
-                  <Typography variant="body2">
-                    팀원들과 이곳에서 이야기를 나누며 전략을 세워 보세요 🧐
-                  </Typography>
-                </ChatDiv>
-                <hr />
-              </>
-            )}
 
             {/* 채팅 기록을 화면에 출력 */}
             {chatHistory.map((chat, index) => (
@@ -172,7 +159,6 @@ const Wrapper = styled.div`
       return "200px";
     }
   }};
-  margin: 0 3px;
   border: ${(props) => {
     if (props.$isIngame) {
       return `1px solid ${props.$color}`;
@@ -180,7 +166,7 @@ const Wrapper = styled.div`
       return "";
     }
   }};
-  border-radius: 10px;
+  border-radius: 0 10px 0 0;
   background-color: rgba(255, 255, 255, 0.6); /* 반투명 배경 */
   backdrop-filter: blur(40px); /* 블러 효과 */
 

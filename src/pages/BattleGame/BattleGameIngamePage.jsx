@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { styled } from "styled-components";
 
 import PlayPuzzle from "@/components/PlayPuzzle";
@@ -116,11 +116,11 @@ export default function BattleGameIngamePage() {
 
             canvasContainer.appendChild(fireImgCopy);
             addAudio(fireAudioPath);
-            usingItemTyphoon()
 
             setTimeout(() => {
               if (fireImgCopy.parentNode) {
                 console.log("불 효과 삭제");
+                usingItemFire(bundles, targetList);
                 fireImgCopy.parentNode.removeChild(fireImgCopy);
               }
             }, 2000);
@@ -140,12 +140,11 @@ export default function BattleGameIngamePage() {
           // }, 2000);
         }
 
-        setTimeout(() => {
-          if (targetList && targets === getTeam().toUpperCase()) {
-            console.log("fire 발동 !!");
-            usingItemFire(bundles, targetList);
-          }
-        }, 2000);
+        // setTimeout(() => {
+        //   if (targetList && targets === getTeam().toUpperCase()) {
+        //     console.log("fire 발동 !!");
+        //   }
+        // }, 2000);
       },
       MUD(data) {
         const { targets } = data;
@@ -454,6 +453,23 @@ export default function BattleGameIngamePage() {
           changePercent(data)
         });
 
+        subscribe(`/topic/game/room/${gameId}/useItem`, (message) => {
+          const data = JSON.parse(message.body);
+          if (data.team.toUpperCase() == getTeam().toUpperCase()) {
+            setSlots(data.inventory)
+            const config = getConfig()
+            config.tiles[data.fitPieceIndex].strokeColor = undefined
+            config.tiles[data.fitPieceIndex].shadowColor = undefined
+          }
+        });
+
+        subscribe(`/topic/game/room/${gameId}/help`, (message) => {
+          const data = JSON.parse(message.body);
+          if (data.team.toUpperCase() == getTeam().toUpperCase()) {
+            setSlots(data.inventory)
+          }
+        });
+
         // 서버로 메시지 전송
         send(`/pub/${gameId}/game/enter`, {}, JSON.stringify({}));
       },
@@ -480,6 +496,49 @@ export default function BattleGameIngamePage() {
       }),
     );
   }, []);
+
+  const location = useLocation();
+  const playerId = localStorage.getItem("userId");
+  const playerImage = localStorage.getItem("image");
+  const playerName = localStorage.getItem("userName");
+  const createPlayerRequest = () => ({
+    playerId,
+    playerImage,
+    playerName,
+  });
+  const roomId = localStorage.getItem('roomId');
+
+  const exitRoom = useCallback(() => {
+    console.log("방 나가기~");
+    send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
+  }, [roomId]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        console.log("탭 비활성화 또는 닫기 감지");
+        exitRoom();
+      }
+    };
+
+    const handleBeforeUnload = (event) => {
+      // 새로고침이 아닌 URL 변경 및 종료 시 실행
+      if (event.returnValue !== undefined) {
+        console.log("탭 종료 또는 URL 변경 감지");
+        exitRoom();
+      }
+    };
+
+    window.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      console.log("컴포넌트 언마운트");
+      exitRoom();
+      window.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [exitRoom, location]);
 
   useEffect(() => {
     // if (roomId !== getRoomId() || !getSender()) {
@@ -523,10 +582,13 @@ export default function BattleGameIngamePage() {
   return (
     <Wrapper>
       <LeftSidebar>
+        <OutButton onClick={() => navigate("/game/battle")}>
+          나가기
+        </OutButton>
         <Chatting2 chatHistory={chatHistory} isIngame={true} isBattle={true} />
         {/* <Chatting /> */}
       </LeftSidebar>
-      <Row style={{ padding: "10px 10px 10px 0", width: "80%" }}>
+      <Row style={{ padding: "10px 10px 10px 0", width: "80%", boxSizing: "border-box" }}>
         <Board id="gameBoard">
           <PlayPuzzle
             category="battle"
@@ -538,12 +600,10 @@ export default function BattleGameIngamePage() {
             board={gameData[`${getTeam()}Puzzle`].board}
             picture={gameData.picture}
             bundles={Object.values(gameData[`${getTeam()}Puzzle`].bundles)}
+            itemPieces={gameData[`${getTeam()}Puzzle`].itemPiece}
           />
         </Board>
         <GameInfo>
-        <OutButton onClick={() => {}}>
-            나가기
-          </OutButton>
           <img
             src={pictureSrc}
             alt="퍼즐 그림"
@@ -650,13 +710,15 @@ export default function BattleGameIngamePage() {
 }
 
 const Wrapper = styled.div`
-  display: flex; /* Flex 컨테이너 */
-  justify-content: space-between;
+  position: relative;
   height: 100vh;
   background-image: url(${BackgroundPath});
   background-size: cover;
   background-attachment: fixed;
-  margin: 0 auto;
+  box-sizing: border-box;
+
+  display: flex; /* Flex 컨테이너 */
+  justify-content: space-between;
   gap: 10px;
   user-select: none; /* 텍스트 선택 금지 */
 `;
@@ -664,12 +726,14 @@ const Wrapper = styled.div`
 const LeftSidebar = styled.div`
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
   height: 100%;
   width: 20%;
 `;
 
 const ProgressContainer = styled.div`
   display: flex;
+  box-sizing: border-box;
   gap: 10px;
 `;
 
@@ -703,10 +767,10 @@ const GameInfo = styled(Box)`
 const OtherTeam = styled.div`
   display: flex;
   align-items: center;
-
   width: 100%;
   height: 200px;
-  background-color: white;
+  background-color: lightgrey;
+  aspect-ratio: 3 / 4;
 `;
 
 const Board = styled.div`
@@ -749,12 +813,14 @@ const ProgressWrapper = styled(Box)`
 const OutButton = styled.button`
   background-color: orange;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 0 0 10px 0;
   width: 100%;
   font-size: 2.4em;
   padding: 10px;
+  cursor: pointer;
   &:hover {
     background-color: darkorange;
   }

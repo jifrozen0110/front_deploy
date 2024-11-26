@@ -1,16 +1,25 @@
 import { useEffect, useRef } from "react";
 import { styled } from "styled-components";
 import { configStore } from "../puzzle-core";
+import { Color } from "paper/dist/paper-core";
 
 const { initializePuzzle, groupPuzzlePieces, getConfig } = configStore;
 
-export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture, bundles }) {
+export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture, bundles, itemPieces }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     if (canvasRef.current) {
       initializePuzzle({ canvasRef, puzzleImg, level, shapes, board, picture });
-      groupPuzzlePieces({ config: getConfig(), bundles });
+      const config = getConfig()
+      groupPuzzlePieces({ config, bundles })
+      Object.entries(itemPieces).forEach(([idx, bool]) => {
+        if (!bool) {
+          config.tiles[idx].strokeColor = new Color(1, 0, 1);
+          config.tiles[idx].shadowColor = new Color(1, 0, 1)
+        }
+      });
+      console.log(itemPieces)
     }
   }, [canvasRef]);
 

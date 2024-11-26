@@ -5,9 +5,7 @@ import { BackGround, LoginButtonBox, MainBox, PaddingDiv } from "../components/s
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import GalleryWall from "@/components/MyPage/GalleryWall";
-import { ChevronLeft } from "lucide-react";
-
-const width = 100;
+import { ChevronLeft } from 'lucide-react';
 
 export default function Gallery() {
   const [forUpdate, setForUpdate] = useState(0);
@@ -22,22 +20,14 @@ export default function Gallery() {
     <>
       <BackGround style={{ paddingBottom: "50px" }}>
         <Header parentUpdate={forceUpdate} />
-
-        <InfoWraper style={{ marginTop: "40px" }}>
-          <SubSection
-            onClick={moveMyPage}
-            style={{
-              marginBottom: "30px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              cursor: "pointer",
-            }}
-          >
+        <InfoWraper style={{marginTop: "40px"}}>
+          <SubSection style={{marginBottom: "30px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
             <InfoTitle>
-              <ChevronLeft size={20} />
-              갤러리
-              <SubDetail style={{ marginLeft: "10px" }}>17</SubDetail>
+              <div onClick={moveMyPage} style={{display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer"}}>
+                <ChevronLeft size={20} />
+                갤러리
+              </div>
+              <SubDetail style={{marginLeft: "10px"}}>17</SubDetail>
             </InfoTitle>
           </SubSection>
           <GalleryWall />
