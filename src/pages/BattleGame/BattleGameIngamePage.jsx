@@ -402,7 +402,7 @@ export default function BattleGameIngamePage() {
             if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
               const { targets } = data;
               const targetList = JSON.parse(targets);
-              targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
+              targetList.forEach(({ x, y, index }) => lockPuzzle(index, data.team));
               return;
             }
 
@@ -416,7 +416,7 @@ export default function BattleGameIngamePage() {
             if (data.message && data.message === "UNLOCKED" && data.senderId !== getSender()) {
               const { targets } = data;
               const targetList = JSON.parse(targets);
-              targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
+              targetList.forEach(({ x, y, index }) => unLockPuzzle(index));
               return;
             }
 
