@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";
@@ -54,12 +54,12 @@ import frameAudioPath from "@/assets/audio/frame2.mp3";
 import './ani.css';
 
 const { connect, send, subscribe, disconnect } = socket;
-const { 
-  getConfig, 
-  lockPuzzle, 
-  movePuzzle, 
-  unLockPuzzle, 
-  addPiece, 
+const {
+  getConfig,
+  lockPuzzle,
+  movePuzzle,
+  unLockPuzzle,
+  addPiece,
   usingItemFire,
   usingItemTyphoon,
   usingItemFrame,
@@ -230,7 +230,7 @@ export default function BattleGameIngamePage() {
 
         addAudio(bloomAudioPath);
         gameBoard.appendChild(bloomImg);
-        
+
         setTimeout(() => usingItemTyphoon(targetList, bundles), 1000);
         setTimeout(() => {
           if (bloomImg.parentNode) {
@@ -257,7 +257,7 @@ export default function BattleGameIngamePage() {
 
         addAudio(frameAudioPath);
         gameBoard.appendChild(twinkleImg);
-        
+
         setTimeout(() => usingItemFrame(targetList, bundles), 1000);
         setTimeout(() => {
           if (twinkleImg.parentNode) {

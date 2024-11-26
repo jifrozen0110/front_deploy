@@ -1,6 +1,16 @@
 import { useNavigate } from "react-router-dom";
-import { CardContent, CardMedia, Typography, Box, Divider, Chip, CardActionArea, Snackbar, Button } from "@mui/material";
-import styled from "styled-components";
+import {
+  CardContent,
+  CardMedia,
+  Typography,
+  Box,
+  Divider,
+  Chip,
+  CardActionArea,
+  Snackbar,
+  Button,
+} from "@mui/material";
+import { styled } from "styled-components";
 import { isAxiosError } from "axios";
 
 export default function GameCard({ room, category }) {

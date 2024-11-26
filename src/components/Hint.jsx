@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import { styled } from "styled-components";
 import hintEffect from "@/assets/effects/hint.gif";
 import { useCallback, useMemo } from "react";
 import { configStore } from "../puzzle-core";

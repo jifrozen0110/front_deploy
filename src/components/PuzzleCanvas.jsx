@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import { configStore } from "../puzzle-core";
 
 const { initializePuzzle, groupPuzzlePieces, getConfig } = configStore;
@@ -10,7 +10,7 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
   useEffect(() => {
     if (canvasRef.current) {
       initializePuzzle({ canvasRef, puzzleImg, level, shapes, board, picture });
-      groupPuzzlePieces({ config: getConfig(), bundles })
+      groupPuzzlePieces({ config: getConfig(), bundles });
     }
   }, [canvasRef]);
 

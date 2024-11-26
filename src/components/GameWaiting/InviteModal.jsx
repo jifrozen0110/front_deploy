@@ -1,7 +1,7 @@
 // src/components/InviteModal.js
 
 import React, { useState } from "react";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import Button from "@mui/material/Button";
 import { authRequest } from "../../apis/requestBuilder";
 import { socket } from "@/socket-utils/socket2";
@@ -12,11 +12,11 @@ export default function InviteModal({ isOpen, onClose, roomId }) {
   const [searchId, setSearchId] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const user_id = localStorage.userId;
-  const fromUserName= localStorage.userName;
+  const fromUserName = localStorage.userName;
   const fetchFriends = async () => {
     try {
       const res = await authRequest().get(`/api/friend/${user_id}`);
-      console.log("친구목록:",res.data.friends)
+      console.log("친구목록:", res.data.friends);
       setFriends(res.data.friends);
     } catch (e) {
       console.error("친구 목록을 가져오지 못했습니다.", e.message);
@@ -35,15 +35,19 @@ export default function InviteModal({ isOpen, onClose, roomId }) {
 
   const inviteUser = async (toPlayerId) => {
     try {
-      console.log(roomId)
-    send(`/pub/room/${roomId}/invite`,{},JSON.stringify({fromPlayerId:parseInt(user_id), toPlayerId, fromUserName}));
+      console.log(roomId);
+      send(
+        `/pub/room/${roomId}/invite`,
+        {},
+        JSON.stringify({ fromPlayerId: parseInt(user_id), toPlayerId, fromUserName }),
+      );
 
-    alert("초대가 완료되었습니다.");
-    onClose();
+      alert("초대가 완료되었습니다.");
+      onClose();
     } catch (e) {
-    console.error("초대에 실패했습니다.", e.message);
+      console.error("초대에 실패했습니다.", e.message);
     }
-};
+  };
 
   React.useEffect(() => {
     if (isOpen) {
@@ -63,9 +67,7 @@ export default function InviteModal({ isOpen, onClose, roomId }) {
           {friends.map((friend) => (
             <FriendItem key={friend.userId}>
               {friend.userName}
-              <InviteButton onClick={() => inviteUser(friend.userId)}>
-                초대
-              </InviteButton>
+              <InviteButton onClick={() => inviteUser(friend.userId)}>초대</InviteButton>
             </FriendItem>
           ))}
         </FriendList>
@@ -85,9 +87,7 @@ export default function InviteModal({ isOpen, onClose, roomId }) {
         {searchResult && (
           <SearchResult>
             <div>{searchResult.userName}</div>
-            <InviteButton onClick={() => inviteUser(searchResult.userId)}>
-              초대
-            </InviteButton>
+            <InviteButton onClick={() => inviteUser(searchResult.userId)}>초대</InviteButton>
           </SearchResult>
         )}
       </ModalContainer>

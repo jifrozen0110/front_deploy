@@ -3,15 +3,15 @@ import { useEffect, useState } from "react";
 import { authRequest, SERVER_END_POINT } from "../apis/requestBuilder";
 import { BackGround, LoginButtonBox, MainBox, PaddingDiv } from "../components/styled/styled";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import GalleryWall from "@/components/MyPage/GalleryWall";
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from "lucide-react";
 
-const width = 100
+const width = 100;
 
 export default function Gallery() {
-  const [forUpdate, setForUpdate] = useState(0)
-  const forceUpdate = () => setForUpdate(forUpdate + 1)
+  const [forUpdate, setForUpdate] = useState(0);
+  const forceUpdate = () => setForUpdate(forUpdate + 1);
   const navigate = useNavigate();
 
   const moveMyPage = async () => {
@@ -20,15 +20,24 @@ export default function Gallery() {
 
   return (
     <>
-      <BackGround style={{paddingBottom: "50px"}}>
+      <BackGround style={{ paddingBottom: "50px" }}>
         <Header parentUpdate={forceUpdate} />
 
-        <InfoWraper style={{marginTop: "40px"}}>
-          <SubSection onClick={moveMyPage} style={{marginBottom: "30px", display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer"}}>
+        <InfoWraper style={{ marginTop: "40px" }}>
+          <SubSection
+            onClick={moveMyPage}
+            style={{
+              marginBottom: "30px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              cursor: "pointer",
+            }}
+          >
             <InfoTitle>
               <ChevronLeft size={20} />
               갤러리
-              <SubDetail style={{marginLeft: "10px"}}>17</SubDetail>
+              <SubDetail style={{ marginLeft: "10px" }}>17</SubDetail>
             </InfoTitle>
           </SubSection>
           <GalleryWall />
@@ -45,8 +54,11 @@ const InfoWraper = styled.div`
   box-sizing: border-box;
   max-width: 1000px;
   margin: 25px auto 0;
-  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
-`
+  box-shadow:
+    0px 2px 4px -1px rgba(0, 0, 0, 0.2),
+    0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+`;
 
 const SubSection = styled.div`
   margin-right: auto;

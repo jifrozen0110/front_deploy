@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 export default function ImageIcon({ imageSource, size = "md", onClick }) {
   const width = widthMatcher[size];

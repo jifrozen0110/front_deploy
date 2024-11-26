@@ -1,5 +1,5 @@
 import { useMemo, useEffect } from "react";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import { PlayerCard } from "@/components/GameWaiting/PlayerCard";
 import { getTeam, getRoomId } from "@/socket-utils/storage";
 import { addAudio } from "@/puzzle-core/attackItem";
@@ -34,7 +34,7 @@ export default function ResultModal({
   numOfUsingItemBlue,
 }) {
   const { image } = useGameInfo();
-  const roomId = localStorage.getItem('roomId');
+  const roomId = localStorage.getItem("roomId");
   const theme = createTheme({
     typography: {
       fontFamily: "'Galmuri11', sans-serif",
@@ -67,7 +67,7 @@ export default function ResultModal({
   }, [isOpenedDialog]);
   const navigateToWaitingPage = () => {
     window.location.replace(`/game/battle/waiting/${roomId}`);
-  }; 
+  };
   return (
     <ThemeProvider theme={theme}>
       <Dialog open={isOpenedDialog} onClose={() => navigateToWaitingPage()}>
@@ -94,8 +94,8 @@ export default function ResultModal({
             />
           </Wrapper>
           {/* 버튼 추가 */}
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             color="primary"
             sx={{ width: "100%", height: "50px", padding: "2%", margin: "15% auto" }}
             onClick={navigateToWaitingPage} // Room ID를 포함하여 이동

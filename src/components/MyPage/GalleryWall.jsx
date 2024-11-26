@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { X, Users } from 'lucide-react';
+import React, { useState } from "react";
+import { styled } from "styled-components";
+import { X, Users } from "lucide-react";
 
-const GalleryWall = ({count = 0}) => {
+const GalleryWall = ({ count = 0 }) => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   const images = [
     {
       id: 1,
-      url: 'https://i.namu.wiki/i/nOXgZWBRaZguCSSys7FwQEdEae7OIo3gU6kMwqQ-52ITBgrmTNxqaOVF68Arm5pxLGUAy08DWHLhZdn_6hyzdg.webp',
-      roomTitle: '퍼즐 한 판',
-      description: '추가적인 설명란 필요?',
-      piece: '300',
-      clearTime: '10:10',
-      date: '2024/11/25 10:00',
+      url: "https://i.namu.wiki/i/nOXgZWBRaZguCSSys7FwQEdEae7OIo3gU6kMwqQ-52ITBgrmTNxqaOVF68Arm5pxLGUAy08DWHLhZdn_6hyzdg.webp",
+      roomTitle: "퍼즐 한 판",
+      description: "추가적인 설명란 필요?",
+      piece: "300",
+      clearTime: "10:10",
+      date: "2024/11/25 10:00",
       whos: [
         {
           id: 1,
@@ -35,16 +35,16 @@ const GalleryWall = ({count = 0}) => {
           name: "미로쿠",
           avatar: "https://via.placeholder.com/50",
         },
-      ]
+      ],
     },
     {
       id: 2,
-      url: 'https://i.pinimg.com/originals/b5/9d/8f/b59d8f8cbb54368862109db8324dc6b8.jpg',
-      roomTitle: '너만 오면 고',
-      description: '추가적인 설명란 필요?',
-      piece: '500',
-      clearTime: '10:10',
-      date: '2024/11/25 10:00',
+      url: "https://i.pinimg.com/originals/b5/9d/8f/b59d8f8cbb54368862109db8324dc6b8.jpg",
+      roomTitle: "너만 오면 고",
+      description: "추가적인 설명란 필요?",
+      piece: "500",
+      clearTime: "10:10",
+      date: "2024/11/25 10:00",
       whos: [
         {
           id: 1,
@@ -66,16 +66,16 @@ const GalleryWall = ({count = 0}) => {
           name: "미로쿠",
           avatar: "https://via.placeholder.com/50",
         },
-      ]
+      ],
     },
     {
       id: 3,
-      url: 'https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp',
-      roomTitle: '짱구가 좋아',
-      description: '추가적인 설명란 필요?',
-      piece: '100',
-      clearTime: '10:10',
-      date: '2024/11/25 10:00',
+      url: "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+      roomTitle: "짱구가 좋아",
+      description: "추가적인 설명란 필요?",
+      piece: "100",
+      clearTime: "10:10",
+      date: "2024/11/25 10:00",
       whos: [
         {
           id: 1,
@@ -97,16 +97,16 @@ const GalleryWall = ({count = 0}) => {
           name: "미로쿠",
           avatar: "https://via.placeholder.com/50",
         },
-      ]
+      ],
     },
     {
       id: 4,
-      url: 'https://i.namu.wiki/i/nOXgZWBRaZguCSSys7FwQEdEae7OIo3gU6kMwqQ-52ITBgrmTNxqaOVF68Arm5pxLGUAy08DWHLhZdn_6hyzdg.webp',
-      roomTitle: '퍼즐 한 판',
-      description: '추가적인 설명란 필요?',
-      piece: '300',
-      clearTime: '10:10',
-      date: '2024/11/25 10:00',
+      url: "https://i.namu.wiki/i/nOXgZWBRaZguCSSys7FwQEdEae7OIo3gU6kMwqQ-52ITBgrmTNxqaOVF68Arm5pxLGUAy08DWHLhZdn_6hyzdg.webp",
+      roomTitle: "퍼즐 한 판",
+      description: "추가적인 설명란 필요?",
+      piece: "300",
+      clearTime: "10:10",
+      date: "2024/11/25 10:00",
       whos: [
         {
           id: 1,
@@ -128,16 +128,16 @@ const GalleryWall = ({count = 0}) => {
           name: "미로쿠",
           avatar: "https://via.placeholder.com/50",
         },
-      ]
+      ],
     },
     {
       id: 5,
-      url: 'https://i.pinimg.com/originals/b5/9d/8f/b59d8f8cbb54368862109db8324dc6b8.jpg',
-      roomTitle: '너만 오면 고',
-      description: '추가적인 설명란 필요?',
-      piece: '500',
-      clearTime: '10:10',
-      date: '2024/11/25 10:00',
+      url: "https://i.pinimg.com/originals/b5/9d/8f/b59d8f8cbb54368862109db8324dc6b8.jpg",
+      roomTitle: "너만 오면 고",
+      description: "추가적인 설명란 필요?",
+      piece: "500",
+      clearTime: "10:10",
+      date: "2024/11/25 10:00",
       whos: [
         {
           id: 1,
@@ -159,16 +159,16 @@ const GalleryWall = ({count = 0}) => {
           name: "미로쿠",
           avatar: "https://via.placeholder.com/50",
         },
-      ]
+      ],
     },
     {
       id: 6,
-      url: 'https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp',
-      roomTitle: '짱구가 좋아',
-      description: '추가적인 설명란 필요?',
-      piece: '100',
-      clearTime: '10:10',
-      date: '2024/11/25 10:00',
+      url: "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+      roomTitle: "짱구가 좋아",
+      description: "추가적인 설명란 필요?",
+      piece: "100",
+      clearTime: "10:10",
+      date: "2024/11/25 10:00",
       whos: [
         {
           id: 1,
@@ -190,16 +190,16 @@ const GalleryWall = ({count = 0}) => {
           name: "미로쿠",
           avatar: "https://via.placeholder.com/50",
         },
-      ]
+      ],
     },
     {
       id: 7,
-      url: 'https://i.namu.wiki/i/nOXgZWBRaZguCSSys7FwQEdEae7OIo3gU6kMwqQ-52ITBgrmTNxqaOVF68Arm5pxLGUAy08DWHLhZdn_6hyzdg.webp',
-      roomTitle: '퍼즐 한 판',
-      description: '추가적인 설명란 필요?',
-      piece: '300',
-      clearTime: '10:10',
-      date: '2024/11/25 10:00',
+      url: "https://i.namu.wiki/i/nOXgZWBRaZguCSSys7FwQEdEae7OIo3gU6kMwqQ-52ITBgrmTNxqaOVF68Arm5pxLGUAy08DWHLhZdn_6hyzdg.webp",
+      roomTitle: "퍼즐 한 판",
+      description: "추가적인 설명란 필요?",
+      piece: "300",
+      clearTime: "10:10",
+      date: "2024/11/25 10:00",
       whos: [
         {
           id: 1,
@@ -221,16 +221,16 @@ const GalleryWall = ({count = 0}) => {
           name: "미로쿠",
           avatar: "https://via.placeholder.com/50",
         },
-      ]
+      ],
     },
     {
       id: 8,
-      url: 'https://i.pinimg.com/originals/b5/9d/8f/b59d8f8cbb54368862109db8324dc6b8.jpg',
-      roomTitle: '너만 오면 고',
-      description: '추가적인 설명란 필요?',
-      piece: '500',
-      clearTime: '10:10',
-      date: '2024/11/25 10:00',
+      url: "https://i.pinimg.com/originals/b5/9d/8f/b59d8f8cbb54368862109db8324dc6b8.jpg",
+      roomTitle: "너만 오면 고",
+      description: "추가적인 설명란 필요?",
+      piece: "500",
+      clearTime: "10:10",
+      date: "2024/11/25 10:00",
       whos: [
         {
           id: 1,
@@ -252,16 +252,16 @@ const GalleryWall = ({count = 0}) => {
           name: "미로쿠",
           avatar: "https://via.placeholder.com/50",
         },
-      ]
+      ],
     },
     {
       id: 9,
-      url: 'https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp',
-      roomTitle: '짱구가 좋아',
-      description: '추가적인 설명란 필요?',
-      piece: '100',
-      clearTime: '10:10',
-      date: '2024/11/25 10:00',
+      url: "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+      roomTitle: "짱구가 좋아",
+      description: "추가적인 설명란 필요?",
+      piece: "100",
+      clearTime: "10:10",
+      date: "2024/11/25 10:00",
       whos: [
         {
           id: 1,
@@ -283,7 +283,7 @@ const GalleryWall = ({count = 0}) => {
           name: "미로쿠",
           avatar: "https://via.placeholder.com/50",
         },
-      ]
+      ],
     },
   ];
 
@@ -294,10 +294,7 @@ const GalleryWall = ({count = 0}) => {
       {/* 갤러리 그리드 */}
       <GalleryGrid>
         {limitedImages.map((image) => (
-          <ImageWrapper
-            key={image.id}
-            onClick={() => setSelectedImage(image)}
-          >
+          <ImageWrapper key={image.id} onClick={() => setSelectedImage(image)}>
             <ImageContainer>
               <Image src={image.url} alt={image.roomTitle} />
               <ImageOverlay />
@@ -313,7 +310,7 @@ const GalleryWall = ({count = 0}) => {
       {selectedImage && (
         <ModalOverlay>
           <ModalCard>
-            <CloseButton onClick={() => setSelectedImage(null)} style={{zIndex: "1"}}>
+            <CloseButton onClick={() => setSelectedImage(null)} style={{ zIndex: "1" }}>
               <X color="rgba(0,0,0,0.6)" />
             </CloseButton>
             <ModalContent>
@@ -321,8 +318,10 @@ const GalleryWall = ({count = 0}) => {
                 <ImageModal src={selectedImage.url} alt={selectedImage.roomTitle} />
               </ImageContainerModal>
               <Details>
-                <div style={{display: "flex", justifyContent: "space-between", color: "#606060"}}>
-                  <span>{selectedImage.piece}피스 {selectedImage.clearTime}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", color: "#606060" }}>
+                  <span>
+                    {selectedImage.piece}피스 {selectedImage.clearTime}
+                  </span>
                   <span>{selectedImage.date}</span>
                 </div>
                 <Title>
@@ -355,8 +354,7 @@ const GalleryWall = ({count = 0}) => {
 export default GalleryWall;
 
 // Styled Components
-const Container = styled.div`
-`;
+const Container = styled.div``;
 
 const GalleryGrid = styled.div`
   max-width: 1200px;
@@ -374,7 +372,7 @@ const ImageContainer = styled.div`
   position: relative;
   overflow: hidden;
   border: 4px solid white;
-  box-shadow: 2px 2px 6px 0 rgba(0,0,0,0.25);
+  box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.25);
   aspect-ratio: 1 / 1;
 `;
 
@@ -383,7 +381,7 @@ const ImageContainerModal = styled.div`
   position: relative;
   overflow: hidden;
   border: 4px solid white;
-  box-shadow: 2px 2px 6px 0 rgba(0,0,0,0.25);
+  box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.25);
   line-height: 0;
 `;
 
@@ -425,7 +423,9 @@ const ImageTitle = styled.div`
   right: 16px;
   opacity: 0;
   transform: translateY(16px);
-  transition: opacity 0.3s, transform 0.3s;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
   h3 {
     color: white;
     font-size: 1.2rem;
@@ -479,7 +479,6 @@ const ModalCard = styled.div`
     background: transparent; /* 스크롤 트랙 배경 투명화 */
   }
 `;
-
 
 const CloseButton = styled.button`
   position: sticky;
