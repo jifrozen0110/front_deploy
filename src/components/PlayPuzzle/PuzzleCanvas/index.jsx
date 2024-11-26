@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import Paper from "paper";
 import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
 import { createTiles } from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/CreatePuzzle";

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import { configStore } from "../puzzle-core";
 
 const { initializePuzzle, groupPuzzlePieces, getConfig } = configStore;

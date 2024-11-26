@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { request } from "../../apis/requestBuilder";
 import IconButton from "@mui/material/IconButton";

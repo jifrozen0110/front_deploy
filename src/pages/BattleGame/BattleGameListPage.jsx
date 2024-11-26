@@ -1,6 +1,6 @@
 import { useEffect, useState,useMemo, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import { IconButton, Button, createTheme, ThemeProvider } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import Header from "@/components/Header";

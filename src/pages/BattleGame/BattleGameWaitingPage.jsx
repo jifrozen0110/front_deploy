@@ -1,6 +1,6 @@
-import { useEffect, useState, useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import styled from "styled-components";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { styled } from "styled-components";
 import { isAxiosError } from "axios";
 
 import Header from "@/components/Header";
@@ -44,6 +44,7 @@ export default function BattleGameWaitingPage() {
   const [chatList, setChatList] = useState([])
   // 초대 버튼 모달창
   const [isInviteModalOpen, setInviteModalOpen] = useState(false);
+  const location = useLocation();
   
   // InviteAlertModal을 상태로 관리
   const [isInviteAlertOpen, setInviteAlertOpen] = useState(false);
@@ -82,10 +83,10 @@ export default function BattleGameWaitingPage() {
     console.log("방 입장~");
     send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
   };
-  const exitRoom = () => {
+  const exitRoom = useCallback(() => {
     console.log("방 나가기~");
     send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
-  };
+  }, [roomId]);
   const switchTeam = () => {
     console.log("팀 바꾸기~");
     send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
@@ -227,11 +228,34 @@ export default function BattleGameWaitingPage() {
   };
 
   useEffect(() => {
-    initialize();
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        console.log("탭 비활성화 또는 닫기 감지");
+        exitRoom();
+      }
+    };
+
+    const handleBeforeUnload = (event) => {
+      // 새로고침이 아닌 URL 변경 및 종료 시 실행
+      if (event.returnValue !== undefined) {
+        console.log("탭 종료 또는 URL 변경 감지");
+        exitRoom();
+      }
+    };
+
+    window.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
+      console.log("컴포넌트 언마운트");
       exitRoom();
+      window.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
+  }, [exitRoom, location]);
+
+  useEffect(() => {
+    initialize();
   }, [roomId]);
 
   if (isLoading) {

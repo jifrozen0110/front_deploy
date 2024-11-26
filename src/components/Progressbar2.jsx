@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import { styled } from "styled-components";
 
 export default function ProgressBar({ percent, height = 50, isEnemy }) {
   const backgroundColor = isEnemy ? "tomato" : "royalblue";
