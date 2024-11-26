@@ -116,11 +116,11 @@ export default function BattleGameIngamePage() {
 
             canvasContainer.appendChild(fireImgCopy);
             addAudio(fireAudioPath);
-            usingItemTyphoon()
 
             setTimeout(() => {
               if (fireImgCopy.parentNode) {
                 console.log("불 효과 삭제");
+                usingItemFire(bundles, targetList);
                 fireImgCopy.parentNode.removeChild(fireImgCopy);
               }
             }, 2000);
@@ -140,12 +140,11 @@ export default function BattleGameIngamePage() {
           // }, 2000);
         }
 
-        setTimeout(() => {
-          if (targetList && targets === getTeam().toUpperCase()) {
-            console.log("fire 발동 !!");
-            usingItemFire(bundles, targetList);
-          }
-        }, 2000);
+        // setTimeout(() => {
+        //   if (targetList && targets === getTeam().toUpperCase()) {
+        //     console.log("fire 발동 !!");
+        //   }
+        // }, 2000);
       },
       MUD(data) {
         const { targets } = data;
@@ -454,6 +453,23 @@ export default function BattleGameIngamePage() {
           changePercent(data)
         });
 
+        subscribe(`/topic/game/room/${gameId}/useItem`, (message) => {
+          const data = JSON.parse(message.body);
+          if (data.team.toUpperCase() == getTeam().toUpperCase()) {
+            setSlots(data.inventory)
+            const config = getConfig()
+            config.tiles[data.fitPieceIndex].strokeColor = undefined
+            config.tiles[data.fitPieceIndex].shadowColor = undefined
+          }
+        });
+
+        subscribe(`/topic/game/room/${gameId}/help`, (message) => {
+          const data = JSON.parse(message.body);
+          if (data.team.toUpperCase() == getTeam().toUpperCase()) {
+            setSlots(data.inventory)
+          }
+        });
+
         // 서버로 메시지 전송
         send(`/pub/${gameId}/game/enter`, {}, JSON.stringify({}));
       },
@@ -584,6 +600,7 @@ export default function BattleGameIngamePage() {
             board={gameData[`${getTeam()}Puzzle`].board}
             picture={gameData.picture}
             bundles={Object.values(gameData[`${getTeam()}Puzzle`].bundles)}
+            itemPieces={gameData[`${getTeam()}Puzzle`].itemPiece}
           />
         </Board>
         <GameInfo>
