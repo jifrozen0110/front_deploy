@@ -36,7 +36,7 @@ export default function BattleGameWaitingPage() {
   const [emptyPlayerCount, setEmptyPlayerCount] = useState([0, 0]);
   const [xPlayerCount, setXPlayerCount] = useState([0, 0]);
   const [gameData, setGameData] = useState(null);
-  const playerId = localStorage.getItem("userId");
+  const playerId = parseInt(localStorage.getItem("userId"));
   const playerImage = localStorage.getItem("image");
   const playerName = localStorage.getItem("userName");
   const { setImage } = useGameInfo();
@@ -54,7 +54,8 @@ export default function BattleGameWaitingPage() {
     playerId,
     playerImage,
     playerName,
-  });
+  }); 
+  const [isMaster, setIsMaster] = useState(false)
 
   // 초대 수락 처리 함수
   const handleInviteAccept = () => {
@@ -124,21 +125,18 @@ export default function BattleGameWaitingPage() {
 
   const connectSocket = async (roomId) => {
     connect(() => {
-      console.log(roomId);
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
-
       subscribe(`/topic/room/${roomId}`, (message) => {
         const data = JSON.parse(message.body);
         const halfPlayers = Math.ceil(data.maxPlayers / 2);
         setRoomData(data);
+        setIsMaster(data.master===playerId)
         setPlayerCount(data.nowPlayers);
         setEmptyPlayerCount([
           Math.max(0, halfPlayers - data.redPlayers.length),
           Math.max(0, halfPlayers - data.bluePlayers.length),
         ]);
         setXPlayerCount([Math.max(0, 4 - halfPlayers), Math.max(0, 4 - halfPlayers)]);
-
-        console.log(data);
 
         // if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
         //   data.blueTeam.players.forEach((player) => {
@@ -209,6 +207,7 @@ export default function BattleGameWaitingPage() {
       const response = await authRequest().get(`/api/rooms/${roomId}`);
 
       const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
+      setIsMaster(response.data.master===playerId)
       setRoomData(response.data);
       setPlayerCount(response.data.nowPlayers);
       setEmptyPlayerCount([
@@ -337,7 +336,7 @@ export default function BattleGameWaitingPage() {
               <Team style={{backgroundColor: "rgba(91, 175, 254, 0.6)"}}>파란팀</Team>
               <TeamGrid>
                 {roomData.bluePlayers.map((player, i) => (
-                  <PlayerCard key={`blue-player-${i}`} player={player} color="blue" />
+                  <PlayerCard key={`blue-player-${i}`} player={player} master={roomData.master} color="blue" />
                 ))}
                 {makeEmptyPlayer(emptyPlayerCount[1])}
                 {makeXPlayer(xPlayerCount[1])}
@@ -350,7 +349,7 @@ export default function BattleGameWaitingPage() {
               <Team style={{backgroundColor: "rgba(254, 91, 94, 0.6)"}}>빨간팀</Team>
               <TeamGrid>
                 {roomData.redPlayers.map((player, i) => (
-                  <PlayerCard key={`red-player-${i}`} player={player} color="red" />
+                  <PlayerCard key={`red-player-${i}`} player={player} master={roomData.master} color="red" />
                 ))}
                 {makeEmptyPlayer(emptyPlayerCount[0])}
                 {makeXPlayer(xPlayerCount[0])}
@@ -367,7 +366,7 @@ export default function BattleGameWaitingPage() {
               <Divider/>
               <Typography variant="subtitle1">{roomData.gameMode == "battle"? "대전 모드": ""}</Typography>
               <Typography variant="subtitle1">{roomData.puzzlePiece} 피스</Typography>
-              <StartButton onClick={startGame}>시작</StartButton>
+              <StartButton isMaster={isMaster} onClick={() => isMaster && startGame()}>시작</StartButton>
             </Details>
           </PuzzleDetails>
         </Body>
@@ -525,17 +524,22 @@ const Details = styled.div`
 `;
 
 const StartButton = styled(Button)`
-  margin-top: 30px;
-  background-color: orange;
+  background-color: ${({ isMaster }) => (isMaster ? "orange" : "lightgray")};
+  margin-top:30px;
   color: white;
   width: 100%;
-  height: 70px;
-  font-size: 30px;
   font-weight: bold;
+  font-size: 30px;
+  border-radius: 5px;
+  cursor: ${({ isMaster }) => (isMaster ? "pointer" : "not-allowed")};
+  opacity: ${({ isMaster }) => (isMaster ? 1 : 0.6)};
+
   &:hover {
-    background-color: darkorange;
+    background-color: ${({ isMaster }) => (isMaster ? "darkorange" : "lightgray")};
   }
 `;
+
+
 
 const Divider = styled.div`
   margin: 10px 0;
