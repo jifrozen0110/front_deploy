@@ -4,11 +4,11 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
+import LocalPoliceTwoToneIcon from '@mui/icons-material/LocalPoliceTwoTone';
 
 function PlayerCard(props) {
-  const { player, color } = props;
-  console.log(player);
-
+  const { player, master, color } = props;
+  
   return (
     <WrapperCard className={color}>
       <CardMedia
@@ -18,12 +18,12 @@ function PlayerCard(props) {
         image={player.playerImage}
       />
       <Content>
-        <Nickname component="div" variant="subtitle1">
-          {player.playerName}
-        </Nickname>
-        {/* <State component="div" variant="subtitle2">
-          {state}
-        </State> */}
+      <NicknameWrapper>
+          <Nickname component="div" variant="subtitle1">
+            {player.playerName}
+          </Nickname>
+          {master === player.playerId && <StyledCrownIcon />} {/* 왕관 아이콘 표시 */}
+        </NicknameWrapper>
       </Content>
       {/* <GameOpenVidu gameId={gameId} playerName={player.playerName} /> */}
     </WrapperCard>
@@ -72,11 +72,24 @@ const WrapperCard = styled(Card)`
   }};
 `;
 
+const StyledCrownIcon = styled(LocalPoliceTwoToneIcon)`
+  color: #ffd700; /* 금색으로 변경 */
+  font-size: 1.8rem; /* 크기 키우기 */
+  margin-left: 5px; /* 닉네임과 간격 */
+  vertical-align: middle; /* 텍스트와 정렬 */
+`;
+
 const Nickname = styled(Typography)`
   color: white;
   font-weight: bold;
   font-size: 20px;
 `;
+
+const NicknameWrapper = styled.div`
+  display: flex;
+  align-items: center; /* 세로 정렬 */
+`;
+
 
 const Content = styled.div`
   width: 100%;
@@ -98,40 +111,6 @@ const XContent = styled.div`
   line-height: 1;
   padding-bottom: 5px;
   font-size: 40px;
-`;
-
-const State = styled.div`
-  display: inline-block;
-  padding: 8px 16px;
-  font-size: 18px;
-  font-weight: bold;
-  color: ${(props) => {
-    switch (props.children) {
-      case "방 장":
-        return "white";
-      case "준비 중":
-        return "black";
-      case "준비 완료":
-        return "white";
-      default:
-        return "white";
-    }
-  }};
-  background-color: ${(props) => {
-    switch (props.children) {
-      case "방 장":
-        return "#FF5722";
-      case "준비 중":
-        return "#FFEB3B";
-      case "준비 완료":
-        return "#4CAF50";
-    }
-  }};
-  border-radius: 15px;
-  text-align: center;
-  white-space: nowrap;
-  user-select: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 약간의 그림자 */
 `;
 
 export { PlayerCard, EmptyPlayerCard, XPlayerCard };
