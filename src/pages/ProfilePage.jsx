@@ -1,104 +1,152 @@
 import Header from "../components/Header";
 import { useEffect, useState } from "react";
-import { authRequest, SERVER_END_POINT } from "../apis/requestBuilder";
-import { BackGround, LoginButtonBox, MainBox, PaddingDiv } from "../components/styled/styled";
+import { authRequest } from "../apis/requestBuilder";
+import { BackGround } from "../components/styled/styled";
 import { useNavigate } from "react-router-dom";
-import { styled } from "styled-components";
+import styled from "styled-components";
 import GalleryWall from "@/components/MyPage/GalleryWall";
 import { Camera, ChevronRight, Swords, Handshake, User, Star } from 'lucide-react';
 
 const width = 100
 
 export default function ProfilePage() {
-  const [userData, setUserData] = useState({})
-  const [forUpdate, setForUpdate] = useState(0)
+  const [forUpdate, setForUpdate] = useState(0);
+  const [userData, setUserData] = useState({});
+  const [gameRecords, setGameRecords] = useState([]);
+  const [battleWinRate, setBattleWinRate] = useState(0);
+  const [totalWins, setTotalWins] = useState(0);
+  const [totalLosses, setTotalLosses] = useState(0);
+  const [totalDraws, setTotalDraws] = useState(0);
+  const [totalGames, setTotalGames] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0); // 현재 페이지
+  const [totalPages, setTotalPages] = useState(0); // 총 페이지 수
+
+
   const navigate = useNavigate()
   const forceUpdate = () => setForUpdate(forUpdate + 1)
 
-  const records = [
-    {
-      id: 1,
-      title: "방 제목입니다111",
-      mode: "대전",
-      detail: "2024.11.17 15:32",
-      status: "승리"
-    },
-    {
-      id: 2,
-      title: "방 제목입니다222",
-      mode: "협동",
-      detail: "2024.11.17 14:45",
-      status: "완료"
-    },
-    {
-      id: 3,
-      title: "방 제목입니다333",
-      mode: "솔로",
-      detail: "2024.11.16 19:23",
-      status: "실패"
-    },
-  ];
+  // getUserInfo를 컴포넌트의 상위 스코프로 이동
+  const getUserInfo = async (page = 0) => {
+    try {
+      const res = await authRequest().get("/api/user/info");
+      if (typeof res.data === "string") {
+        navigate("/");
+      } else {
+        localStorage.setItem("email", res.data.email);
+        localStorage.setItem("image", res.data.image);
+        localStorage.setItem("provider", res.data.provider);
+        localStorage.setItem("userId", res.data.userId);
+        localStorage.setItem("userName", res.data.userName);
+        setUserData(res.data);
+
+        // 사용자 ID로 게임 기록 및 승률 가져오기
+        const userId = res.data.userId;
+
+        // 페이징 요청
+        const recordsRes = await authRequest().get(
+          `/games/${userId}/records?page=${page}`
+        );
+
+        // 백엔드에서 받은 데이터 구조에 따라 상태 변수 설정
+        const data = recordsRes.data;
+
+        // teamMates와 opponents를 파싱하여 배열로 변환
+        const processedRecords = data.records.map((record) => ({
+          ...record,
+          teamMates: record.teamMates ? JSON.parse(record.teamMates) : [],
+          opponents: record.opponents ? JSON.parse(record.opponents) : [],
+        }));
+
+        setBattleWinRate(data.winRate || 0);
+        setTotalWins(data.winCount || 0);
+        setTotalLosses(data.lossCount || 0);
+        setTotalDraws(data.drawCount || 0);
+        setTotalGames(data.totalGames || 0);
+
+        setGameRecords(processedRecords);
+        setCurrentPage(data.currentPage);
+        setTotalPages(data.totalPages);
+      }
+    } catch (error) {
+      console.error("사용자 정보 또는 게임 기록을 가져오는 중 오류 발생:", error);
+      navigate("/");
+    }
+  };
 
   useEffect(() => {
-    const getUserInfo = async () => {
-      const res = await authRequest().get("/api/user/info")
-      if(typeof res.data === 'string'){
-        navi("/")
-      }else{
-        localStorage.setItem("email", res.data.email)
-        localStorage.setItem("image", res.data.image)
-        localStorage.setItem("provider", res.data.provider)
-        localStorage.setItem("userId", res.data.userId)
-        localStorage.setItem("userName", res.data.userName)
-        setUserData(res.data)
-      }
+    getUserInfo(currentPage); // 초기 페이지 요청
+  }, [forUpdate]);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      getUserInfo(currentPage + 1);
     }
-    getUserInfo()
-  }, [forUpdate])
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 0) {
+      getUserInfo(currentPage - 1);
+    }
+  };
+  
 
   const moveGalleryWall = async () => {
     navigate(`/user/gallery`);
   };
 
+  // 게임 모드를 한글로 변환하는 함수
+  const getGameModeText = (gameType) => {
+    switch (gameType) {
+      case "BATTLE":
+        return "대전 모드";
+      case "COOPERATION":
+        return "협동 모드";
+      case "SOLO":
+        return "솔로 모드";
+      default:
+        return "알 수 없는 모드";
+    }
+  };
+
   return (
     <>
-      <BackGround style={{paddingBottom: "50px"}}>
+      <BackGround style={{ paddingBottom: "50px" }}>
         <Header parentUpdate={forceUpdate} />
 
-        <InfoWraper style={{marginTop: "50px", padding: "35px"}}>
+        <InfoWraper style={{ marginTop: "50px", padding: "35px" }}>
           <Profile>
             <div style={{
-              backgroundImage:`url(${userData.image})`,
-              display:'inline-block',
-              width:width,
-              height:width,
-              backgroundSize:"cover",
-              backgroundPosition:"center",
-              borderRadius:width / 2,
+              backgroundImage: `url(${userData.image})`,
+              display: 'inline-block',
+              width: width,
+              height: width,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              borderRadius: width / 2,
             }}></div>
             <div>
-              <div style={{fontSize: "32px", fontWeight: "bold"}}>{userData.userName}</div>
-              <div style={{fontSize: "20px"}}>{userData.email}</div>
+              <div style={{ fontSize: "32px", fontWeight: "bold" }}>{userData.userName}</div>
+              <div style={{ fontSize: "20px" }}>{userData.email}</div>
             </div>
           </Profile>
         </InfoWraper>
 
-        <InfoWraper style={{marginTop: "40px"}}>
-          <SubSection style={{marginBottom: "30px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+        <InfoWraper style={{ marginTop: "40px" }}>
+          <SubSection style={{ marginBottom: "30px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <InfoTitle>
               <Camera size={20} color="#3B82F6" />
               갤러리
-              <SubDetail>17</SubDetail>
+              <SubDetail>17</SubDetail> {/* 갤러리 수는 임의의 값 */}
             </InfoTitle>
-            <div onClick={moveGalleryWall} style={{display: "flex", alignItem: "center", color: "grey", cursor: "pointer"}}>
+            <div onClick={moveGalleryWall} style={{ display: "flex", alignItems: "center", color: "grey", cursor: "pointer" }}>
               더보기
-              <ChevronRight size={20} style={{margin: "auto 0"}} />
+              <ChevronRight size={20} style={{ margin: "auto 0" }} />
             </div>
           </SubSection>
           <GalleryWall count={3} />
         </InfoWraper>
 
-        <InfoWraper style={{zIndex: "0"}}>
+        <InfoWraper style={{ zIndex: "0" }}>
           <Battle>
             <SubSection>
               <InfoTitle>
@@ -108,17 +156,17 @@ export default function ProfilePage() {
             </SubSection>
             <SubSection>
               <Subtitle>승률</Subtitle>
-              <SubValue>72.5%</SubValue>
-              <SubDetail>180승 / 248게임</SubDetail>
+              <SubValue>{battleWinRate.toFixed(1)}%</SubValue>
+              <SubDetail>{totalWins}승 / {totalDraws}무 / {totalLosses}패 / {totalGames}게임</SubDetail>
             </SubSection>
             <SubSection>
               <Subtitle>랭킹</Subtitle>
-              <SubValue>#127</SubValue>
+              <SubValue>#127</SubValue> {/* 임의의 값 */}
             </SubSection>
           </Battle>
         </InfoWraper>
 
-        <InfoWraper style={{zIndex: "0"}}>
+        <InfoWraper style={{ zIndex: "0" }}>
           <SubSection>
             <InfoTitle>
               <Star size={20} color="orange" />
@@ -126,35 +174,164 @@ export default function ProfilePage() {
             </InfoTitle>
           </SubSection>
           <Record>
-            {records.map((record) => (
-              <RecordCard key={record.id}>
-                <IconContainer style={{ 
-                  backgroundColor: record.mode=="대전"? "rgba(254, 91, 94, 0.1)":
-                                    record.mode=="협동"? "rgba(34, 197, 94, 0.1)":
-                                    record.mode=="솔로"? "rgba(168, 85, 247, 0.1)":"grey" }}>
-                  {record.mode=="대전"? <Swords size={20} color="#FE5B5E" />:
-                    record.mode=="협동"? <Handshake size={20} color="#22C55E" />:
-                    record.mode=="솔로"? <User size={20} color="#A855F7" />:""}
-                </IconContainer>
-                <RecordContent>
-                  <RecordTitle>{record.title}</RecordTitle>
-                  <RecordDetail>{record.detail}</RecordDetail>
-                </RecordContent>
-                <RecordResult
-                  style={{
-                    color: (record.status=="승리"? "#15803D": record.status=="완료"? "#A855F7":"#801515"),
-                    backgroundColor: (record.status=="승리"? "#DCFCE7": record.status=="완료"? "#F3E8FF":"#FCDCDC")
-                  }}>
-                  {record.status}
-                </RecordResult>
-              </RecordCard>
-            ))}
+            {Array.isArray(gameRecords) && gameRecords.length > 0 ? (
+              gameRecords.map((record) => (
+                <RecordCard key={record.recordId}>
+                  <PuzzleImage src={record.puzzleImage} alt="퍼즐 이미지" />
+                  <RecordInfo>
+                    {/* Record Content */}
+                    <RecordContent>
+                      <RecordTitle>{record.gameName || "게임 이름 없음"}</RecordTitle>
+                      <RecordDetail>{new Date(record.playedAt).toLocaleString()}</RecordDetail>
+                      <RecordMode>{getGameModeText(record.gameType)}</RecordMode>
+                    </RecordContent>
+                    
+                    {/* 대전 모드인 경우 팀원 정보 표시 */}
+                    {record.gameType === "BATTLE" && (
+                      <TeamContainer>
+                        <TeamSection>
+                          <TeamTitle>With</TeamTitle>
+                          <TeamMembers>
+                          {record.teamMates && Array.isArray(record.teamMates) && record.teamMates.length > 0 ? (
+                            record.teamMates.map((member, index) => (
+                              <MemberName key={index}>{member}</MemberName>
+                            ))
+                          ) : (
+                            <MemberName>팀원 정보 없음</MemberName>
+                          )}
+                          </TeamMembers>
+                        </TeamSection>
+                        <TeamSection>
+                          <TeamTitle>VS</TeamTitle>
+                          <TeamMembers>
+                            {record.opponents && Array.isArray(record.opponents) && record.opponents.length > 0 ? (
+                              record.opponents.map((member, index) => (
+                                <MemberName key={index}>{member}</MemberName>
+                              ))
+                            ) : (
+                              <MemberName>상대 팀원 정보 없음</MemberName>
+                            )}
+                          </TeamMembers>
+                        </TeamSection>
+                      </TeamContainer>
+                    )}
+                  </RecordInfo>
+
+                  {/* 승패 정보 */}
+                  <RecordResult
+                    style={{
+                      color: record.gameStatus === "WIN" ? "#15803D" : record.gameStatus === "DRAW" ? "#A855F7" : "#801515",
+                      backgroundColor: record.gameStatus === "WIN" ? "#DCFCE7" : record.gameStatus === "DRAW" ? "#F3E8FF" : "#FCDCDC"
+                    }}>
+                    {record.gameStatus === "WIN" ? "승리" : record.gameStatus === "DRAW" ? "무승부" : "패배"}
+                  </RecordResult>
+                </RecordCard>
+              ))
+            ) : (
+              <div>게임 기록이 없습니다.</div>
+            )}
           </Record>
+          <Navigation>
+            <button onClick={handlePreviousPage} disabled={currentPage === 0}>
+              이전
+            </button>
+            <span>
+              {currentPage + 1} / {totalPages}
+            </span>
+            <button onClick={handleNextPage} disabled={currentPage === totalPages - 1}>
+              다음
+            </button>
+        </Navigation>
         </InfoWraper>
       </BackGround>
     </>
   );
 }
+
+// 스타일 컴포넌트는 기존과 동일하게 유지합니다.
+
+
+const RecordCard = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #F5F5F5;
+  border-radius: 10px;
+  gap: 20px; /* 이미지와 컨텐츠 간 간격 */
+`;
+
+const PuzzleImage = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  object-fit: cover;
+`;
+
+const RecordInfo = styled.div`
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const RecordContent = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const RecordTitle = styled.div`
+  font-size: 16px;
+  font-weight: bold;
+  color: #333333;
+`;
+
+const RecordDetail = styled.div`
+  font-size: 14px;
+  color: #707070;
+  margin-top: 4px;
+`;
+
+const RecordMode = styled.div`
+  font-size: 14px;
+  color: #707070;
+  margin-top: 4px;
+`;
+
+const TeamContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+`;
+
+const TeamSection = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const TeamTitle = styled.div`
+  font-size: 14px;
+  font-weight: bold;
+  margin-right: 10px;
+`;
+
+const TeamMembers = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+`;
+
+const MemberName = styled.div`
+  font-size: 14px;
+  color: #333333;
+`;
+
+const RecordResult = styled.span`
+  margin-left: auto;
+  padding: 5px 15px;
+  border-radius: 5px;
+  font-weight: bold ;
+  font-size: 14px;
+`;
 
 const InfoWraper = styled.div`
   padding: 30px 25px;
@@ -190,41 +367,6 @@ const Record = styled.div`
   gap: 15px; /* 카드 간격 조정 */
 `;
 
-const RecordCard = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 15px 20px;
-  background-color: #F5F5F5;
-  border-radius: 10px;
-  gap: 20px; /* 아이콘과 텍스트 간격 */
-`;
-
-const RecordContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-`;
-
-const RecordTitle = styled.div`
-  font-size: 16px;
-  font-weight: bold;
-  color: #333333;
-`;
-
-const RecordDetail = styled.div`
-  font-size: 14px;
-  color: #707070;
-  margin-top: 4px;
-`;
-
-const RecordResult = styled.span`
-  margin-left: auto;
-  padding: 5px 15px;
-  border-radius: 5px;
-  font-weight: bold ;
-  font-size: 14px;
-`
-
 const SubSection = styled.div`
   margin-right: auto;
 `;
@@ -257,11 +399,29 @@ const SubDetail = styled.span`
   display: block;
 `;
 
-const IconContainer = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%; /* 원 모양 */
+const Navigation = styled.div`
   display: flex;
-  align-items: center;
   justify-content: center;
-`
+  align-items: center;
+  margin-top: 20px;
+
+  button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin: 0 10px;
+    cursor: pointer;
+    border-radius: 5px;
+
+    &:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  }
+
+  span {
+    font-size: 16px;
+  }
+`;
+
