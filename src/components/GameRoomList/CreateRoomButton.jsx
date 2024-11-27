@@ -355,6 +355,8 @@ const CreateButton = styled(Button)`
   background-color: orange;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   color: white;
+  font-size: 25px;
+  padding: 10px 20px;
   &:hover {
     background-color: darkorange;
   }

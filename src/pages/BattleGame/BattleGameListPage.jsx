@@ -8,14 +8,13 @@ import Footer from "@/components/Footer";
 import Chatting from "@/components/Chatting";
 import CreateRoomButton from "@/components/GameRoomList/CreateRoomButton";
 import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
-import { request } from "@/apis/requestBuilder";
+import { request, authRequest } from "@/apis/requestBuilder";
 import { getSender } from "@/socket-utils/storage";
 import backgroundPath from "@/assets/backgrounds/background.png";
-import { socket } from "../../socket-utils/socket2";
+import { socket } from "@/socket-utils/socket2";
 import { setRoomId, setSender, setTeam } from "../../socket-utils/storage";
 import { deepPurple } from "@mui/material/colors";
-import UserListSidebar from "../../components/GameRoomList/UserListSidebar";
-import { authRequest } from "../../apis/requestBuilder";
+import UserListSidebar from "@/components/GameRoomList/UserListSidebar";
 import music from "@/assets/audio/wait_game.mp3";
 import InviteAlertModal from "@/components/GameWaiting/InviteAlertModal";
 const { connect, send, subscribe, disconnect } = socket;
@@ -97,11 +96,16 @@ export default function BattleGameListPage() {
   const playerId = localStorage.getItem("userId");
   const playerImage = localStorage.getItem("image");
   const playerName = localStorage.getItem("userName");
-
+  
   // InviteAlertModal을 상태로 관리
   const [isInviteAlertOpen, setInviteAlertOpen] = useState(false);
   const [invitingPlayer, setInvitingPlayer] = useState(null);
   const [inviteRoomId, setInviteRoomId] = useState("");
+
+  // 친구 모달창 관리
+  const [isUserListModalOpen, setIsUserListModalOpen] = useState(false);
+  const openUserListModal = () => setIsUserListModalOpen(true);
+  const closeUserListModal = () => setIsUserListModalOpen(false);
 
   // 초대 수락 처리 함수
   const handleInviteAccept = () => {
@@ -184,17 +188,18 @@ export default function BattleGameListPage() {
                   게임 찾기
                 </CenterContext>
                 <CenterButton>
-                  <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginLeft: "auto" }}>
-                    <RefreshIcon />
-                  </IconButton>
+                  <RefreshButton onClick={refetchAllRoom}>
+                    <RefreshIcon /> 새로고침
+                  </RefreshButton>
+                  <FriendButton onClick={openUserListModal}>
+                    친구
+                  </FriendButton>
                   <CreateRoomButton category="battle" />
                 </CenterButton>
               </CenterTop>
               <GameRoomListBoard category="battle" roomList={roomList} />
             </CenterContaier>
-            {/* <RightSidebar>
-              <UserListSidebar />
-            </RightSidebar> */}
+            {/* <UserListSidebar /> */}
           </ContentContainer>
           <InviteAlertModal
             isOpen={isInviteAlertOpen}
@@ -203,6 +208,15 @@ export default function BattleGameListPage() {
             onAccept={handleInviteAccept}
             onDecline={handleInviteDecline}
           />
+          {/* UserListSidebar 모달 */}
+          {isUserListModalOpen && (
+            <ModalOverlay>
+              <ModalContent>
+                <UserListSidebar />
+                <CloseButton onClick={closeUserListModal}>닫기</CloseButton>
+              </ModalContent>
+            </ModalOverlay>
+          )}
         </Wrapper>
       )}
     </>
@@ -277,5 +291,67 @@ const CenterContext = styled.div`
 `
 
 const CenterButton = styled.div`
-  margin-top: auto;
+  display: flex;
+  margin: auto 12px 0 0;
+  gap: 10px;
+  height: 62px;
 `
+
+const RefreshButton = styled(Button)`
+  background-color: orange;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  color: white;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 25px;
+  &:hover {
+    background-color: darkorange;
+  }
+`
+
+const FriendButton = styled(Button)`
+  background-color: orange;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  color: white;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 25px;
+  &:hover {
+    background-color: darkorange;
+  }
+`
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  max-width: 600px;
+  width: 90%;
+  position: relative;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+`;
