@@ -94,6 +94,8 @@ const Pointer = styled.div`
   position: absolute;
   background: ${(props) => props.color};
   mask: url(${(props)=> props.path}) no-repeat center / contain;
+  transition: left 0.1s ease, top 0.1s ease;
+  pointer-events: none;
 `
 
 const Canvas = styled.canvas`
