@@ -59,9 +59,8 @@ const createPuzzleConfig = () => {
 
   const unLockPuzzle = (index) => {
     config.tiles[index].locked = false
-    config.tiles[index].strokeColor = undefined
-    config.tiles[index].shadowColor = undefined
-    // config.tiles[index].sendToBack()
+    config.tiles[index].strokeColor = config.tiles[index].originStroke ?? colors.DEFAULT_STROKE
+    config.tiles[index].shadowColor = config.tiles[index].originShadow ?? colors.DEFAULT_SHADOW
   };
 
   const addPiece = ({ fromIndex, toIndex }, bundles = []) => {

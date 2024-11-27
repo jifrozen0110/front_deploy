@@ -113,10 +113,12 @@ const initConfig = ({ config, board }) => {
       const border = mask.clone();
       border.strokeColor = new config.project.Color("#ddd");
       border.strokeWidth = constant.borderStrokeWidth;
+      border.originStroke = new config.project.Color("#ddd");
 
       // 피스 생성
       const tile = new config.project.Group([mask, img, border]);
       tile.shadowColor = new config.project.Color("#666");
+      tile.originShadow = new config.project.Color("#666");
       tile.shadowBlur = 1;
       tile.shadowOffset = new Point(-1, -1);
 
