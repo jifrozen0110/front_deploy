@@ -53,6 +53,7 @@ import bloomAudioPath from "@/assets/audio/blooming.mp3";
 import frameAudioPath from "@/assets/audio/frame2.mp3";
 
 import './ani.css';
+import { colors } from "../../puzzle-core/color";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
@@ -78,7 +79,7 @@ export default function BattleGameIngamePage() {
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
   const [slots, setSlots] = useState(Array(8).fill(0));
-
+  const [players, setPlayers] = useState([])
   const isGameEndingRef = useRef(false);
 
   const itemFunc = useMemo(() => {
@@ -462,8 +463,10 @@ export default function BattleGameIngamePage() {
           if (data.team.toUpperCase() == getTeam().toUpperCase()) {
             setSlots(data.inventory)
             const config = getConfig()
-            config.tiles[data.fitPieceIndex].strokeColor = undefined
-            config.tiles[data.fitPieceIndex].shadowColor = undefined
+            config.tiles[data.fitPieceIndex].strokeColor = colors.DEFAULT_STROKE
+            config.tiles[data.fitPieceIndex].shadowColor = colors.DEFAULT_SHADOW
+            config.tiles[data.fitPieceIndex].originStroke = colors.DEFAULT_STROKE
+            config.tiles[data.fitPieceIndex].originShadow = colors.DEFAULT_SHADOW
           }
         });
 
@@ -473,6 +476,13 @@ export default function BattleGameIngamePage() {
             setSlots(data.inventory)
           }
         });
+
+        subscribe(`/topic/game/${gameId}/pointer/init`, message => {
+          const data = JSON.parse(message.body)
+          setPlayers(data.filter(p => p.team.toUpperCase() == getTeam().toUpperCase()))
+          const me = data.find(p => p.playerId == localStorage.getItem("userId"))
+          localStorage.setItem('myColor', me.color)
+        })
 
         // 서버로 메시지 전송
         send(`/pub/${gameId}/game/enter`, {}, JSON.stringify({}));
@@ -579,6 +589,7 @@ export default function BattleGameIngamePage() {
             picture={gameData.picture}
             bundles={Object.values(gameData[`${getTeam()}Puzzle`].bundles)}
             itemPieces={gameData[`${getTeam()}Puzzle`].itemPiece}
+            players={players}
           />
         </Board>
         <GameInfo>
