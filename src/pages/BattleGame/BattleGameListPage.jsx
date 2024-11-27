@@ -90,9 +90,7 @@ const theme = createTheme({
 
 export default function BattleGameListPage() {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [roomList, setRoomList] = useState(null);
-  const [pageNumber, setPageNumber] = useState(0);
   const isLoading = useMemo(() => roomList === null, [roomList]);
   const audioTag = useRef(null);
   const [chatList, setChatList] = useState([]);
@@ -135,7 +133,7 @@ export default function BattleGameListPage() {
   };
 
   const fetchAllRoom = async () => {
-    const res = await authRequest().get(`/api/rooms?page=${pageNumber}`);
+    const res = await authRequest().get(`/api/rooms`);
     const { data: fetchedRoomList } = res;
     setRoomList(fetchedRoomList);
   };
@@ -163,12 +161,6 @@ export default function BattleGameListPage() {
     });
   }, []);
 
-  useEffect(() => {
-    // 페이지 번호가 변경될 때 데이터 가져오기
-    setPageNumber(parseInt(searchParams.get("page"), 10) || 0);
-    fetchAllRoom();
-  }, [pageNumber]);
-
   return (
     <>
       <audio ref={audioTag} src={music} autoPlay loop muted></audio>
@@ -183,21 +175,21 @@ export default function BattleGameListPage() {
           <ContentContainer>
             <LeftSidebar>
               <CreateRoomButtonContainer>
-                <CreateRoomButton category="battle" style={{ width: "100%" }} />
-                <IconButton
-                  aria-label="refresh"
-                  onClick={refetchAllRoom}
-                  sx={{ marginLeft: "auto" }}
-                >
-                  <RefreshIcon />
-                </IconButton>
               </CreateRoomButtonContainer>
               <Chatting chatList={chatList} path={"/pub/chat/main"} />
             </LeftSidebar>
             <CenterContaier>
-              <CenterFunc>
-
-              </CenterFunc>
+              <CenterTop>
+                <CenterContext>
+                  게임 찾기
+                </CenterContext>
+                <CenterButton>
+                  <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginLeft: "auto" }}>
+                    <RefreshIcon />
+                  </IconButton>
+                  <CreateRoomButton category="battle" />
+                </CenterButton>
+              </CenterTop>
               <GameRoomListBoard category="battle" roomList={roomList} />
             </CenterContaier>
             {/* <RightSidebar>
@@ -232,6 +224,7 @@ const Wrapper = styled.div`
     right: 0;
     bottom: 0;
     z-index: 0; /* 배경 위에 위치 */
+    background-color: rgba(0,0,0,0.2);
   }
 
   > * {
@@ -263,16 +256,26 @@ const LeftSidebar = styled.div`
 `;
 
 const CenterContaier = styled.div`
-  width: 100%;
-`
-
-const CenterFunc = styled.div`
-
-`
-
-const RightSidebar = styled.div`
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+  width: 100%;
   height: 100%;
-  width: 25%;
-`;
+  padding: 0 20px;
+`
+
+const CenterTop = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+`
+
+const CenterContext = styled.div`
+  color: white;
+  font-size: 100px;
+  font-weight: bold;
+`
+
+const CenterButton = styled.div`
+  margin-top: auto;
+`

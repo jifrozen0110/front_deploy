@@ -16,9 +16,7 @@ export default function GameRoomListBoard({ category, roomList }) {
 
   // 초기 roomList 설정
   useEffect(() => {
-    setRooms(roomList?.content ?? []);
-    setPage(roomList?.pageable?.pageNumber ?? 0);
-    setTotalPage(roomList?.totalPages ?? 0);
+    setRooms(roomList ?? []);
   }, [roomList]);
 
   // 페이지 변경 시 데이터 요청
@@ -32,10 +30,9 @@ export default function GameRoomListBoard({ category, roomList }) {
 
     setIsFetching(true);
     try {
-      const res = await authRequest().get(`/api/rooms?page=${currentPage}`);
+      const res = await authRequest().get(`/api/rooms`);
       const { data } = res;
-      setRooms(data.content ?? []);
-      setTotalPage(data.totalPages ?? 0);
+      setRooms(data ?? []);
     } catch (error) {
       console.error("Failed to fetch rooms:", error);
     } finally {
@@ -43,25 +40,11 @@ export default function GameRoomListBoard({ category, roomList }) {
     }
   };
 
-  // 이전 페이지 이동
-  const handlePreviousPage = () => {
-    if (page > 0 && !isFetching) {
-      setPage(page - 1);
-    }
-  };
-
-  // 다음 페이지 이동
-  const handleNextPage = () => {
-    if (page < totalPage - 1 && !isFetching) {
-      setPage(page + 1);
-    }
-  };
-
   return (
     <Wrapper>
       <GridContainer>
         {rooms.map((room) => (
-          <GameCard room={room} category={category} />
+          <GameCard key={room.roomId} room={room} category={category} />
         ))}
       </GridContainer>
     </Wrapper>
@@ -72,13 +55,14 @@ export default function GameRoomListBoard({ category, roomList }) {
 const Wrapper = styled.div`
   width: 100%;
   height: 100%;
-  padding: 20px 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
   box-sizing: border-box;
+  overflow: hidden; /* 부모 범위를 초과하지 않도록 설정 */
 `;
+
 
 const GridContainer = styled.div`
   width: 100%;
@@ -86,6 +70,7 @@ const GridContainer = styled.div`
   
   overflow-y: auto;
   padding-right: 10px;
+  box-sizing: border-box;
 
   /* 스크롤바 스타일 */
   &::-webkit-scrollbar {

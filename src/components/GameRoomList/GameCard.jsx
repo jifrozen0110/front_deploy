@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import UserCard from "@/components/UserCard"
 import {
   CardContent,
   CardMedia,
@@ -38,17 +39,21 @@ export default function GameCard({ room, category }) {
           justifyContent: "space-between",
           alignItems: "center",
           padding: "0 0 0 15px",
+          boxSizing: "border-box",
           gap: "15px",
         }}
       >
-        <Typography sx={{ fontWeight: "bold", color: "white", fontSize: "30px", minWidth: "320px", textAlign: "left" }}>
+        <Typography sx={{ fontWeight: "bold", color: "white", fontSize: "30px", width: "40%", textAlign: "left" }}>
           {room.roomName}
         </Typography>
-        <div style={{display: "flex", justifyContent: "space-between", width: "40%", gap: "25px"}}>
-          <Typography sx={{ color: "white", width: "80px", fontSize: "20px" }}>
+        <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", width: "60%"}}>
+          <div style={{width: "200px"}}>
+            <UserCard userImage={room.masterImage} userName={room.masterName} imageSize="40" nameSize="20" />
+          </div>
+          <Typography sx={{ color: "white" }}>
             {room.gameMode}
           </Typography>
-          <Typography sx={{ color: "white", width: "80px", fontSize: "20px" }}>
+          <Typography sx={{ color: "white" }}>
             {room.puzzlePiece} 피스
           </Typography>
           <Box
