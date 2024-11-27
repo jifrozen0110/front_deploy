@@ -29,53 +29,55 @@ export default function GameCard({ room, category }) {
       <CardMedia
         component="img"
         image={room.puzzleImage} // 이미지 경로 수정
-        sx={{ width: 80, height: 80, marginLeft: "10px", borderRadius: "8px" }}
+        sx={{ width: 280, height: "100%"}}
       />
       <CardContent
         sx={{
           flex: 1,
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          padding: "0 16px",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "0 0 0 15px",
+          gap: "15px",
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: "bold", color: "white" }}>
+        <Typography sx={{ fontWeight: "bold", color: "white", fontSize: "30px", minWidth: "320px", textAlign: "left" }}>
           {room.roomName}
         </Typography>
-        <Typography variant="body2" sx={{ color: "white" }}>
-          {room.gameMode}
-        </Typography>
-        <Typography variant="body2" sx={{ color: "white" }}>
-          {room.puzzlePiece}피스
-        </Typography>
+        <div style={{display: "flex", justifyContent: "space-between", width: "40%", gap: "25px"}}>
+          <Typography sx={{ color: "white", width: "80px", fontSize: "20px" }}>
+            {room.gameMode}
+          </Typography>
+          <Typography sx={{ color: "white", width: "80px", fontSize: "20px" }}>
+            {room.puzzlePiece} 피스
+          </Typography>
+          <Box
+            sx={{
+              marginRight: "16px",
+              color: "white",
+              fontSize: "20px"
+            }}
+          >
+            {`${room.nowPlayers}/${room.maxPlayers}`}
+          </Box>
+        </div>
       </CardContent>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginRight: "16px",
-          color: "white",
-          fontWeight: "bold",
-        }}
-      >
-        {`${room.nowPlayers}/${room.maxPlayers}`}
-      </Box>
     </StyledCard>
   );
 }
 
 const StyledCard = styled(Button)`
   display: flex;
-  padding: 15px 10px;
+  justify-content: flex-start;
+  padding: 0 10px 0 0;
+  margin-bottom: 10px;
   width: 100%;
-  height: 100%;
-  background-color: #42a5f5; // 파란색 배경
+  height: 150px;
+  background-color: rgba(0, 0, 0, 0.7);
   border-radius: 8px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  backdrop-filter: blur(5px); /* 블러 효과 추가 */
   &:hover {
-    background-color: #42a5f5;
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+    background-color: rgba(73, 73, 73, 0.7);
   }
 `;

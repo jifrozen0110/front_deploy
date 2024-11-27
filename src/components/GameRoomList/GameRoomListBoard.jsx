@@ -14,20 +14,6 @@ export default function GameRoomListBoard({ category, roomList }) {
   const [totalPage, setTotalPage] = useState(0);
   const [isFetching, setIsFetching] = useState(false); // 중복 요청 방지
 
-  // 빈 방 생성 함수
-  const makeEmptyRooms = (rooms) => {
-    const result = [];
-    const totalItems = 10; // 한 페이지에 10개 항목
-    for (let i = 0; i < totalItems - rooms.length; i++) {
-      result.push(
-        <Grid item xs={6} key={`empty ${i}`}>
-          <EmptyCard></EmptyCard>
-        </Grid>,
-      );
-    }
-    return result;
-  };
-
   // 초기 roomList 설정
   useEffect(() => {
     setRooms(roomList?.content ?? []);
@@ -75,30 +61,9 @@ export default function GameRoomListBoard({ category, roomList }) {
     <Wrapper>
       <GridContainer>
         {rooms.map((room) => (
-          <Grid item xs={6} key={room.roomId}>
-            <GameCard room={room} category={category} />
-          </Grid>
+          <GameCard room={room} category={category} />
         ))}
-        {makeEmptyRooms(rooms)}
       </GridContainer>
-      <PagingContainer>
-        <PageButton onClick={handlePreviousPage} disabled={page === 0 || isFetching}>
-          <img
-            src={LeftTriangle}
-            alt="앞 페이지"
-            className="icon"
-            style={{ display: "block", margin: "0 auto", height: "100%" }}
-          />
-        </PageButton>
-        <PageButton onClick={handleNextPage} disabled={page === totalPage - 1 || isFetching}>
-          <img
-            src={RightTriangle}
-            alt="뒷 페이지"
-            className="icon"
-            style={{ display: "block", margin: "0 auto", height: "100%" }}
-          />
-        </PageButton>
-      </PagingContainer>
     </Wrapper>
   );
 }
@@ -116,12 +81,29 @@ const Wrapper = styled.div`
 `;
 
 const GridContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2개의 열 */
-  grid-auto-rows: 1fr;
-  gap: 10px;
   width: 100%;
   height: 100%;
+  
+  overflow-y: auto;
+  padding-right: 10px;
+
+  /* 스크롤바 스타일 */
+  &::-webkit-scrollbar {
+    width: 10px; /* 스크롤바 너비 */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3); /* 스크롤바 색상 */
+    border-radius: 10px; /* 스크롤바 둥글게 */
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.5); /* 스크롤바 hover 효과 */
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent; /* 스크롤 트랙 배경 투명화 */
+  }
 `;
 
 const EmptyCard = styled(Card)`

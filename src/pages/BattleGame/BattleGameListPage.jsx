@@ -169,54 +169,6 @@ export default function BattleGameListPage() {
     fetchAllRoom();
   }, [pageNumber]);
 
-  // function getCookie(name) {
-  //   const value = `; ${document.cookie}`;
-  //   const parts = value.split(`; ${name}=`);
-  //   if (parts.length === 2) {
-  //     return parts.pop().split(";").shift();
-  //   }
-  // }
-
-  // const quickMatching = () => {
-  //   const sender = getCookie("userId");
-  //   if (!sender) {
-  //     alert("로그인한 유저만 이용할 수 있는 기능입니다.");
-  //     return;
-  //   }
-
-  //   connect(() => {
-  //     //대기 큐 입장했다고 보내기
-  //     send(
-  //       "/app/game/message",
-  //       {},
-  //       JSON.stringify({
-  //         type: "QUICK",
-  //         sender: sender,
-  //         member: true,
-  //       }),
-  //     );
-
-  //     //랜덤 매칭 큐 소켓
-  //     subscribe(`/topic/game/room/quick/${sender}`, (message) => {
-  //       const data = JSON.parse(message.body);
-  //       if (data.message === "WAITING") {
-  //         alert("waiting");
-  //       } else if (data.message === "GAME_START") {
-  //         setRoomId(data.targets);
-  //         setSender(sender);
-  //         if (data.team === "RED") {
-  //           setTeam("red");
-  //         } else {
-  //           setTeam("blue");
-  //         }
-  //         window.location.replace(`/game/battle/ingame/${data.targets}`);
-  //       }
-  //     });
-
-  //     //응답 메시지 파싱
-  //   });
-  // };
-
   return (
     <>
       <audio ref={audioTag} src={music} autoPlay loop muted></audio>
@@ -242,10 +194,15 @@ export default function BattleGameListPage() {
               </CreateRoomButtonContainer>
               <Chatting chatList={chatList} path={"/pub/chat/main"} />
             </LeftSidebar>
-            <GameRoomListBoard category="battle" roomList={roomList} />
-            <RightSidebar>
+            <CenterContaier>
+              <CenterFunc>
+
+              </CenterFunc>
+              <GameRoomListBoard category="battle" roomList={roomList} />
+            </CenterContaier>
+            {/* <RightSidebar>
               <UserListSidebar />
-            </RightSidebar>
+            </RightSidebar> */}
           </ContentContainer>
           <InviteAlertModal
             isOpen={isInviteAlertOpen}
@@ -274,7 +231,6 @@ const Wrapper = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    backdrop-filter: blur(5px); /* 블러 효과 추가 */
     z-index: 0; /* 배경 위에 위치 */
   }
 
@@ -305,6 +261,14 @@ const LeftSidebar = styled.div`
   height: 100%;
   width: 25%;
 `;
+
+const CenterContaier = styled.div`
+  width: 100%;
+`
+
+const CenterFunc = styled.div`
+
+`
 
 const RightSidebar = styled.div`
   display: flex;
