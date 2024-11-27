@@ -40,16 +40,21 @@ import { setRoomId, setTeam } from "../../socket-utils/storage";
 
 import Inventory from "../../components/GameIngame/Inventory";
 import firePath from "@/assets/effects/fire.gif";
+import boomPath from "@/assets/effects/boom.gif";
 import mudPath from "@/assets/effects/mud.png";
+import inkPath from "@/assets/effects/ink.png";
 import tornadoPath from "@/assets/effects/tornado.gif";
 import bloomPath from "@/assets/effects/blooming.gif";
+import blackholePath from "@/assets/effects/blackhole.png";
 import twinklePath from "@/assets/effects/twinkle.gif";
+import framePath from "@/assets/effects/frame.png";
 
 import { addAudio } from "../../puzzle-core/attackItem";
 import fireAudioPath from "@/assets/audio/fire.mp3";
 import mudAudioPath from "@/assets/audio/mud.wav";
 import tornadoAudioPath from "@/assets/audio/tornado.mp3";
 import bloomAudioPath from "@/assets/audio/blooming.mp3";
+import blackholeAudioPath from "@/assets/audio/blackhole.mp3";
 import frameAudioPath from "@/assets/audio/frame2.mp3";
 
 import './ani.css';
@@ -89,13 +94,8 @@ export default function BattleGameIngamePage() {
         const bundles = targets === "RED" ? data.redBundles : data.blueBundles;
         const fireImg = document.createElement("img");
         const canvasContainer = document.getElementById("canvasContainer");
-        fireImg.src = firePath;
-
-        fireImg.style.zIndex = 100;
-        fireImg.style.position = "absolute";
-        fireImg.style.width = "100px";
-        fireImg.style.height = "150px";
-        fireImg.style.transform = "translate(-50%, -90%)";
+        fireImg.src = boomPath;
+        fireImg.className = "boom"
 
         // fire 당하는 팀의 효과
         if (targets === getTeam().toUpperCase()) {
@@ -120,8 +120,7 @@ export default function BattleGameIngamePage() {
             fireImgCopy.style.top = `${y}px`;
 
             canvasContainer.appendChild(fireImgCopy);
-            addAudio(fireAudioPath);
-
+            
             setTimeout(() => {
               if (fireImgCopy.parentNode) {
                 console.log("불 효과 삭제");
@@ -130,6 +129,7 @@ export default function BattleGameIngamePage() {
               }
             }, 2000);
           }
+          addAudio(fireAudioPath);
         } else {
           // fire 발동하는 팀의 효과
           // console.log("fire 보낼거임");
@@ -157,16 +157,8 @@ export default function BattleGameIngamePage() {
           return;
         }
         const mudImg = document.createElement("img");
-        mudImg.src = mudPath;
-        mudImg.style.zIndex = 100;
-        mudImg.style.position = "absolute";
-        mudImg.style["-webkit-user-drag"] = "none";
-        mudImg.style["-khtml-user-drag"] = "none";
-        mudImg.style["-moz-user-drag"] = "none";
-        mudImg.style["-o-user-drag"] = "none";
-        mudImg.style["user-drag"] = "none";
-        mudImg.style["pointer-events"] = "none";
-        mudImg.style["max-height"] = "100%";
+        mudImg.src = inkPath;
+        mudImg.className = "ink"
 
         const gameBoard = document.getElementById("gameBoard");
 
@@ -189,23 +181,15 @@ export default function BattleGameIngamePage() {
         const tornadoImg = document.createElement("img");
         const gameBoard = document.getElementById("gameBoard");
         tornadoImg.src = tornadoPath;
-
-        tornadoImg.style.zIndex = 100;
-        tornadoImg.style.position = "absolute";
-        tornadoImg.style["pointer-events"] = "none";
-        tornadoImg.style.width = "40%";
-        tornadoImg.style.height = "45%";
+        tornadoImg.className = "tornado"
 
         if (targetList === null || targetList.length === 0) {
           return;
         }
 
-        tornadoImg.style.animation = "moveAround 1.2s linear infinite";
-
         addAudio(tornadoAudioPath);
         gameBoard.appendChild(tornadoImg);
-        usingItemTyphoon(targetList, bundles)
-
+        setTimeout(() => usingItemTyphoon(targetList, bundles), 500);
         setTimeout(() => {
           if (tornadoImg.parentNode) {
             tornadoImg.parentNode.removeChild(tornadoImg);
@@ -224,15 +208,10 @@ export default function BattleGameIngamePage() {
 
         const bloomImg = document.createElement("img");
         const gameBoard = document.getElementById("gameBoard");
-        bloomImg.src = bloomPath;
+        bloomImg.src = blackholePath;
+        bloomImg.className = "black-hole"
 
-        bloomImg.style.zIndex = 100;
-        bloomImg.style.position = "absolute";
-        bloomImg.style["pointer-events"] = "none";
-        bloomImg.style.width = "75%";
-        bloomImg.style.height = "75%";
-
-        addAudio(bloomAudioPath);
+        addAudio(blackholeAudioPath);
         gameBoard.appendChild(bloomImg);
 
         setTimeout(() => usingItemTyphoon(targetList, bundles), 1000);
@@ -251,21 +230,19 @@ export default function BattleGameIngamePage() {
 
         const twinkleImg = document.createElement("img");
         const gameBoard = document.getElementById("gameBoard");
-        twinkleImg.src = twinklePath;
+        twinkleImg.src = framePath;
 
-        twinkleImg.style.zIndex = 100;
-        twinkleImg.style.position = "absolute";
-        twinkleImg.style["pointer-events"] = "none";
-        twinkleImg.style.width = "100%";
-        twinkleImg.style.height = "100%";
+        const frame = document.createElement("div")
+        frame.className = "frame"
+        frame.appendChild(twinkleImg)
 
         addAudio(frameAudioPath);
-        gameBoard.appendChild(twinkleImg);
+        gameBoard.appendChild(frame);
 
         setTimeout(() => usingItemFrame(targetList, bundles), 1000);
         setTimeout(() => {
-          if (twinkleImg.parentNode) {
-            twinkleImg.parentNode.removeChild(twinkleImg);
+          if (frame.parentNode) {
+            frame.parentNode.removeChild(frame);
           }
         }, 2000);
       },

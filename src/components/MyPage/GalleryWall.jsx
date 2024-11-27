@@ -454,13 +454,14 @@ const ModalCard = styled.div`
   max-width: 60vw;
   max-height: 90vh;
   border-radius: 12px;
-  overflow-y: auto;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transform: translate(-50%, -50%);
   top: 50%;
   left: 50%;
   z-index: 60;
 
+  overflow-y: auto;
+  
   /* 스크롤바 스타일 */
   &::-webkit-scrollbar {
     width: 6px; /* 스크롤바 너비 */
