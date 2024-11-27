@@ -14,3 +14,112 @@
         transform: translate(-50%, -50%);
     }
 }
+
+.boom {
+    z-index: 100;
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    transform: translate(-50%, -90%);
+    pointer-events: none;
+}
+
+.ink {
+    z-index: 100;
+    opacity: 0.95;
+    position: absolute;
+    -webkit-user-drag: none;
+    pointer-events: none;
+    max-height: 100%;
+}
+
+.tornado {
+    z-index: 100;
+    position: absolute;
+    pointer-events: none;
+    width: 40%;
+    height: 45%;
+    animation: moveAround 1.2s linear infinite;
+}
+
+.black-hole {
+    z-index: 100;
+    position: absolute;
+    pointer-events: none;
+    width: 75%;
+    height: 75%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: rotateShrink 2s infinite linear;
+}
+
+.frame {
+    position: absolute;
+    display: inline-block;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.frame img {
+    pointer-events: none;
+    display: block;
+    width: 100%;
+    /* Adjust to fit your design */
+    height: auto;
+    border: 5px solid transparent;
+    /* Frame border */
+    filter: brightness(1);
+    /* Initial brightness */
+    animation: sparkle 3s infinite ease-in-out;
+    /* Sparkling effect */
+}
+
+@keyframes sparkle {
+    0% {
+        filter: brightness(1);
+        box-shadow: none;
+    }
+
+    25% {
+        filter: brightness(1.2);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+
+    50% {
+        filter: brightness(1);
+        box-shadow: none;
+    }
+
+    75% {
+        filter: brightness(1.5);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 1);
+    }
+
+    100% {
+        filter: brightness(1);
+        box-shadow: none;
+    }
+}
+
+@keyframes rotateShrink {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg) scale(1);
+    }
+
+    25% {
+        transform: translate(-50%, -50%) rotate(180deg) scale(0.75);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) rotate(360deg) scale(0.5);
+    }
+
+    75% {
+        transform: translate(-50%, -50%) rotate(540deg) scale(0.25);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(720deg) scale(0);
+    }
+}
