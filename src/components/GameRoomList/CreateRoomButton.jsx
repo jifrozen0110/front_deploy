@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import {
@@ -13,22 +13,33 @@ import {
   FormControlLabel,
   RadioGroup,
   Radio,
+  Alert,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
-import { request } from "@/apis/requestBuilder";
 import { authRequest } from "../../apis/requestBuilder";
+
+const DEFAULT_IMAGE_URL =
+  "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp";
 
 export default function CreateRoomButton({ category }) {
   const navigate = useNavigate();
   const [roomName, setRoomName] = useState("퍼즐 한 판 !!");
   const [gameMode, setGameMode] = useState("battle"); // Default value
-  const [puzzleImage, setPuzzleImage] = useState(
-    "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
-  ); // Default image
+  const [puzzleImage, setPuzzleImage] = useState(DEFAULT_IMAGE_URL); // Default image
+
   const [puzzlePiece, setPuzzlePiece] = useState(100); // Default puzzle pieces
   const [maxPlayers, setMaxPlayers] = useState(4); // Default max players
   const [isOpenedModal, setIsOpenedModal] = useState(false);
+
+  // width과 length 상태는 더 이상 사용되지 않으므로 제거
+  // const [width, setWidth] = useState(0);
+  // const [length, setLength] = useState(0);
+
+  const [isImageLoading, setIsImageLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("info"); // 'success', 'error', 'warning', 'info'
 
   const playerId = localStorage.getItem("userId");
   const playerImage = localStorage.getItem("image");
@@ -49,34 +60,114 @@ export default function CreateRoomButton({ category }) {
     }
   };
 
+  const handlePuzzleImageChange = (e) => {
+    const inputValue = e.target.value.trim();
+
+    if (inputValue === "짱구.jpg") {
+      setPuzzleImage(DEFAULT_IMAGE_URL);
+      setAlertMessage("짱구.jpg는 기본 이미지로 대체되었습니다.");
+      setAlertSeverity("warning");
+    } else {
+      setPuzzleImage(inputValue);
+      setAlertMessage("");
+      setAlertSeverity("info");
+    }
+  };
+
+  // 이미지 크기 요청
+  useEffect(() => {
+    if (!puzzleImage) return;
+
+    const fetchImageDimensions = async () => {
+      setIsImageLoading(true);
+      setImageError(false);
+      setAlertMessage("");
+      try {
+        const response = await authRequest().post("/api/rooms/image/dimensions", null, {
+          params: { imageUrl: puzzleImage },
+        });
+
+        const isValid = response.data;
+
+        if (isValid) {
+          setAlertMessage("이미지 URL이 유효합니다.");
+          setAlertSeverity("success");
+        } else {
+          setAlertMessage("이미지 URL이 유효하지 않아 기본 이미지가 사용되었습니다.");
+          setAlertSeverity("warning");
+          setPuzzleImage(DEFAULT_IMAGE_URL);
+        }
+      } catch (error) {
+        console.error("이미지 크기 가져오기 실패:", error);
+        if (error.response) {
+          const { error: errorCode, message } = error.response.data;
+
+          if (errorCode === "InvalidImageUrl") {
+            setAlertMessage("이미지 URL이 유효하지 않습니다. 기본 이미지로 대체됩니다.");
+            setAlertSeverity("warning");
+            setPuzzleImage(DEFAULT_IMAGE_URL);
+          } else {
+            setAlertMessage(message || "이미지 처리 중 오류가 발생했습니다.");
+            setAlertSeverity("error");
+          }
+        } else {
+          setAlertMessage("이미지 처리 중 네트워크 오류가 발생했습니다.");
+          setAlertSeverity("error");
+        }
+        setImageError(true);
+      } finally {
+        setIsImageLoading(false);
+      }
+    };
+
+    fetchImageDimensions();
+  }, [puzzleImage]);
+
   const handleClose = () => {
-    setGameMode("일반 모드");
-    setPuzzlePiece("100");
     setGameMode("battle");
+    setPuzzlePiece(100);
     setRoomName("퍼즐 한 판 !!");
     setMaxPlayers(4);
+    setPuzzleImage(DEFAULT_IMAGE_URL);
+    // setWidth(0);
+    // setLength(0);
     setIsOpenedModal(false);
+    setImageError(false);
+    setAlertMessage("");
+    setAlertSeverity("info");
+  };
+
+  const isValidImageUrl = (url) => {
+    try {
+      new URL(url);
+      return /\.(jpeg|jpg|gif|png|webp|bmp)$/.test(url);
+    } catch (e) {
+      return false;
+    }
   };
 
   const createRoom = async () => {
-    // if (roomName!="" || puzzleImage!="") {
-    //   alert("필수 정보가 누락되었습니다.");
-    //   return;
-    // }
+    if (!roomName || !puzzleImage || isImageLoading || imageError) {
+      alert("필수 정보가 누락되었거나 이미지 처리에 실패했습니다.");
+      return;
+    }
+
+    if (!isValidImageUrl(puzzleImage)) {
+      alert("유효한 이미지 URL을 입력해주세요.");
+      return;
+    }
 
     const requestData = {
       roomName,
-      // gameMode,
       gameMode: "battle",
       puzzleImage,
-      // puzzlePiece,
       puzzlePiece: 100,
       maxPlayers,
       playerId,
       playerImage,
       playerName,
     };
-    console.log(requestData);
+    console.log("방 생성 요청 데이터:", requestData);
 
     try {
       const { data } = await authRequest().post("/api/rooms", requestData);
@@ -85,7 +176,17 @@ export default function CreateRoomButton({ category }) {
       navigate(`/game/${category}/waiting/${roomId}`);
     } catch (error) {
       console.error("방 생성에 실패했습니다.", error);
-      alert("방 생성 중 오류가 발생했습니다.");
+
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.error === "InvalidImageUrl"
+      ) {
+        alert("이미지 URL이 유효하지 않습니다. 기본 이미지로 대체됩니다.");
+        setPuzzleImage(DEFAULT_IMAGE_URL);
+      } else {
+        alert("방 생성 중 오류가 발생했습니다.");
+      }
     }
   };
 
@@ -182,6 +283,11 @@ export default function CreateRoomButton({ category }) {
             flexDirection: "column",
           }}
         >
+          {alertMessage && (
+            <Alert severity={alertSeverity} sx={{ mb: 2 }}>
+              {alertMessage}
+            </Alert>
+          )}
           <Typography id="modal-modal-title" variant="h5">
             {category === "cooperation" ? "협동" : "배틀"}방 만들기
           </Typography>
@@ -199,32 +305,24 @@ export default function CreateRoomButton({ category }) {
               <TextField
                 label="퍼즐 이미지 URL"
                 value={puzzleImage}
-                onChange={(e) => setPuzzleImage(e.target.value)}
+                onChange={handlePuzzleImageChange}
                 sx={{ width: "100%" }}
+                placeholder="이미지 URL을 입력하세요"
               />
             </Grid>
-            {/* <Grid item xs={12}>
-              <FormControl>
-                <FormLabel id="radio-game-mode">게임 모드</FormLabel>
-                <RadioGroup row value={gameMode} onChange={handleGameMode}>
-                  <FormControlLabel value="normal" control={<Radio />} label="일반 모드" />
-                  <FormControlLabel value="battle" control={<Radio />} label="아이템 모드" />
-                  <FormControlLabel value="timeAttack" control={<Radio />} label="타임어택" />
-                </RadioGroup>
-              </FormControl>
-            </Grid>
             <Grid item xs={12}>
-              <FormControl>
-                <FormLabel id="radio-puzzle-piece">퍼즐 조각 수</FormLabel>
-                <RadioGroup row value={puzzlePiece} onChange={handlePuzzlePiece}>
-                  <FormControlLabel value={20} control={<Radio />} label="20" />
-                  <FormControlLabel value={50} control={<Radio />} label="50" />
-                  <FormControlLabel value={80} control={<Radio />} label="80" />
-                  <FormControlLabel value={100} control={<Radio />} label="100" />
-                  <FormControlLabel value={150} control={<Radio />} label="150" />
-                </RadioGroup>
-              </FormControl>
-            </Grid> */}
+              <Typography variant="subtitle1">이미지 미리보기:</Typography>
+              <img
+                src={puzzleImage}
+                alt="퍼즐 이미지 미리보기"
+                style={{ width: "100%", maxHeight: "300px", objectFit: "contain" }}
+                onError={() => {
+                  setPuzzleImage(DEFAULT_IMAGE_URL);
+                  setAlertMessage("이미지 로딩에 실패했습니다. 기본 이미지로 대체되었습니다.");
+                  setAlertSeverity("warning");
+                }}
+              />
+            </Grid>
             <Grid item xs={9}>
               <FormControl>
                 <FormLabel id="radio-room-size">최대 인원수</FormLabel>
