@@ -7,6 +7,7 @@ import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
+
 const OPENVIDU_SERVER_URL = import.meta.env.VITE_SERVER_END_POINT;
 
 const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
@@ -28,6 +29,7 @@ const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
 
     return () => {
       window.removeEventListener("beforeunload", onbeforeunload);
+      leaveSession();
     };
   }, []);
 
@@ -46,13 +48,11 @@ const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
     const mySession = OV.initSession();
 
     mySession.on("streamCreated", (event) => {
-      console.log("streamCreated");
       const subscriber = mySession.subscribe(event.stream, undefined);
       setSubscribers((prevSubscribers) => [...prevSubscribers, subscriber]);
     });
 
     mySession.on("streamDestroyed", (event) => {
-      console.log("streamDestroyed");
       deleteSubscriber(event.stream.streamManager);
     });
 
@@ -61,9 +61,19 @@ const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
     });
 
     try {
-      const sessionId = await createSession(mySessionId);
-      const token = await createToken(sessionId);
-      mySession.connect(token, { clientData: myUserName });
+      // 백엔드에서 토큰 받아오기
+      const response = await axios.post(
+        OPENVIDU_SERVER_URL + "/api/get-token",
+        { sessionId: mySessionId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      const token = response.data;
+
+      await mySession.connect(token, { clientData: myUserName });
 
       const publisherOV = await OV.initPublisherAsync(undefined, {
         audioSource: undefined,
@@ -79,7 +89,7 @@ const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
       mySession.publish(publisherOV);
       publisher.current = publisherOV;
     } catch (error) {
-      console.log("There was an error connecting to the session:", error.code, error.message);
+      console.error("There was an error connecting to the session:", error);
     }
 
     setSession(mySession);
@@ -95,9 +105,8 @@ const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
   };
 
   const toggleMute = () => {
-    setIsUnMuted(!isUnMuted);
+    setIsUnMuted((prev) => !prev);
   };
-
   const theme = createTheme({
     typography: {
       fontFamily: "'Galmuri11', sans-serif",
@@ -157,35 +166,5 @@ const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
 
   return <div>{session && renderSession()}</div>;
 };
-
-async function createSession(sessionId) {
-  return new Promise(async (resolve, reject) => {
-    const data = { customSessionId: sessionId };
-    try {
-      const response = await axios.post(OPENVIDU_SERVER_URL + "/api/sessions", data);
-
-      setTimeout(() => {
-        console.log("Forced return through developer settings");
-        console.log(sessionId);
-        return resolve(sessionId);
-      }, 1000);
-
-      return response.data.id;
-    } catch (response) {
-      const error = Object.assign({}, response);
-      if (error?.response?.status === 409) {
-        return resolve(sessionId);
-      }
-    }
-  });
-}
-
-async function createToken(sessionId) {
-  const response = await axios.post(
-    OPENVIDU_SERVER_URL + "/api/sessions/" + sessionId + "/connection",
-    {},
-  );
-  return response.data.token;
-}
 
 export default GameOpenVidu;
