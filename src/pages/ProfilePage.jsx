@@ -5,9 +5,9 @@ import { BackGround } from "../components/styled/styled";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import GalleryWall from "@/components/MyPage/GalleryWall";
-import { Camera, ChevronRight, Swords, Handshake, User, Star } from 'lucide-react';
+import { Camera, ChevronRight, Swords, Handshake, User, Star } from "lucide-react";
 
-const width = 100
+const width = 100;
 
 export default function ProfilePage() {
   const [forUpdate, setForUpdate] = useState(0);
@@ -88,7 +88,7 @@ export default function ProfilePage() {
       getUserInfo(currentPage - 1);
     }
   };
-  
+
 
   const moveGalleryWall = async () => {
     navigate(`/user/gallery`);
@@ -138,7 +138,10 @@ export default function ProfilePage() {
               갤러리
               <SubDetail>17</SubDetail> {/* 갤러리 수는 임의의 값 */}
             </InfoTitle>
-            <div onClick={moveGalleryWall} style={{ display: "flex", alignItems: "center", color: "grey", cursor: "pointer" }}>
+            <div
+              onClick={moveGalleryWall}
+              style={{ display: "flex", alignItem: "center", color: "grey", cursor: "pointer" }}
+            >
               더보기
               <ChevronRight size={20} style={{ margin: "auto 0" }} />
             </div>
@@ -249,13 +252,11 @@ export default function ProfilePage() {
 }
 
 // 스타일 컴포넌트는 기존과 동일하게 유지합니다.
-
-
 const RecordCard = styled.div`
   display: flex;
   align-items: center;
   padding: 15px 20px;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
   border-radius: 10px;
   gap: 20px; /* 이미지와 컨텐츠 간 간격 */
 `;
@@ -329,7 +330,7 @@ const RecordResult = styled.span`
   margin-left: auto;
   padding: 5px 15px;
   border-radius: 5px;
-  font-weight: bold ;
+  font-weight: bold;
   font-size: 14px;
 `;
 
@@ -424,4 +425,3 @@ const Navigation = styled.div`
     font-size: 16px;
   }
 `;
-

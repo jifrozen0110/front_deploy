@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { styled } from "styled-components";
 
 import PlayPuzzle from "@/components/PlayPuzzle";
@@ -9,6 +9,7 @@ import PrograssBar from "@/components/GameIngame/ProgressBar";
 import Chatting2 from "@/components/GameWaiting/Chatting";
 import Chatting from "@/components/Chatting";
 import ResultModal from "@/components/GameIngame/ResultModal";
+import useExitRoom from "@/components/ExitRoom";
 
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
@@ -39,29 +40,35 @@ import { setRoomId, setTeam } from "../../socket-utils/storage";
 
 import Inventory from "../../components/GameIngame/Inventory";
 import firePath from "@/assets/effects/fire.gif";
+import boomPath from "@/assets/effects/boom.gif";
 import mudPath from "@/assets/effects/mud.png";
+import inkPath from "@/assets/effects/ink.png";
 import tornadoPath from "@/assets/effects/tornado.gif";
 import bloomPath from "@/assets/effects/blooming.gif";
+import blackholePath from "@/assets/effects/blackhole.png";
 import twinklePath from "@/assets/effects/twinkle.gif";
+import framePath from "@/assets/effects/frame.png";
 
 import { addAudio } from "../../puzzle-core/attackItem";
 import fireAudioPath from "@/assets/audio/fire.mp3";
 import mudAudioPath from "@/assets/audio/mud.wav";
 import tornadoAudioPath from "@/assets/audio/tornado.mp3";
 import bloomAudioPath from "@/assets/audio/blooming.mp3";
+import blackholeAudioPath from "@/assets/audio/blackhole.mp3";
 import frameAudioPath from "@/assets/audio/frame2.mp3";
 
 import './ani.css';
 import { authRequest } from "../../apis/requestBuilder";
+import { colors } from "../../puzzle-core/color";
 
 
 const { connect, send, subscribe, disconnect } = socket;
-const { 
-  getConfig, 
-  lockPuzzle, 
-  movePuzzle, 
-  unLockPuzzle, 
-  addPiece, 
+const {
+  getConfig,
+  lockPuzzle,
+  movePuzzle,
+  unLockPuzzle,
+  addPiece,
   usingItemFire,
   usingItemTyphoon,
   usingItemFrame,
@@ -132,6 +139,10 @@ export default function BattleGameIngamePage() {
     });
   };
 
+  const [players, setPlayers] = useState([])
+  const isGameEndingRef = useRef(false);
+
+
   const itemFunc = useMemo(() => {
     return {
       FIRE(data) {
@@ -139,13 +150,8 @@ export default function BattleGameIngamePage() {
         const bundles = targets === "RED" ? data.redBundles : data.blueBundles;
         const fireImg = document.createElement("img");
         const canvasContainer = document.getElementById("canvasContainer");
-        fireImg.src = firePath;
-
-        fireImg.style.zIndex = 100;
-        fireImg.style.position = "absolute";
-        fireImg.style.width = "100px";
-        fireImg.style.height = "150px";
-        fireImg.style.transform = "translate(-50%, -90%)";
+        fireImg.src = boomPath;
+        fireImg.className = "boom"
 
         // fire 당하는 팀의 효과
         if (targets === getTeam().toUpperCase()) {
@@ -170,16 +176,16 @@ export default function BattleGameIngamePage() {
             fireImgCopy.style.top = `${y}px`;
 
             canvasContainer.appendChild(fireImgCopy);
-            addAudio(fireAudioPath);
-            usingItemTyphoon()
-
+            
             setTimeout(() => {
               if (fireImgCopy.parentNode) {
                 console.log("불 효과 삭제");
+                usingItemFire(bundles, targetList);
                 fireImgCopy.parentNode.removeChild(fireImgCopy);
               }
             }, 2000);
           }
+          addAudio(fireAudioPath);
         } else {
           // fire 발동하는 팀의 효과
           // console.log("fire 보낼거임");
@@ -195,12 +201,11 @@ export default function BattleGameIngamePage() {
           // }, 2000);
         }
 
-        setTimeout(() => {
-          if (targetList && targets === getTeam().toUpperCase()) {
-            console.log("fire 발동 !!");
-            usingItemFire(bundles, targetList);
-          }
-        }, 2000);
+        // setTimeout(() => {
+        //   if (targetList && targets === getTeam().toUpperCase()) {
+        //     console.log("fire 발동 !!");
+        //   }
+        // }, 2000);
       },
       MUD(data) {
         const { targets } = data;
@@ -208,16 +213,8 @@ export default function BattleGameIngamePage() {
           return;
         }
         const mudImg = document.createElement("img");
-        mudImg.src = mudPath;
-        mudImg.style.zIndex = 100;
-        mudImg.style.position = "absolute";
-        mudImg.style["-webkit-user-drag"] = "none";
-        mudImg.style["-khtml-user-drag"] = "none";
-        mudImg.style["-moz-user-drag"] = "none";
-        mudImg.style["-o-user-drag"] = "none";
-        mudImg.style["user-drag"] = "none";
-        mudImg.style["pointer-events"] = "none";
-        mudImg.style["max-height"] = "100%";
+        mudImg.src = inkPath;
+        mudImg.className = "ink"
 
         const gameBoard = document.getElementById("gameBoard");
 
@@ -240,23 +237,15 @@ export default function BattleGameIngamePage() {
         const tornadoImg = document.createElement("img");
         const gameBoard = document.getElementById("gameBoard");
         tornadoImg.src = tornadoPath;
-
-        tornadoImg.style.zIndex = 100;
-        tornadoImg.style.position = "absolute";
-        tornadoImg.style["pointer-events"] = "none";
-        tornadoImg.style.width = "40%";
-        tornadoImg.style.height = "45%";
+        tornadoImg.className = "tornado"
 
         if (targetList === null || targetList.length === 0) {
           return;
         }
 
-        tornadoImg.style.animation = "moveAround 1.2s linear infinite";
-
         addAudio(tornadoAudioPath);
         gameBoard.appendChild(tornadoImg);
-        usingItemTyphoon(targetList, bundles)
-
+        setTimeout(() => usingItemTyphoon(targetList, bundles), 500);
         setTimeout(() => {
           if (tornadoImg.parentNode) {
             tornadoImg.parentNode.removeChild(tornadoImg);
@@ -275,17 +264,12 @@ export default function BattleGameIngamePage() {
 
         const bloomImg = document.createElement("img");
         const gameBoard = document.getElementById("gameBoard");
-        bloomImg.src = bloomPath;
+        bloomImg.src = blackholePath;
+        bloomImg.className = "black-hole"
 
-        bloomImg.style.zIndex = 100;
-        bloomImg.style.position = "absolute";
-        bloomImg.style["pointer-events"] = "none";
-        bloomImg.style.width = "75%";
-        bloomImg.style.height = "75%";
-
-        addAudio(bloomAudioPath);
+        addAudio(blackholeAudioPath);
         gameBoard.appendChild(bloomImg);
-        
+
         setTimeout(() => usingItemTyphoon(targetList, bundles), 1000);
         setTimeout(() => {
           if (bloomImg.parentNode) {
@@ -302,21 +286,19 @@ export default function BattleGameIngamePage() {
 
         const twinkleImg = document.createElement("img");
         const gameBoard = document.getElementById("gameBoard");
-        twinkleImg.src = twinklePath;
+        twinkleImg.src = framePath;
 
-        twinkleImg.style.zIndex = 100;
-        twinkleImg.style.position = "absolute";
-        twinkleImg.style["pointer-events"] = "none";
-        twinkleImg.style.width = "100%";
-        twinkleImg.style.height = "100%";
+        const frame = document.createElement("div")
+        frame.className = "frame"
+        frame.appendChild(twinkleImg)
 
         addAudio(frameAudioPath);
-        gameBoard.appendChild(twinkleImg);
-        
+        gameBoard.appendChild(frame);
+
         setTimeout(() => usingItemFrame(targetList, bundles), 1000);
         setTimeout(() => {
-          if (twinkleImg.parentNode) {
-            twinkleImg.parentNode.removeChild(twinkleImg);
+          if (frame.parentNode) {
+            frame.parentNode.removeChild(frame);
           }
         }, 2000);
       },
@@ -467,7 +449,7 @@ export default function BattleGameIngamePage() {
             if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
               const { targets } = data;
               const targetList = JSON.parse(targets);
-              targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
+              targetList.forEach(({ x, y, index }) => lockPuzzle(index, data.team));
               return;
             }
 
@@ -481,7 +463,7 @@ export default function BattleGameIngamePage() {
             if (data.message && data.message === "UNLOCKED" && data.senderId !== getSender()) {
               const { targets } = data;
               const targetList = JSON.parse(targets);
-              targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
+              targetList.forEach(({ x, y, index }) => unLockPuzzle(index));
               return;
             }
 
@@ -518,6 +500,32 @@ export default function BattleGameIngamePage() {
           changePercent(data)
         });
 
+        subscribe(`/topic/game/room/${gameId}/useItem`, (message) => {
+          const data = JSON.parse(message.body);
+          if (data.team.toUpperCase() == getTeam().toUpperCase()) {
+            setSlots(data.inventory)
+            const config = getConfig()
+            config.tiles[data.fitPieceIndex].strokeColor = colors.DEFAULT_STROKE
+            config.tiles[data.fitPieceIndex].shadowColor = colors.DEFAULT_SHADOW
+            config.tiles[data.fitPieceIndex].originStroke = colors.DEFAULT_STROKE
+            config.tiles[data.fitPieceIndex].originShadow = colors.DEFAULT_SHADOW
+          }
+        });
+
+        subscribe(`/topic/game/room/${gameId}/help`, (message) => {
+          const data = JSON.parse(message.body);
+          if (data.team.toUpperCase() == getTeam().toUpperCase()) {
+            setSlots(data.inventory)
+          }
+        });
+
+        subscribe(`/topic/game/${gameId}/pointer/init`, message => {
+          const data = JSON.parse(message.body)
+          setPlayers(data.filter(p => p.team.toUpperCase() == getTeam().toUpperCase()))
+          const me = data.find(p => p.playerId == localStorage.getItem("userId"))
+          localStorage.setItem('myColor', me.color)
+        })
+
         // 서버로 메시지 전송
         send(`/pub/${gameId}/game/enter`, {}, JSON.stringify({}));
       },
@@ -545,7 +553,6 @@ export default function BattleGameIngamePage() {
     );
   }, []);
 
-  const location = useLocation();
   const playerId = localStorage.getItem("userId");
   const playerImage = localStorage.getItem("image");
   const playerName = localStorage.getItem("userName");
@@ -556,37 +563,12 @@ export default function BattleGameIngamePage() {
   });
   const roomId = localStorage.getItem('roomId');
 
-  const exitRoom = useCallback(() => {
+  const exitRoom = () => {
     console.log("방 나가기~");
     send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
-  }, [roomId]);
+  };
 
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        console.log("탭 비활성화 또는 닫기 감지");
-        exitRoom();
-      }
-    };
-
-    const handleBeforeUnload = (event) => {
-      // 새로고침이 아닌 URL 변경 및 종료 시 실행
-      if (event.returnValue !== undefined) {
-        console.log("탭 종료 또는 URL 변경 감지");
-        exitRoom();
-      }
-    };
-
-    window.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      console.log("컴포넌트 언마운트");
-      exitRoom();
-      window.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [exitRoom, location]);
+  useExitRoom(exitRoom, isGameEndingRef);
 
   useEffect(() => {
     // if (roomId !== getRoomId() || !getSender()) {
@@ -648,6 +630,8 @@ export default function BattleGameIngamePage() {
             board={gameData[`${getTeam()}Puzzle`].board}
             picture={gameData.picture}
             bundles={Object.values(gameData[`${getTeam()}Puzzle`].bundles)}
+            itemPieces={gameData[`${getTeam()}Puzzle`].itemPiece}
+            players={players}
           />
         </Board>
         <GameInfo>
@@ -751,6 +735,7 @@ export default function BattleGameIngamePage() {
         enemyTeam={getTeam() === "red" ? gameData.blueTeam.players : gameData.redTeam.players}
         numOfUsingItemRed={numOfUsingItemRed}
         numOfUsingItemBlue={numOfUsingItemBlue}
+        isGameEndingRef={isGameEndingRef}
       />
     </Wrapper>
   );

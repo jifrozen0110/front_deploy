@@ -12,7 +12,7 @@ import GamePageNavigation from "@/components/GamePageNavigation";
 import { authRequest } from "../apis/requestBuilder";
 import { getCookie, removeCookie } from "../hooks/cookieUtil";
 
-export default function Header({parentUpdate}) {
+export default function Header({ parentUpdate }) {
   const navigate = useNavigate();
 
   const theme = createTheme({
@@ -33,35 +33,29 @@ export default function Header({parentUpdate}) {
 
   useEffect(() => {
     const token = getCookie("jwt");
-    if(!token)
-      authRequest().get('/api/user/refresh')
-      .then(res => {
-        const {
-          userId,
-          userName,
-          image,
-          email,
-          provider,
-        } = res.data
-        localStorage.setItem('userId', userId)
-        localStorage.setItem('userName', userName)
-        localStorage.setItem('image', image)
-        localStorage.setItem('email', email)
-        localStorage.setItem('provider', provider)
-
-      }).catch(err => navigate("/"))
-      
+    if (!token)
+      authRequest()
+        .get("/api/user/refresh")
+        .then((res) => {
+          const { userId, userName, image, email, provider } = res.data;
+          localStorage.setItem("userId", userId);
+          localStorage.setItem("userName", userName);
+          localStorage.setItem("image", image);
+          localStorage.setItem("email", email);
+          localStorage.setItem("provider", provider);
+        })
+        .catch((err) => navigate("/"));
   }, []);
 
   const logout = async () => {
-    localStorage.removeItem("email")
-    localStorage.removeItem("image")
-    localStorage.removeItem("provider")
-    localStorage.removeItem("userId")
-    localStorage.removeItem("userName")
-    removeCookie("jwt")
+    localStorage.removeItem("email");
+    localStorage.removeItem("image");
+    localStorage.removeItem("provider");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
+    removeCookie("jwt");
 
-    navigate("/")
+    navigate("/");
   };
 
   const moveProfile = async () => {
@@ -76,9 +70,9 @@ export default function Header({parentUpdate}) {
 
         <nav style={{ display: "flex", gap: "20px" }}>
           <ThemeProvider theme={theme}>
-              <Button variant="text" size="large" onClick={moveProfile}>
-                mypage
-              </Button>
+            <Button variant="text" size="large" onClick={moveProfile}>
+              mypage
+            </Button>
             <Button variant="text" size="large" onClick={logout}>
               Logout
             </Button>

@@ -17,7 +17,10 @@ export default function ResultModal({
   enemyTeam = [], // 기본값 설정
   numOfUsingItemRed,
   numOfUsingItemBlue,
+  isGameEndingRef,
 }) {
+  const bluePercent = getTeam() === "blue" ? ourPercent : enemyPercent;
+  const redPercent = getTeam() === "red" ? ourPercent : enemyPercent;
 
   const { image } = useGameInfo();
 
@@ -36,6 +39,7 @@ export default function ResultModal({
   const roomId = localStorage.getItem('roomId');
 
   const navigateToWaitingPage = () => {
+    isGameEndingRef.current = true;
     window.location.replace(`/game/battle/waiting/${roomId}`);
   };
 
@@ -80,7 +84,7 @@ export default function ResultModal({
         <ResultContainer>
           <TeamWrapper>
             <TeamName color="#3b82f6">Blue</TeamName>
-            <TeamPercent color="#3b82f6">{ourPercent}%</TeamPercent>
+            <TeamPercent color="#3b82f6">{bluePercent}%</TeamPercent>
             <TeamPlayers>
               {ourTeam.length > 0 ? (
                 ourTeam.map((player) => (
@@ -107,7 +111,7 @@ export default function ResultModal({
 
           <TeamWrapper>
             <TeamName color="#ef4444">Red</TeamName>
-            <TeamPercent color="#ef4444">{enemyPercent}%</TeamPercent>
+            <TeamPercent color="#ef4444">{redPercent}%</TeamPercent>
             <TeamPlayers>
               {enemyTeam.length > 0 ? (
                 enemyTeam.map((player) => (

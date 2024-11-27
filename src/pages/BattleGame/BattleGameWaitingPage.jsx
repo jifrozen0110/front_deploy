@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { styled } from "styled-components";
 import { isAxiosError } from "axios";
@@ -6,6 +6,7 @@ import { isAxiosError } from "axios";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Chatting from "@/components/Chatting";
+import useExitRoom from "@/components/ExitRoom";
 
 import Grid from "@mui/material/Unstable_Grid2";
 import Button from "@mui/material/Button";
@@ -36,12 +37,12 @@ export default function BattleGameWaitingPage() {
   const [emptyPlayerCount, setEmptyPlayerCount] = useState([0, 0]);
   const [xPlayerCount, setXPlayerCount] = useState([0, 0]);
   const [gameData, setGameData] = useState(null);
-  const playerId = localStorage.getItem("userId");
+  const playerId = parseInt(localStorage.getItem("userId"));
   const playerImage = localStorage.getItem("image");
   const playerName = localStorage.getItem("userName");
   const { setImage } = useGameInfo();
   const isLoading = useMemo(() => roomData === null, [roomData]);
-  const [chatList, setChatList] = useState([])
+  const [chatList, setChatList] = useState([]);
   // 초대 버튼 모달창
   const [isInviteModalOpen, setInviteModalOpen] = useState(false);
   const location = useLocation();
@@ -49,29 +50,32 @@ export default function BattleGameWaitingPage() {
   // InviteAlertModal을 상태로 관리
   const [isInviteAlertOpen, setInviteAlertOpen] = useState(false);
   const [invitingPlayer, setInvitingPlayer] = useState(null);
-  const [inviteRoomId, setInviteRoomId] = useState("")
+  const [inviteRoomId, setInviteRoomId] = useState("");
   const createPlayerRequest = () => ({
     playerId,
     playerImage,
     playerName,
-  });
+  }); 
+  const [isMaster, setIsMaster] = useState(false)
+
+  const isGameStartingRef = useRef(false);
 
   // 초대 수락 처리 함수
   const handleInviteAccept = () => {
-  // 초대 수락 시 처리할 로직
-  console.log(`${invitingPlayer.playerName}의 초대를 수락`);
-  // 예: 서버에 초대 수락을 알리거나, 소켓으로 통지
-  setInviteAlertOpen(false);  // 모달 닫기
-  exitRoom();
-  enterRoom(inviteRoomId);
-  navigate(`/game/battle/waiting/${inviteRoomId}`);
-};
+    // 초대 수락 시 처리할 로직
+    console.log(`${invitingPlayer.playerName}의 초대를 수락`);
+    // 예: 서버에 초대 수락을 알리거나, 소켓으로 통지
+    setInviteAlertOpen(false); // 모달 닫기
+    exitRoom();
+    enterRoom(inviteRoomId);
+    navigate(`/game/battle/waiting/${inviteRoomId}`);
+  };
 
   const handleInviteDecline = () => {
     // 초대 거절 시 처리할 로직
     console.log(`${invitingPlayer.playerName}의 초대를 거절`);
     // 예: 서버에 초대 거절을 알리거나, 소켓으로 통지
-    setInviteAlertOpen(false);  // 모달 닫기
+    setInviteAlertOpen(false); // 모달 닫기
   };
 
   // 초대 버튼 클릭 핸들러
@@ -83,10 +87,10 @@ export default function BattleGameWaitingPage() {
     console.log("방 입장~");
     send(`/pub/room/${roomId}/enter`, {}, JSON.stringify(createPlayerRequest()));
   };
-  const exitRoom = useCallback(() => {
+  const exitRoom = () => {
     console.log("방 나가기~");
     send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
-  }, [roomId]);
+  };
   const switchTeam = () => {
     console.log("팀 바꾸기~");
     send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
@@ -110,35 +114,37 @@ export default function BattleGameWaitingPage() {
 
   const isNotInRoom = () => {
     const playerId = parseInt(localStorage.getItem("userId"), 10); // 현재 사용자 ID
-  
+
     if (!roomData || !Array.isArray(roomData.redPlayers) || !Array.isArray(roomData.bluePlayers)) {
       return true; // roomData가 없거나 플레이어 정보가 없으면 방에 없다고 판단
     }
-  
+
     // 플레이어가 redPlayers나 bluePlayers에 존재하는지 확인
-    const isInRedTeam = roomData.redPlayers.some(player => player.playerId === playerId);
-    const isInBlueTeam = roomData.bluePlayers.some(player => player.playerId === playerId);
-  
+    const isInRedTeam = roomData.redPlayers.some((player) => player.playerId === playerId);
+    const isInBlueTeam = roomData.bluePlayers.some((player) => player.playerId === playerId);
+
     return !(isInRedTeam || isInBlueTeam); // 둘 중 하나라도 true면 방에 있음 -> 반대로 반환
-  };  
+  };
 
   const connectSocket = async (roomId) => {
     connect(() => {
-      console.log(roomId);
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
-
       subscribe(`/topic/room/${roomId}`, (message) => {
         const data = JSON.parse(message.body);
         const halfPlayers = Math.ceil(data.maxPlayers / 2);
         setRoomData(data);
+        setIsMaster(data.master===playerId)
         setPlayerCount(data.nowPlayers);
         setEmptyPlayerCount([
           Math.max(0, halfPlayers - data.redPlayers.length),
           Math.max(0, halfPlayers - data.bluePlayers.length),
         ]);
         setXPlayerCount([Math.max(0, 4 - halfPlayers), Math.max(0, 4 - halfPlayers)]);
-
-        console.log(data);
+        if (data.bluePlayers.map(p => p.playerId).includes(Number(playerId))) {
+          setTeam("blue")
+        } else if (data.redPlayers.map(p => p.playerId).includes(Number(playerId))) {
+          setTeam("red")
+        }
 
         // if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
         //   data.blueTeam.players.forEach((player) => {
@@ -148,41 +154,40 @@ export default function BattleGameWaitingPage() {
         //     }
         //   });
         // }
-
       });
 
-      subscribe(`/topic/room/${roomId}/game`, message => {
+      subscribe(`/topic/room/${roomId}/game`, (message) => {
         const data = JSON.parse(message.body);
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (data.gameId && Boolean(data.isStarted) && !Boolean(data.isFinished)) {
+          isGameStartingRef.current = true;
           setGameData(data);
-          
           setImage(
             "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
           );
-          localStorage.setItem('roomId', roomId);
+          localStorage.setItem("roomId", roomId);
           window.location.replace(`/game/battle/ingame/${data.gameId}`);
           // window.location.replace(`/game/battle/ingame/${roomId}`);
           return;
         }
       });
 
-      subscribe(`/topic/chat/room/${roomId}`, message => {
-        const data = JSON.parse(message.body)
-        setChatList(preChatList => [...preChatList, data])
+      subscribe(`/topic/chat/room/${roomId}`, (message) => {
+        const data = JSON.parse(message.body);
+        setChatList((preChatList) => [...preChatList, data]);
       });
 
-      subscribe(`/topic/invite/${playerId}`, message => {
-         // JSON 문자열을 객체로 변환
+      subscribe(`/topic/invite/${playerId}`, (message) => {
+        // JSON 문자열을 객체로 변환
         const parsedMessage = JSON.parse(message.body);
         // 필요한 필드에 접근
         const fromPlayer = parsedMessage.fromPlayerId;
         const toPlayer = parsedMessage.toPlayerId;
         const fromUserName = parsedMessage.fromUserName;
-        setInvitingPlayer(fromUserName);  // 초대한 플레이어 정보 설정
-        setInviteAlertOpen(true);  // 초대 알림 모달 열기
-        setInviteRoomId(parsedMessage.roomId)
-      })
+        setInvitingPlayer(fromUserName); // 초대한 플레이어 정보 설정
+        setInviteAlertOpen(true); // 초대 알림 모달 열기
+        setInviteRoomId(parsedMessage.roomId);
+      });
 
       enterRoom(roomId);
 
@@ -209,6 +214,7 @@ export default function BattleGameWaitingPage() {
       const response = await authRequest().get(`/api/rooms/${roomId}`);
 
       const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
+      setIsMaster(response.data.master===playerId)
       setRoomData(response.data);
       setPlayerCount(response.data.nowPlayers);
       setEmptyPlayerCount([
@@ -227,36 +233,11 @@ export default function BattleGameWaitingPage() {
     }
   };
 
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        console.log("탭 비활성화 또는 닫기 감지");
-        exitRoom();
-      }
-    };
-
-    const handleBeforeUnload = (event) => {
-      // 새로고침이 아닌 URL 변경 및 종료 시 실행
-      if (event.returnValue !== undefined) {
-        console.log("탭 종료 또는 URL 변경 감지");
-        exitRoom();
-      }
-    };
-
-    window.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      console.log("컴포넌트 언마운트");
-      exitRoom();
-      window.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [exitRoom, location]);
+  useExitRoom(exitRoom, isGameStartingRef);
 
   useEffect(() => {
     initialize();
-  }, [roomId]);
+  }, []);
 
   if (isLoading) {
     return (
@@ -275,11 +256,13 @@ export default function BattleGameWaitingPage() {
     <Wrapper>
       {/* 왼쪽 채팅 */}
       <LeftSidebar>
-        <Chatting chatList={chatList} 
-                path={"/pub/chat/room"} 
-                defualtData={{roomId, roomName:roomData.roomName}}/>
+        <Chatting
+          chatList={chatList}
+          path={"/pub/chat/room"}
+          defualtData={{ roomId, roomName: roomData.roomName }}
+        />
       </LeftSidebar>
-  
+
       {/* 나머지 콘텐츠 */}
       <Content>
         <Top>
@@ -334,40 +317,42 @@ export default function BattleGameWaitingPage() {
           <MainSection>
             {/* 팀 정보 */}
             <TeamSection>
-              <Team style={{backgroundColor: "rgba(91, 175, 254, 0.6)"}}>파란팀</Team>
+              <Team style={{ backgroundColor: "rgba(91, 175, 254, 0.6)" }}>파란팀</Team>
               <TeamGrid>
                 {roomData.bluePlayers.map((player, i) => (
-                  <PlayerCard key={`blue-player-${i}`} player={player} color="blue" />
+                  <PlayerCard key={`blue-player-${i}`} player={player} master={roomData.master} color="blue" />
                 ))}
                 {makeEmptyPlayer(emptyPlayerCount[1])}
                 {makeXPlayer(xPlayerCount[1])}
               </TeamGrid>
             </TeamSection>
-  
+
             <Versus>VS</Versus>
-  
+
             <TeamSection>
-              <Team style={{backgroundColor: "rgba(254, 91, 94, 0.6)"}}>빨간팀</Team>
+              <Team style={{ backgroundColor: "rgba(254, 91, 94, 0.6)" }}>빨간팀</Team>
               <TeamGrid>
                 {roomData.redPlayers.map((player, i) => (
-                  <PlayerCard key={`red-player-${i}`} player={player} color="red" />
+                  <PlayerCard key={`red-player-${i}`} player={player} master={roomData.master} color="red" />
                 ))}
                 {makeEmptyPlayer(emptyPlayerCount[0])}
                 {makeXPlayer(xPlayerCount[0])}
               </TeamGrid>
             </TeamSection>
           </MainSection>
-  
+
           <PuzzleDetails>
             <PuzzleImage>
               <img src={roomData.puzzleImage} alt="Puzzle" />
             </PuzzleImage>
             <Details>
               <Title>{roomData.roomName}</Title>
-              <Divider/>
-              <Typography variant="subtitle1">{roomData.gameMode == "battle"? "대전 모드": ""}</Typography>
+              <Divider />
+              <Typography variant="subtitle1">
+                {roomData.gameMode == "battle" ? "대전 모드" : ""}
+              </Typography>
               <Typography variant="subtitle1">{roomData.puzzlePiece} 피스</Typography>
-              <StartButton onClick={startGame}>시작</StartButton>
+              <StartButton isMaster={isMaster} onClick={() => isMaster && startGame()}>시작</StartButton>
             </Details>
           </PuzzleDetails>
         </Body>
@@ -375,18 +360,18 @@ export default function BattleGameWaitingPage() {
       <InviteModal
         isOpen={isInviteModalOpen}
         onClose={() => setInviteModalOpen(false)}
-        roomId = {roomId}
+        roomId={roomId}
       />
       <InviteAlertModal
         isOpen={isInviteAlertOpen}
         onClose={() => setInviteAlertOpen(false)}
         roomId={roomId}
-        inviter = {invitingPlayer}
+        inviter={invitingPlayer}
         onAccept={handleInviteAccept}
         onDecline={handleInviteDecline}
       />
     </Wrapper>
-  );  
+  );
 }
 
 const Wrapper = styled.div`
@@ -412,10 +397,10 @@ const Content = styled.div`
   justify-content: center;
   align-item: center;
   padding: 0 30px;
-  boxSizing: border-box;
+  boxsizing: border-box;
   width: 80%;
   height: 100%;
-`
+`;
 
 const Team = styled.div`
   max-width: 400px;
@@ -525,17 +510,22 @@ const Details = styled.div`
 `;
 
 const StartButton = styled(Button)`
-  margin-top: 30px;
-  background-color: orange;
+  background-color: ${({ isMaster }) => (isMaster ? "orange" : "lightgray")};
+  margin-top:30px;
   color: white;
   width: 100%;
-  height: 70px;
-  font-size: 30px;
   font-weight: bold;
+  font-size: 30px;
+  border-radius: 5px;
+  cursor: ${({ isMaster }) => (isMaster ? "pointer" : "not-allowed")};
+  opacity: ${({ isMaster }) => (isMaster ? 1 : 0.6)};
+
   &:hover {
-    background-color: darkorange;
+    background-color: ${({ isMaster }) => (isMaster ? "darkorange" : "lightgray")};
   }
 `;
+
+
 
 const Divider = styled.div`
   margin: 10px 0;
