@@ -14,25 +14,9 @@ export default function GameRoomListBoard({ category, roomList }) {
   const [totalPage, setTotalPage] = useState(0);
   const [isFetching, setIsFetching] = useState(false); // 중복 요청 방지
 
-  // 빈 방 생성 함수
-  const makeEmptyRooms = (rooms) => {
-    const result = [];
-    const totalItems = 10; // 한 페이지에 10개 항목
-    for (let i = 0; i < totalItems - rooms.length; i++) {
-      result.push(
-        <Grid item xs={6} key={`empty ${i}`}>
-          <EmptyCard></EmptyCard>
-        </Grid>,
-      );
-    }
-    return result;
-  };
-
   // 초기 roomList 설정
   useEffect(() => {
-    setRooms(roomList?.content ?? []);
-    setPage(roomList?.pageable?.pageNumber ?? 0);
-    setTotalPage(roomList?.totalPages ?? 0);
+    setRooms(roomList ?? []);
   }, [roomList]);
 
   // 페이지 변경 시 데이터 요청
@@ -46,10 +30,9 @@ export default function GameRoomListBoard({ category, roomList }) {
 
     setIsFetching(true);
     try {
-      const res = await authRequest().get(`/api/rooms?page=${currentPage}`);
+      const res = await authRequest().get(`/api/rooms`);
       const { data } = res;
-      setRooms(data.content ?? []);
-      setTotalPage(data.totalPages ?? 0);
+      setRooms(data ?? []);
     } catch (error) {
       console.error("Failed to fetch rooms:", error);
     } finally {
@@ -57,48 +40,13 @@ export default function GameRoomListBoard({ category, roomList }) {
     }
   };
 
-  // 이전 페이지 이동
-  const handlePreviousPage = () => {
-    if (page > 0 && !isFetching) {
-      setPage(page - 1);
-    }
-  };
-
-  // 다음 페이지 이동
-  const handleNextPage = () => {
-    if (page < totalPage - 1 && !isFetching) {
-      setPage(page + 1);
-    }
-  };
-
   return (
     <Wrapper>
       <GridContainer>
         {rooms.map((room) => (
-          <Grid item xs={6} key={room.roomId}>
-            <GameCard room={room} category={category} />
-          </Grid>
+          <GameCard key={room.roomId} room={room} category={category} />
         ))}
-        {makeEmptyRooms(rooms)}
       </GridContainer>
-      <PagingContainer>
-        <PageButton onClick={handlePreviousPage} disabled={page === 0 || isFetching}>
-          <img
-            src={LeftTriangle}
-            alt="앞 페이지"
-            className="icon"
-            style={{ display: "block", margin: "0 auto", height: "100%" }}
-          />
-        </PageButton>
-        <PageButton onClick={handleNextPage} disabled={page === totalPage - 1 || isFetching}>
-          <img
-            src={RightTriangle}
-            alt="뒷 페이지"
-            className="icon"
-            style={{ display: "block", margin: "0 auto", height: "100%" }}
-          />
-        </PageButton>
-      </PagingContainer>
     </Wrapper>
   );
 }
@@ -107,21 +55,40 @@ export default function GameRoomListBoard({ category, roomList }) {
 const Wrapper = styled.div`
   width: 100%;
   height: 100%;
-  padding: 20px 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
   box-sizing: border-box;
+  overflow: hidden; /* 부모 범위를 초과하지 않도록 설정 */
 `;
 
+
 const GridContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2개의 열 */
-  grid-auto-rows: 1fr;
-  gap: 10px;
   width: 100%;
   height: 100%;
+  
+  overflow-y: auto;
+  padding-right: 10px;
+  box-sizing: border-box;
+
+  /* 스크롤바 스타일 */
+  &::-webkit-scrollbar {
+    width: 10px; /* 스크롤바 너비 */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3); /* 스크롤바 색상 */
+    border-radius: 10px; /* 스크롤바 둥글게 */
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.5); /* 스크롤바 hover 효과 */
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent; /* 스크롤 트랙 배경 투명화 */
+  }
 `;
 
 const EmptyCard = styled(Card)`
