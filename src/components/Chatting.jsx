@@ -5,24 +5,27 @@ import ChatSend from "@/assets/icons/chat_send.png";
 import { socket } from "@/socket-utils/socket2"; // 소켓 유틸리티
 const { send } = socket;
 
-function ChatComponent({chatList, path, defualtData = {}}) {
+function ChatComponent({ chatList, path, defualtData = {} }) {
   // const [messages, setMessages] = useState([]); // 메시지 목록
   // const [input, setInput] = useState(""); // 입력 필드 값
-  const inputTag = useRef(null)
+  const inputTag = useRef(null);
 
   // 메시지 전송 핸들러
   const handleSendMessage = () => {
     if (inputTag.current.value.trim() !== "") {
       // setMessages([...messages, { text: input, user: "me" }]);
       // setInput(""); // 입력 필드 초기화
-      send(path, {}, 
+      send(
+        path,
+        {},
         JSON.stringify({
-          message : inputTag.current.value,
-          userName : localStorage.getItem('userName'),
-          userId : localStorage.getItem('userId'),
-          ...defualtData
-        }))
-      inputTag.current.value = ''
+          message: inputTag.current.value,
+          userName: localStorage.getItem("userName"),
+          userId: localStorage.getItem("userId"),
+          ...defualtData,
+        }),
+      );
+      inputTag.current.value = "";
     }
   };
 
@@ -31,11 +34,8 @@ function ChatComponent({chatList, path, defualtData = {}}) {
       {/* 채팅 메시지 목록 */}
       <ChatMessages>
         {chatList.map((chat, index) => (
-          <Message
-            key={index}
-            isMyMessage={chat.userId == localStorage.getItem('userId')}
-          >
-            {chat.userId != localStorage.getItem('userId') && <div>{chat.userName}:</div>}
+          <Message key={index} isMyMessage={chat.userId == localStorage.getItem("userId")}>
+            {chat.userId != localStorage.getItem("userId") && <div>{chat.userName}:</div>}
             {chat.message}
           </Message>
         ))}
@@ -48,17 +48,12 @@ function ChatComponent({chatList, path, defualtData = {}}) {
           ref={inputTag}
           // onChange={(e) => setInput(e.target.value)}
           placeholder="메시지를 입력하세요..."
-          onKeyDown={ e => {
-            if (e.key === 'Enter') 
-              handleSendMessage()
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSendMessage();
           }}
         />
         <ChatButton onClick={handleSendMessage}>
-            <img
-                src={ChatSend}
-                alt="채팅"
-                className="icon"
-            />
+          <img src={ChatSend} alt="채팅" className="icon" />
         </ChatButton>
       </ChatInputContainer>
     </ChatContainer>
@@ -87,8 +82,7 @@ const ChatMessages = styled.div`
 const Message = styled.div`
   text-align: ${(props) => (props.isMyMessage ? "right" : "left")};
   padding: 10px;
-  background-color: ${(props) =>
-    props.isMyMessage ? "#FFFFFF" : "#DCF8C6"};
+  background-color: ${(props) => (props.isMyMessage ? "#FFFFFF" : "#DCF8C6")};
   border-radius: 8px;
   margin-bottom: 8px;
   max-width: 70%;
@@ -102,7 +96,7 @@ const ChatInputContainer = styled.div`
   box-sizing: border-box;
   width: 100%;
   padding: 5px;
-  background-color: #C6E7FF;
+  background-color: #c6e7ff;
   border-radius: 5px;
 `;
 
@@ -131,7 +125,7 @@ const ChatButton = styled(Button)`
   cursor: pointer;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   &:hover {
-    background-color: rgba(255,255,255, 0.75);
+    background-color: rgba(255, 255, 255, 0.75);
   }
 `;
 

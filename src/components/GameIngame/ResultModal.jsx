@@ -1,8 +1,10 @@
 import { useMemo, useEffect } from "react";
 import { styled } from "styled-components";
+import { PlayerCard } from "@/components/GameWaiting/PlayerCard";
+import { getTeam, getRoomId } from "@/socket-utils/storage";
+import { addAudio } from "@/puzzle-core/attackItem";
 import { useGameInfo } from "@/hooks/useGameInfo";
 import { socket } from "@/socket-utils/socket2";
-import { getTeam } from "@/socket-utils/storage";
 
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -15,6 +17,7 @@ export default function ResultModal({
   enemyTeam = [], // 기본값 설정
   numOfUsingItemRed,
   numOfUsingItemBlue,
+  isGameEndingRef,
 }) {
   const bluePercent = getTeam() === "blue" ? ourPercent : enemyPercent;
   const redPercent = getTeam() === "red" ? ourPercent : enemyPercent;
@@ -36,6 +39,7 @@ export default function ResultModal({
   const roomId = localStorage.getItem('roomId');
 
   const navigateToWaitingPage = () => {
+    isGameEndingRef.current = true;
     window.location.replace(`/game/battle/waiting/${roomId}`);
   };
 

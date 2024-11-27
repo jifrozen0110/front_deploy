@@ -1,5 +1,5 @@
 import Paper from "paper";
-import { Point } from "paper/dist/paper-core";
+import { Color, Point } from "paper/dist/paper-core";
 import { initializeConfig } from "./initializeConfig";
 import {
   itemFire,
@@ -12,6 +12,7 @@ import {
 import { setMoveEvent } from "./setMoveEvent";
 import { uniteTiles } from "./uniteTiles";
 import { cleanBorderStyle, switchDirection, updateGroupByBundles } from "./utils";
+import { colors } from "./color";
 export const groupPuzzlePieces = ({ config, bundles }) => {
   updateGroupByBundles({ config, bundles });
   return config;
@@ -44,19 +45,23 @@ const createPuzzleConfig = () => {
 
   const getConfig = () => ({ ...config });
 
-  const lockPuzzle = (x, y, index) => {
-    console.log(x, y, index);
-    // TODO: "Lock"이 걸려있다는 처리해야함
-    // 피그마처럼 유저별로 "색깔"을 지정해두고 border 색깔을 변경하는 것도 좋을듯?
+  const lockPuzzle = (index, color) => {
+    config.tiles[index].locked = true
+    config.tiles[index].strokeColor = colors[color.toUpperCase()]
+    config.tiles[index].shadowColor = colors[color.toUpperCase()]
+    config.tiles[index].bringToFront()
+
   };
 
   const movePuzzle = (x, y, index) => {
     config.tiles[index].position = new Point(x, y);
   };
 
-  const unLockPuzzle = (x, y, index) => {
-    console.log(x, y, index);
-    // TODO: 여기서 Lock에 대한 UI처리를 해제한다.
+  const unLockPuzzle = (index) => {
+    config.tiles[index].locked = false
+    config.tiles[index].strokeColor = undefined
+    config.tiles[index].shadowColor = undefined
+    // config.tiles[index].sendToBack()
   };
 
   const addPiece = ({ fromIndex, toIndex }, bundles = []) => {

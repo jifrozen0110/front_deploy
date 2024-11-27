@@ -22,7 +22,7 @@ export default function GameRoomListBoard({ category, roomList }) {
       result.push(
         <Grid item xs={6} key={`empty ${i}`}>
           <EmptyCard></EmptyCard>
-        </Grid>
+        </Grid>,
       );
     }
     return result;
@@ -90,10 +90,7 @@ export default function GameRoomListBoard({ category, roomList }) {
             style={{ display: "block", margin: "0 auto", height: "100%" }}
           />
         </PageButton>
-        <PageButton
-          onClick={handleNextPage}
-          disabled={page === totalPage - 1 || isFetching}
-        >
+        <PageButton onClick={handleNextPage} disabled={page === totalPage - 1 || isFetching}>
           <img
             src={RightTriangle}
             alt="뒷 페이지"

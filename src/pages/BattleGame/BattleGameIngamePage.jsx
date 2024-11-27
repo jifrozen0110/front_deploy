@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { styled } from "styled-components";
 
 import PlayPuzzle from "@/components/PlayPuzzle";
@@ -9,6 +9,7 @@ import PrograssBar from "@/components/GameIngame/ProgressBar";
 import Chatting2 from "@/components/GameWaiting/Chatting";
 import Chatting from "@/components/Chatting";
 import ResultModal from "@/components/GameIngame/ResultModal";
+import useExitRoom from "@/components/ExitRoom";
 
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
@@ -54,12 +55,12 @@ import frameAudioPath from "@/assets/audio/frame2.mp3";
 import './ani.css';
 
 const { connect, send, subscribe, disconnect } = socket;
-const { 
-  getConfig, 
-  lockPuzzle, 
-  movePuzzle, 
-  unLockPuzzle, 
-  addPiece, 
+const {
+  getConfig,
+  lockPuzzle,
+  movePuzzle,
+  unLockPuzzle,
+  addPiece,
   usingItemFire,
   usingItemTyphoon,
   usingItemFrame,
@@ -77,6 +78,9 @@ export default function BattleGameIngamePage() {
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
   const [slots, setSlots] = useState(Array(8).fill(0));
+
+  const isGameEndingRef = useRef(false);
+
   const itemFunc = useMemo(() => {
     return {
       FIRE(data) {
@@ -116,11 +120,11 @@ export default function BattleGameIngamePage() {
 
             canvasContainer.appendChild(fireImgCopy);
             addAudio(fireAudioPath);
-            usingItemTyphoon()
 
             setTimeout(() => {
               if (fireImgCopy.parentNode) {
                 console.log("불 효과 삭제");
+                usingItemFire(bundles, targetList);
                 fireImgCopy.parentNode.removeChild(fireImgCopy);
               }
             }, 2000);
@@ -140,12 +144,11 @@ export default function BattleGameIngamePage() {
           // }, 2000);
         }
 
-        setTimeout(() => {
-          if (targetList && targets === getTeam().toUpperCase()) {
-            console.log("fire 발동 !!");
-            usingItemFire(bundles, targetList);
-          }
-        }, 2000);
+        // setTimeout(() => {
+        //   if (targetList && targets === getTeam().toUpperCase()) {
+        //     console.log("fire 발동 !!");
+        //   }
+        // }, 2000);
       },
       MUD(data) {
         const { targets } = data;
@@ -230,7 +233,7 @@ export default function BattleGameIngamePage() {
 
         addAudio(bloomAudioPath);
         gameBoard.appendChild(bloomImg);
-        
+
         setTimeout(() => usingItemTyphoon(targetList, bundles), 1000);
         setTimeout(() => {
           if (bloomImg.parentNode) {
@@ -257,7 +260,7 @@ export default function BattleGameIngamePage() {
 
         addAudio(frameAudioPath);
         gameBoard.appendChild(twinkleImg);
-        
+
         setTimeout(() => usingItemFrame(targetList, bundles), 1000);
         setTimeout(() => {
           if (twinkleImg.parentNode) {
@@ -403,7 +406,7 @@ export default function BattleGameIngamePage() {
             if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
               const { targets } = data;
               const targetList = JSON.parse(targets);
-              targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
+              targetList.forEach(({ x, y, index }) => lockPuzzle(index, data.team));
               return;
             }
 
@@ -417,7 +420,7 @@ export default function BattleGameIngamePage() {
             if (data.message && data.message === "UNLOCKED" && data.senderId !== getSender()) {
               const { targets } = data;
               const targetList = JSON.parse(targets);
-              targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
+              targetList.forEach(({ x, y, index }) => unLockPuzzle(index));
               return;
             }
 
@@ -454,6 +457,23 @@ export default function BattleGameIngamePage() {
           changePercent(data)
         });
 
+        subscribe(`/topic/game/room/${gameId}/useItem`, (message) => {
+          const data = JSON.parse(message.body);
+          if (data.team.toUpperCase() == getTeam().toUpperCase()) {
+            setSlots(data.inventory)
+            const config = getConfig()
+            config.tiles[data.fitPieceIndex].strokeColor = undefined
+            config.tiles[data.fitPieceIndex].shadowColor = undefined
+          }
+        });
+
+        subscribe(`/topic/game/room/${gameId}/help`, (message) => {
+          const data = JSON.parse(message.body);
+          if (data.team.toUpperCase() == getTeam().toUpperCase()) {
+            setSlots(data.inventory)
+          }
+        });
+
         // 서버로 메시지 전송
         send(`/pub/${gameId}/game/enter`, {}, JSON.stringify({}));
       },
@@ -481,7 +501,6 @@ export default function BattleGameIngamePage() {
     );
   }, []);
 
-  const location = useLocation();
   const playerId = localStorage.getItem("userId");
   const playerImage = localStorage.getItem("image");
   const playerName = localStorage.getItem("userName");
@@ -492,37 +511,12 @@ export default function BattleGameIngamePage() {
   });
   const roomId = localStorage.getItem('roomId');
 
-  const exitRoom = useCallback(() => {
+  const exitRoom = () => {
     console.log("방 나가기~");
     send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
-  }, [roomId]);
+  };
 
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        console.log("탭 비활성화 또는 닫기 감지");
-        exitRoom();
-      }
-    };
-
-    const handleBeforeUnload = (event) => {
-      // 새로고침이 아닌 URL 변경 및 종료 시 실행
-      if (event.returnValue !== undefined) {
-        console.log("탭 종료 또는 URL 변경 감지");
-        exitRoom();
-      }
-    };
-
-    window.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      console.log("컴포넌트 언마운트");
-      exitRoom();
-      window.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [exitRoom, location]);
+  useExitRoom(exitRoom, isGameEndingRef);
 
   useEffect(() => {
     // if (roomId !== getRoomId() || !getSender()) {
@@ -584,6 +578,7 @@ export default function BattleGameIngamePage() {
             board={gameData[`${getTeam()}Puzzle`].board}
             picture={gameData.picture}
             bundles={Object.values(gameData[`${getTeam()}Puzzle`].bundles)}
+            itemPieces={gameData[`${getTeam()}Puzzle`].itemPiece}
           />
         </Board>
         <GameInfo>
@@ -687,6 +682,7 @@ export default function BattleGameIngamePage() {
         enemyTeam={getTeam() === "red" ? gameData.blueTeam.players : gameData.redTeam.players}
         numOfUsingItemRed={numOfUsingItemRed}
         numOfUsingItemBlue={numOfUsingItemBlue}
+        isGameEndingRef={isGameEndingRef}
       />
     </Wrapper>
   );

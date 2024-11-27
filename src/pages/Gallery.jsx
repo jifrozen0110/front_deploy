@@ -8,8 +8,8 @@ import GalleryWall from "@/components/MyPage/GalleryWall";
 import { ChevronLeft } from 'lucide-react';
 
 export default function Gallery() {
-  const [forUpdate, setForUpdate] = useState(0)
-  const forceUpdate = () => setForUpdate(forUpdate + 1)
+  const [forUpdate, setForUpdate] = useState(0);
+  const forceUpdate = () => setForUpdate(forUpdate + 1);
   const navigate = useNavigate();
 
   const moveMyPage = async () => {
@@ -18,7 +18,7 @@ export default function Gallery() {
 
   return (
     <>
-      <BackGround style={{paddingBottom: "50px"}}>
+      <BackGround style={{ paddingBottom: "50px" }}>
         <Header parentUpdate={forceUpdate} />
         <InfoWraper style={{marginTop: "40px"}}>
           <SubSection style={{marginBottom: "30px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
@@ -44,8 +44,11 @@ const InfoWraper = styled.div`
   box-sizing: border-box;
   max-width: 1000px;
   margin: 25px auto 0;
-  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
-`
+  box-shadow:
+    0px 2px 4px -1px rgba(0, 0, 0, 0.2),
+    0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+`;
 
 const SubSection = styled.div`
   margin-right: auto;

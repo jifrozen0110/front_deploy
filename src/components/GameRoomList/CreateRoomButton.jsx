@@ -26,8 +26,8 @@ export default function CreateRoomButton({ category }) {
   const navigate = useNavigate();
   const [roomName, setRoomName] = useState("퍼즐 한 판 !!");
   const [gameMode, setGameMode] = useState("battle"); // Default value
-
   const [puzzleImage, setPuzzleImage] = useState(DEFAULT_IMAGE_URL); // Default image
+
   const [puzzlePiece, setPuzzlePiece] = useState(100); // Default puzzle pieces
   const [maxPlayers, setMaxPlayers] = useState(4); // Default max players
   const [isOpenedModal, setIsOpenedModal] = useState(false);

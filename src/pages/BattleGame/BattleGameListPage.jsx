@@ -1,4 +1,4 @@
-import { useEffect, useState,useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import { IconButton, Button, createTheme, ThemeProvider } from "@mui/material";
@@ -16,8 +16,8 @@ import { setRoomId, setSender, setTeam } from "../../socket-utils/storage";
 import { deepPurple } from "@mui/material/colors";
 import UserListSidebar from "../../components/GameRoomList/UserListSidebar";
 import { authRequest } from "../../apis/requestBuilder";
-import music from "@/assets/audio/wait_game.mp3"
-import InviteAlertModal from "@/components/GameWaiting/InviteAlertModal"
+import music from "@/assets/audio/wait_game.mp3";
+import InviteAlertModal from "@/components/GameWaiting/InviteAlertModal";
 const { connect, send, subscribe, disconnect } = socket;
 const theme = createTheme({
   typography: {
@@ -88,30 +88,27 @@ const theme = createTheme({
   },
 });
 
-
-
 export default function BattleGameListPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [roomList, setRoomList] = useState(null);
   const [pageNumber, setPageNumber] = useState(0);
   const isLoading = useMemo(() => roomList === null, [roomList]);
-  const audioTag = useRef(null)
-  const [chatList, setChatList] = useState([])
+  const audioTag = useRef(null);
+  const [chatList, setChatList] = useState([]);
   const playerId = localStorage.getItem("userId");
   const playerImage = localStorage.getItem("image");
   const playerName = localStorage.getItem("userName");
-  
 
   // InviteAlertModal을 상태로 관리
   const [isInviteAlertOpen, setInviteAlertOpen] = useState(false);
   const [invitingPlayer, setInvitingPlayer] = useState(null);
-  const [inviteRoomId, setInviteRoomId] = useState("")
+  const [inviteRoomId, setInviteRoomId] = useState("");
 
   // 초대 수락 처리 함수
   const handleInviteAccept = () => {
     console.log(`${invitingPlayer.playerName}의 초대를 수락`);
-    setInviteAlertOpen(false); 
+    setInviteAlertOpen(false);
     enterRoom(inviteRoomId);
   };
 
@@ -130,7 +127,7 @@ export default function BattleGameListPage() {
     // 초대 거절 시 처리할 로직
     console.log(`${invitingPlayer.playerName}의 초대를 거절`);
     // 예: 서버에 초대 거절을 알리거나, 소켓으로 통지
-    setInviteAlertOpen(false);  // 모달 닫기
+    setInviteAlertOpen(false); // 모달 닫기
   };
 
   const refetchAllRoom = () => {
@@ -145,26 +142,25 @@ export default function BattleGameListPage() {
 
   useEffect(() => {
     fetchAllRoom();
-    audioTag.current.muted = false
+    audioTag.current.muted = false;
     connect(() => {
-      subscribe('/topic/chat/main', message => {
-        const data = JSON.parse(message.body)
-        setChatList(preChatList => [...preChatList, data])
-      })
+      subscribe("/topic/chat/main", (message) => {
+        const data = JSON.parse(message.body);
+        setChatList((preChatList) => [...preChatList, data]);
+      });
 
-      subscribe(`/topic/invite/${playerId}`, message => {
-         // JSON 문자열을 객체로 변환
+      subscribe(`/topic/invite/${playerId}`, (message) => {
+        // JSON 문자열을 객체로 변환
         const parsedMessage = JSON.parse(message.body);
         // 필요한 필드에 접근
         const fromPlayer = parsedMessage.fromPlayerId;
         const toPlayer = parsedMessage.toPlayerId;
         const fromUserName = parsedMessage.fromUserName;
-        setInvitingPlayer(fromUserName);  // 초대한 플레이어 정보 설정
-        setInviteAlertOpen(true);  // 초대 알림 모달 열기
-        setInviteRoomId(parsedMessage.roomId)
-      })
-
-    })
+        setInvitingPlayer(fromUserName); // 초대한 플레이어 정보 설정
+        setInviteAlertOpen(true); // 초대 알림 모달 열기
+        setInviteRoomId(parsedMessage.roomId);
+      });
+    });
   }, []);
 
   useEffect(() => {
@@ -220,7 +216,7 @@ export default function BattleGameListPage() {
   //     //응답 메시지 파싱
   //   });
   // };
-  
+
   return (
     <>
       <audio ref={audioTag} src={music} autoPlay loop muted></audio>
@@ -235,12 +231,16 @@ export default function BattleGameListPage() {
           <ContentContainer>
             <LeftSidebar>
               <CreateRoomButtonContainer>
-                <CreateRoomButton category="battle" style={{width: "100%"}} />
-                <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginLeft: "auto" }}>
+                <CreateRoomButton category="battle" style={{ width: "100%" }} />
+                <IconButton
+                  aria-label="refresh"
+                  onClick={refetchAllRoom}
+                  sx={{ marginLeft: "auto" }}
+                >
                   <RefreshIcon />
                 </IconButton>
               </CreateRoomButtonContainer>
-              <Chatting chatList={chatList} path={"/pub/chat/main"}/>
+              <Chatting chatList={chatList} path={"/pub/chat/main"} />
             </LeftSidebar>
             <GameRoomListBoard category="battle" roomList={roomList} />
             <RightSidebar>
@@ -248,16 +248,16 @@ export default function BattleGameListPage() {
             </RightSidebar>
           </ContentContainer>
           <InviteAlertModal
-        isOpen={isInviteAlertOpen}
-        onClose={() => setInviteAlertOpen(false)}
-        inviter = {invitingPlayer}
-        onAccept={handleInviteAccept}
-        onDecline={handleInviteDecline}
-      />
+            isOpen={isInviteAlertOpen}
+            onClose={() => setInviteAlertOpen(false)}
+            inviter={invitingPlayer}
+            onAccept={handleInviteAccept}
+            onDecline={handleInviteDecline}
+          />
         </Wrapper>
       )}
     </>
-  );  
+  );
 }
 
 const Wrapper = styled.div`
@@ -268,7 +268,7 @@ const Wrapper = styled.div`
   background-attachment: fixed;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -291,7 +291,7 @@ const CreateRoomButtonContainer = styled.div`
   flex-direction: column;
   padding: 15px; 10px;
   gap: 15px;
-`
+`;
 
 const ContentContainer = styled.div`
   display: flex;
