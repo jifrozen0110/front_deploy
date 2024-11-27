@@ -23,7 +23,7 @@ export const requestFile = axios.create({
 export const authRequest = () => {
   return axios.create({
     baseURL: SERVER_END_POINT,
-    timeout: 3000,
+    timeout: 10000,
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${getCookie("jwt")}`

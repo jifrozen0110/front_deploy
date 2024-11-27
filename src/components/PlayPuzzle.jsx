@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import PuzzleCanvas from "./PuzzleCanvas";
 
-const PlayPuzzle = ({ category, shapes, board, picture, bundles, itemPieces }) => {
+const PlayPuzzle = ({ category, shapes, board, picture, bundles, itemPieces, players }) => {
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef(null);
   const [puzzleInfo, setPuzzleInfo] = useState({
@@ -53,6 +53,7 @@ const PlayPuzzle = ({ category, shapes, board, picture, bundles, itemPieces }) =
             picture={picture}
             bundles={bundles}
             itemPieces={itemPieces}
+            players={players}
           />
         )}
       </div>
