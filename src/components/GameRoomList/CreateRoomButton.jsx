@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { styled } from "styled-components";
+import { styled, css, keyframes } from "styled-components";
+import { Plus } from "lucide-react";
 import {
   Button,
   Modal,
@@ -260,7 +261,9 @@ export default function CreateRoomButton({ category }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <CreateButton onClick={() => setIsOpenedModal(true)}>방 만들기</CreateButton>
+      <CreateButton onClick={() => setIsOpenedModal(true)}>
+        <RotatingIcon size="28" />방 만들기
+      </CreateButton>
       <Modal
         open={isOpenedModal}
         onClose={handleClose}
@@ -359,5 +362,13 @@ const CreateButton = styled(Button)`
   padding: 10px 20px;
   &:hover {
     background-color: darkorange;
+    svg {
+      transform: rotate(90deg);
+    }
   }
+`;
+
+const RotatingIcon = styled(Plus)`
+  margin-right: 5px;
+  transition: transform 0.3s;
 `;

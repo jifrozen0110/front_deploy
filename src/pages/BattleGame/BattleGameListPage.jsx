@@ -1,91 +1,19 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { styled } from "styled-components";
-import { IconButton, Button, createTheme, ThemeProvider } from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
+import { styled, keyframes, css } from "styled-components";
+import { Button } from "@mui/material";
+import { RotateCw, User } from "lucide-react";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import Chatting from "@/components/Chatting";
 import CreateRoomButton from "@/components/GameRoomList/CreateRoomButton";
 import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
-import { request, authRequest } from "@/apis/requestBuilder";
-import { getSender } from "@/socket-utils/storage";
+import { authRequest } from "@/apis/requestBuilder";
 import backgroundPath from "@/assets/backgrounds/background.png";
 import { socket } from "@/socket-utils/socket2";
-import { setRoomId, setSender, setTeam } from "../../socket-utils/storage";
-import { deepPurple } from "@mui/material/colors";
 import UserListSidebar from "@/components/GameRoomList/UserListSidebar";
 import music from "@/assets/audio/wait_game.mp3";
 import InviteAlertModal from "@/components/GameWaiting/InviteAlertModal";
 const { connect, send, subscribe, disconnect } = socket;
-const theme = createTheme({
-  typography: {
-    fontFamily: "'Galmuri11', sans-serif",
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          color: deepPurple[700],
-          fontSize: "15px",
-          height: "80%",
-          backgroundColor: "#fff",
-          "&:hover": {
-            backgroundColor: deepPurple[100],
-          },
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          margin: "3% auto",
-
-          "& label": {
-            color: deepPurple[200],
-          },
-          "& label.Mui-focused": {
-            color: deepPurple[700],
-          },
-          "& .MuiOutlinedInput-root": {
-            color: deepPurple[700],
-            "& fieldset": {
-              borderColor: deepPurple[200],
-            },
-            "&:hover fieldset": {
-              borderColor: deepPurple[400],
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: deepPurple[700],
-            },
-          },
-          "& .MuiFormHelperText-root": {
-            color: deepPurple[400],
-          },
-        },
-      },
-    },
-    MuiFormLabel: {
-      styleOverrides: {
-        root: {
-          color: deepPurple[200],
-          "&.Mui-focused": {
-            color: deepPurple[400],
-          },
-        },
-      },
-    },
-    MuiRadio: {
-      styleOverrides: {
-        root: {
-          "&.Mui-checked": {
-            color: deepPurple[400],
-          },
-        },
-      },
-    },
-  },
-});
 
 export default function BattleGameListPage() {
   const navigate = useNavigate();
@@ -106,6 +34,23 @@ export default function BattleGameListPage() {
   const [isUserListModalOpen, setIsUserListModalOpen] = useState(false);
   const openUserListModal = () => setIsUserListModalOpen(true);
   const closeUserListModal = () => setIsUserListModalOpen(false);
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      closeUserListModal();
+    }
+  };
+
+  // 회전 애니메이션
+  const [isRotating, setIsRotating] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const handleRefreshClick = () => {
+    setIsRotating(true); // 애니메이션 시작
+    setIsButtonDisabled(true); // 버튼 비활성화
+    setTimeout(() => {
+      setIsRotating(false); // 애니메이션 종료
+      setIsButtonDisabled(false); // 버튼 활성화
+    }, 1000); // 1초 후 상태 초기화
+  };
 
   // 초대 수락 처리 함수
   const handleInviteAccept = () => {
@@ -187,15 +132,15 @@ export default function BattleGameListPage() {
                 <CenterContext>
                   게임 찾기
                 </CenterContext>
-                <CenterButton>
-                  <RefreshButton onClick={refetchAllRoom}>
-                    <RefreshIcon /> 새로고침
-                  </RefreshButton>
-                  <FriendButton onClick={openUserListModal}>
-                    친구
-                  </FriendButton>
+                <CenterButtonContainer>
+                  <CenterButton onClick={() => {refetchAllRoom(); handleRefreshClick();}} disabled={isButtonDisabled}>
+                    <RotatingIcon size="28" isRotating={isRotating} />새로고침
+                  </CenterButton>
+                  <CenterButton onClick={openUserListModal}>
+                    <ShakingUserIcon size="28" />친구
+                  </CenterButton>
                   <CreateRoomButton category="battle" />
-                </CenterButton>
+                </CenterButtonContainer>
               </CenterTop>
               <GameRoomListBoard category="battle" roomList={roomList} />
             </CenterContaier>
@@ -210,10 +155,9 @@ export default function BattleGameListPage() {
           />
           {/* UserListSidebar 모달 */}
           {isUserListModalOpen && (
-            <ModalOverlay>
+            <ModalOverlay onClick={handleOverlayClick}>
               <ModalContent>
                 <UserListSidebar />
-                <CloseButton onClick={closeUserListModal}>닫기</CloseButton>
               </ModalContent>
             </ModalOverlay>
           )}
@@ -290,14 +234,34 @@ const CenterContext = styled.div`
   font-weight: bold;
 `
 
-const CenterButton = styled.div`
+const rotate = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+`;
+
+const RotatingIcon = styled(RotateCw).withConfig({
+  shouldForwardProp: (prop) => prop !== "isRotating", // isRotating을 DOM으로 전달하지 않음
+})`
+  ${({ isRotating }) =>
+    isRotating &&
+    css`
+      animation: ${rotate} 1s linear;
+    `}
+  margin-right: 5px;
+`;
+
+const CenterButtonContainer = styled.div`
   display: flex;
   margin: auto 12px 0 0;
   gap: 10px;
   height: 62px;
 `
 
-const RefreshButton = styled(Button)`
+const CenterButton = styled(Button)`
   background-color: orange;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   box-sizing: border-box;
@@ -307,21 +271,35 @@ const RefreshButton = styled(Button)`
   font-size: 25px;
   &:hover {
     background-color: darkorange;
+  }
+  &:disabled {
+    background-color: gray;
+    color: white;
+    cursor: not-allowed;
   }
 `
 
-const FriendButton = styled(Button)`
-  background-color: orange;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
-  box-sizing: border-box;
-  color: white;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 25px;
-  &:hover {
-    background-color: darkorange;
+const shake = keyframes`
+  0%, 100% {
+    transform: rotate(0deg);
   }
-`
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+`;
+
+const ShakingUserIcon = styled(User)`
+  margin-right: 5px;
+  animation: none; /* 기본값 */
+
+  /* CenterButton에 hover 시 아이콘 애니메이션 적용 */
+  ${CenterButton}:hover & {
+    animation: ${shake} 0.5s linear;
+  }
+`;
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -344,14 +322,4 @@ const ModalContent = styled.div`
   max-width: 600px;
   width: 90%;
   position: relative;
-`;
-
-const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
 `;
