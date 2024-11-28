@@ -49,7 +49,7 @@ export default function BattleGameListPage() {
     setTimeout(() => {
       setIsRotating(false); // 애니메이션 종료
       setIsButtonDisabled(false); // 버튼 활성화
-    }, 1000); // 1초 후 상태 초기화
+    }, 700); // 1초 후 상태 초기화
   };
 
   // 초대 수락 처리 함수
@@ -249,7 +249,7 @@ const RotatingIcon = styled(RotateCw).withConfig({
   ${({ isRotating }) =>
     isRotating &&
     css`
-      animation: ${rotate} 1s linear;
+      animation: ${rotate} 0.7s linear;
     `}
   margin-right: 5px;
 `;
