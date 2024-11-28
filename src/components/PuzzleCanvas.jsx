@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 import { styled } from "styled-components";
-import { configStore } from "../puzzle-core";
+import { playerConfig } from "../puzzle-core";
 import { Color } from "paper/dist/paper-core";
 import { socket } from "@/socket-utils/socket2";
 import pointerPath from "@/assets/icons/gameRoom/pointer.png";
 import { getTeam } from "../socket-utils/storage";
 import { colors } from "../puzzle-core/color";
 
-const { initializePuzzle, groupPuzzlePieces, getConfig } = configStore;
+const { initializePuzzle, groupPuzzlePieces, getConfig } = playerConfig;
 const { connect, send, subscribe } = socket;
 
 const myPointer = {x : 0, y : 0}

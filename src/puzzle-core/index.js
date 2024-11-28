@@ -177,4 +177,6 @@ const createPuzzleConfig = () => {
   };
 };
 
-export const configStore = createPuzzleConfig();
+export const playerConfig = createPuzzleConfig(); 
+export const enemyConfig  = createPuzzleConfig();
+

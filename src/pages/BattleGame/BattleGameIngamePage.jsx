@@ -14,7 +14,7 @@ import useExitRoom from "@/components/ExitRoom";
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
-import { configStore } from "@/puzzle-core";
+import { playerConfig } from "@/puzzle-core";
 import { getPuzzlePositionByIndex, updateGroupByBundles } from "@/puzzle-core/utils";
 import { groupPuzzlePieces } from "@/puzzle-core/index";
 import BackgroundPath from "@/assets/backgrounds/background2.png";
@@ -70,7 +70,7 @@ const {
   usingItemFire,
   usingItemTyphoon,
   usingItemFrame,
-} = configStore;
+} = playerConfig;
 
 export default function BattleGameIngamePage() {
   const navigate = useNavigate();
