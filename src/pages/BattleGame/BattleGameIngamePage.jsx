@@ -58,7 +58,9 @@ import blackholeAudioPath from "@/assets/audio/blackhole.mp3";
 import frameAudioPath from "@/assets/audio/frame2.mp3";
 
 import './ani.css';
+import { authRequest } from "../../apis/requestBuilder";
 import { colors } from "../../puzzle-core/color";
+
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
@@ -76,6 +78,7 @@ export default function BattleGameIngamePage() {
   const navigate = useNavigate();
   const { roomId: gameId } = useParams();
   const [gameData, setGameData] = useState(null);
+  const [gameDataDto, setGameDataDto] = useState(null);
   const [isOpenedDialog, setIsOpenedDialog] = useState(false);
 
   const [time, setTime] = useState(0);
@@ -84,8 +87,61 @@ export default function BattleGameIngamePage() {
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
   const [slots, setSlots] = useState(Array(8).fill(0));
+  const [startTime, setStartTime] = useState(null);
+
+  // 게임 데이터를 백엔드 서버로 보내기 위한 함수 정의
+  const sendGameDataToBackend = async (data, finishTime) => {
+
+    if (!data.game) {
+      console.error('게임 데이터가 응답에 없습니다.');
+      return;
+    }
+
+    // 총 퍼즐 조각 수 계산
+    const totalPieceCount = data.game.picture.widthPieceCnt * data.game.picture.lengthPieceCnt;
+    // 퍼즐 이미지 URL 설정
+    const puzzleImage = data.game.picture.imageUrl || data.game.picture.encodedString;
+
+    // 팀 정보 포맷팅 함수
+  const formatTeam = (team) => team ? team.map(player => ({
+    playerId: player.playerId,
+    playerImage: player.playerImage,
+    playerName: player.playerName,
+  })) : null;
+
+    // 백엔드로 보낼 데이터 포맷팅
+    const gameDataDto = {
+      gameName: data.game.gameName,
+      gameType: data.game.gameType,
+      redTeam: formatTeam(data.game.redTeam),
+      blueTeam: formatTeam(data.game.blueTeam),
+      players: formatTeam(data.game.players),
+      redProgressPercent: data.redProgressPercent !== undefined ? Math.round(data.redProgressPercent) : null,
+      blueProgressPercent: data.blueProgressPercent !== undefined ? Math.round(data.blueProgressPercent) : null,
+      puzzleImage: puzzleImage,
+      totalPieceCount: totalPieceCount,
+      startTime: data.game.startTime ? new Date(data.game.startTime).toISOString() : null,
+      finishTime: data.game.finishTime ? new Date(data.game.finishTime).toISOString() : null,
+    };
+
+    console.log('전송할 게임 데이터:', gameDataDto);
+
+    // 백엔드 서버로 데이터 전송
+    const userId = getSender(); // 또는 다른 방법으로 userId를 얻으세요.
+
+    await authRequest()
+    .post(`/games/end/${userId}`, gameDataDto)
+    .then(response => {
+      console.log('게임 결과를 백엔드로 전송했습니다.');
+    })
+    .catch(error => {
+      console.error('게임 결과 전송 중 오류 발생', error);
+    });
+  };
+
   const [players, setPlayers] = useState([])
   const isGameEndingRef = useRef(false);
+
 
   const itemFunc = useMemo(() => {
     return {
@@ -333,15 +389,24 @@ export default function BattleGameIngamePage() {
         subscribe(`/topic/game/room/${gameId}`, (message) => {
           const data = JSON.parse(message.body);
           if(data.message !== 'MOVE'){
+            console.log("##################");
             console.log(data);
           }
 
           // 매번 게임이 끝났는지 체크
           if (data.isFinished === true) {
-            // if (temp === true) {
-            // disconnect();
-            console.log("게임 끝남 !"); // TODO : 게임 끝났을 때 effect
-            console.log(data, gameData);
+
+
+
+            // ----------------------------------------------------------------------
+            // 추가 내용
+            // 게임 종료 시간 설정
+            const finishTime = new Date();
+
+            // 백엔드로 게임 데이터 전송
+            sendGameDataToBackend(data, data.game.finishTime);
+            // ----------------------------------------------------------------------
+
             setTimeout(() => {
               setIsOpenedDialog(true);
             }, 1000);
