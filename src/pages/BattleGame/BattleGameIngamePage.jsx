@@ -89,6 +89,14 @@ export default function BattleGameIngamePage() {
   const [slots, setSlots] = useState(Array(8).fill(0));
   const [startTime, setStartTime] = useState(null);
 
+  // 게임 결과 데이터를 저장할 상태 변수
+  const [ourTeamData, setOurTeamData] = useState([]);
+  const [enemyTeamData, setEnemyTeamData] = useState([]);
+  const [ourProgressPercent, setOurProgressPercent] = useState(0);
+  const [enemyProgressPercent, setEnemyProgressPercent] = useState(0);
+  const [puzzleImage, setPuzzleImage] = useState("");
+
+
   // 게임 데이터를 백엔드 서버로 보내기 위한 함수 정의
   const sendGameDataToBackend = async (data, finishTime) => {
 
@@ -103,11 +111,11 @@ export default function BattleGameIngamePage() {
     const puzzleImage = data.game.picture.imageUrl || data.game.picture.encodedString;
 
     // 팀 정보 포맷팅 함수
-  const formatTeam = (team) => team ? team.map(player => ({
-    playerId: player.playerId,
-    playerImage: player.playerImage,
-    playerName: player.playerName,
-  })) : null;
+    const formatTeam = (team) => team ? team.map(player => ({
+      playerId: player.playerId,
+      playerImage: player.playerImage,
+      playerName: player.playerName,
+    })) : null;
 
     // 백엔드로 보낼 데이터 포맷팅
     const gameDataDto = {
@@ -396,12 +404,25 @@ export default function BattleGameIngamePage() {
           // 매번 게임이 끝났는지 체크
           if (data.isFinished === true) {
 
+            const ourTeamKey = `${getTeam()}Team`;
+            const enemyTeamKey = getTeam() === "red" ? "blueTeam" : "redTeam";
 
+            const formatTeamData = (team) => {
+              return team.map(player => ({
+                id: player.playerId,
+                name: player.playerName,
+                avatar: player.playerImage,
+              }));
+            };
 
-            // ----------------------------------------------------------------------
-            // 추가 내용
-            // 게임 종료 시간 설정
-            const finishTime = new Date();
+            setOurTeamData(formatTeamData(data.game[ourTeamKey] || []));
+            setEnemyTeamData(formatTeamData(data.game[enemyTeamKey] || []));
+
+            setOurProgressPercent(getTeam() === "red" ? data.redProgressPercent : data.blueProgressPercent);
+            setEnemyProgressPercent(getTeam() === "red" ? data.blueProgressPercent : data.redProgressPercent);
+
+            const puzzleImageUrl = data.game.picture.imageUrl || data.game.picture.encodedString;
+            setPuzzleImage(puzzleImageUrl);
 
             // 백엔드로 게임 데이터 전송
             sendGameDataToBackend(data, data.game.finishTime);
@@ -721,13 +742,15 @@ export default function BattleGameIngamePage() {
             </Dialog>
           </ThemeProvider> */}
 
+      // ResultModal에 데이터 전달
       <ResultModal
         isOpenedDialog={isOpenedDialog}
         handleCloseGame={handleCloseGame}
-        ourPercent={ourPercent}
-        enemyPercent={enemyPercent}
-        ourTeam={gameData[`${getTeam()}Team`].players}
-        enemyTeam={getTeam() === "red" ? gameData.blueTeam.players : gameData.redTeam.players}
+        ourPercent={ourProgressPercent}
+        enemyPercent={enemyProgressPercent}
+        ourTeam={ourTeamData}
+        enemyTeam={enemyTeamData}
+        image={puzzleImage}
         numOfUsingItemRed={numOfUsingItemRed}
         numOfUsingItemBlue={numOfUsingItemBlue}
         isGameEndingRef={isGameEndingRef}
