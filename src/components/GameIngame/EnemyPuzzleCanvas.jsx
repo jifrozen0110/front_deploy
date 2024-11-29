@@ -2,9 +2,14 @@ import { useEffect, useRef } from "react";
 import { styled } from "styled-components";
 import { enemyConfig } from "../../puzzle-core";
 
-const { enemyInitializePuzzle, groupPuzzlePieces, getConfig } = enemyConfig;
+const { initializePuzzle, groupPuzzlePieces, getConfig } = enemyConfig;
 
 export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, picture, bundles, itemPieces }) {
+  // console.log("img:",puzzleImg);
+  // console.log("level:",level);
+  // console.log("shapes:",shapes);
+  // console.log("board:",board);
+  // console.log("picture:",picture);
   const canvasRef = useRef(null);
   const scale = 0.5;
 
@@ -12,11 +17,8 @@ export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, pic
     if (canvasRef.current) {
       
     const canvas = canvasRef.current;
-      
-    // 캔버스 크기 조정
-      canvas.width = 1000 * scale; 
-      canvas.height = 750 * scale;
-      enemyInitializePuzzle({ canvasRef, puzzleImg, level, shapes, board, picture});
+      // 퍼즐 초기화
+      initializePuzzle({ canvasRef, puzzleImg, level, shapes, board, picture });
 
       // 퍼즐 조각 그룹화
       const config = getConfig();
@@ -36,8 +38,8 @@ export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, pic
   }, [canvasRef,scale]);
 
   return (
-    <CanvasWrapper>
-      <Canvas ref={canvasRef} width={1000*scale} height={750*scale} />
+    <CanvasWrapper id="enemyCanvasContainer" scale={scale}>
+      <EnemyCanvas ref={canvasRef} id="enemyCanvas" scale={scale} />
     </CanvasWrapper>
   );
 }
@@ -48,7 +50,9 @@ const CanvasWrapper = styled.div`
   position: relative;
 `;
 
-const Canvas = styled.canvas`
+const EnemyCanvas = styled.canvas`
+  width: ${props => props.scale * 1000}px;
+  height: ${props => props.scale * 750}px;
   border: 1px solid #ccc;
   border-radius: 10px;
 `;
