@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { styled } from "styled-components";
 
 import PlayPuzzle from "@/components/PlayPuzzle";
+import EnemyPuzzle from "@/components/GameIngame/EnemyPuzzle";
 import Loading from "@/components/Loading";
 import Timer from "@/components/GameIngame/Timer";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
@@ -14,7 +15,7 @@ import useExitRoom from "@/components/ExitRoom";
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
-import { playerConfig } from "@/puzzle-core";
+import { playerConfig, enemyConfig } from "@/puzzle-core";
 import { getPuzzlePositionByIndex, updateGroupByBundles } from "@/puzzle-core/utils";
 import { groupPuzzlePieces } from "@/puzzle-core/index";
 import BackgroundPath from "@/assets/backgrounds/background2.png";
@@ -61,16 +62,16 @@ import './ani.css';
 import { colors } from "../../puzzle-core/color";
 
 const { connect, send, subscribe, disconnect } = socket;
-const {
-  getConfig,
-  lockPuzzle,
-  movePuzzle,
-  unLockPuzzle,
-  addPiece,
-  usingItemFire,
-  usingItemTyphoon,
-  usingItemFrame,
-} = playerConfig;
+// const {
+//   getConfig,
+//   lockPuzzle,
+//   movePuzzle,
+//   unLockPuzzle,
+//   addPiece,
+//   usingItemFire,
+//   usingItemTyphoon,
+//   usingItemFrame,
+// } = playerConfig;
 
 export default function BattleGameIngamePage() {
   const navigate = useNavigate();
@@ -87,80 +88,69 @@ export default function BattleGameIngamePage() {
   const [players, setPlayers] = useState([])
   const isGameEndingRef = useRef(false);
 
-  const itemFunc = useMemo(() => {
+  const itemFunc = useMemo(() => {    
     return {
       FIRE(data) {
         const { targets, targetList } = data;
+        const isPlayerTeam = targets === getTeam().toUpperCase();
+        const {
+          getConfig,
+          usingItemFire,
+        } = isPlayerTeam ? playerConfig : enemyConfig;
+        
+        const canvasContainer = isPlayerTeam
+          ? document.getElementById("canvasContainer")
+          : document.getElementById("enemyCanvasContainer");
         const bundles = targets === "RED" ? data.redBundles : data.blueBundles;
         const fireImg = document.createElement("img");
-        const canvasContainer = document.getElementById("canvasContainer");
         fireImg.src = boomPath;
         fireImg.className = "boom"
-
-        // fire 당하는 팀의 효과
-        if (targets === getTeam().toUpperCase()) {
-          if (targetList === null || targetList.length === 0) {
-            return;
-          }
-
-          console.log("fire 맞을거임");
-
-          for (let i = 0; i < targetList.length; i++) {
-            const currentTargetIdx = targetList[i];
-            const [x, y] = getPuzzlePositionByIndex({
-              config: getConfig(),
-              puzzleIndex: currentTargetIdx,
-            });
-
-            console.log("x, y", x, y);
-
-            const fireImgCopy = fireImg.cloneNode();
-
-            fireImgCopy.style.left = `${x}px`;
-            fireImgCopy.style.top = `${y}px`;
-
-            canvasContainer.appendChild(fireImgCopy);
-            
-            setTimeout(() => {
-              if (fireImgCopy.parentNode) {
-                console.log("불 효과 삭제");
-                usingItemFire(bundles, targetList);
-                fireImgCopy.parentNode.removeChild(fireImgCopy);
-              }
-            }, 2000);
-          }
-          addAudio(fireAudioPath);
-        } else {
-          // fire 발동하는 팀의 효과
-          // console.log("fire 보낼거임");
-          // fireImg.style.left = "1080px";
-          // fireImg.style.top = "750px";
-          // canvasContainer.appendChild(fireImg);
-          // addAudio(fireAudioPath);
-          // setTimeout(() => {
-          //   console.log("불 효과 삭제");
-          //   if (fireImg.parentNode) {
-          //     fireImg.parentNode.removeChild(fireImg);
-          //   }
-          // }, 2000);
+      
+        if (targetList === null || targetList.length === 0) {
+          return;
         }
 
-        // setTimeout(() => {
-        //   if (targetList && targets === getTeam().toUpperCase()) {
-        //     console.log("fire 발동 !!");
-        //   }
-        // }, 2000);
+        console.log("fire 맞을거임");
+
+        for (let i = 0; i < targetList.length; i++) {
+          const currentTargetIdx = targetList[i];
+          const [x, y] = getPuzzlePositionByIndex({
+            config: getConfig(),
+            puzzleIndex: currentTargetIdx,
+          });
+
+          console.log("x, y", x, y);
+
+          const fireImgCopy = fireImg.cloneNode();
+
+          fireImgCopy.style.left = `${x}px`;
+          fireImgCopy.style.top = `${y}px`;
+
+          canvasContainer.appendChild(fireImgCopy);
+          
+          setTimeout(() => {
+            if (fireImgCopy.parentNode) {
+              console.log("불 효과 삭제");
+              usingItemFire(bundles, targetList);
+              fireImgCopy.parentNode.removeChild(fireImgCopy);
+            }
+          }, 2000);
+        }
+        addAudio(fireAudioPath);
+        
       },
       MUD(data) {
         const { targets } = data;
-        if (getTeam().toUpperCase() !== targets) {
-          return;
-        }
+        const isPlayerTeam = targets === getTeam().toUpperCase();
+
         const mudImg = document.createElement("img");
         mudImg.src = inkPath;
         mudImg.className = "ink"
 
-        const gameBoard = document.getElementById("gameBoard");
+        const gameBoard = isPlayerTeam
+          ? document.getElementById("gameBoard")
+          : document.getElementById("enemyCanvasContainer");
+        
 
         addAudio(mudAudioPath);
         gameBoard.appendChild(mudImg);
@@ -174,12 +164,15 @@ export default function BattleGameIngamePage() {
       TYPHOON(data){
         const { targets, targetList } = data
         const bundles = targets === "RED" ? data.redBundles : data.blueBundles;
-        if (getTeam().toUpperCase() !== targets) {
-          return
-        }
+        const isPlayerTeam = targets === getTeam().toUpperCase();
+        const {
+          usingItemTyphoon,
+        } = isPlayerTeam ? playerConfig : enemyConfig;
 
         const tornadoImg = document.createElement("img");
-        const gameBoard = document.getElementById("gameBoard");
+        const gameBoard = isPlayerTeam
+          ? document.getElementById("gameBoard")
+          : document.getElementById("enemyCanvasContainer");
         tornadoImg.src = tornadoPath;
         tornadoImg.className = "tornado"
 
@@ -199,15 +192,19 @@ export default function BattleGameIngamePage() {
       BROOMSTICK(data){
         const { targets, targetList } = data
         const bundles = targets === "RED" ? data.redBundles : data.blueBundles;
-        if (getTeam().toUpperCase() !== targets) {
-          return
-        }
+        const isPlayerTeam = targets === getTeam().toUpperCase();
+        const {
+          usingItemTyphoon,
+        } = isPlayerTeam ? playerConfig : enemyConfig;
+
         if (targetList === null || targetList.length === 0) {
           return;
         }
 
         const bloomImg = document.createElement("img");
-        const gameBoard = document.getElementById("gameBoard");
+        const gameBoard = isPlayerTeam
+          ? document.getElementById("gameBoard")
+          : document.getElementById("enemyCanvasContainer");
         bloomImg.src = blackholePath;
         bloomImg.className = "black-hole"
 
@@ -224,12 +221,15 @@ export default function BattleGameIngamePage() {
       FRAME(data){
         const { targets, targetList } = data
         const bundles = targets === "RED" ? data.redBundles : data.blueBundles;
-        if (getTeam().toUpperCase() !== targets) {
-          return
-        }
+        const isPlayerTeam = targets === getTeam().toUpperCase();
+        const {
+          usingItemFrame,
+        } = isPlayerTeam ? playerConfig : enemyConfig;
 
         const twinkleImg = document.createElement("img");
-        const gameBoard = document.getElementById("gameBoard");
+        const gameBoard = isPlayerTeam
+          ? document.getElementById("gameBoard")
+          : document.getElementById("enemyCanvasContainer");
         twinkleImg.src = framePath;
 
         const frame = document.createElement("div")
@@ -417,6 +417,11 @@ export default function BattleGameIngamePage() {
 
               return;
             }
+          }else{
+            const { targets } = data;
+            const targetList = JSON.parse(targets);
+            targetList.forEach(({ x, y, index }) => enemyConfig.movePuzzle(x, y, index));
+            return;
           }
         });
 
@@ -445,6 +450,7 @@ export default function BattleGameIngamePage() {
             config.tiles[data.fitPieceIndex].originStroke = colors.DEFAULT_STROKE
             config.tiles[data.fitPieceIndex].originShadow = colors.DEFAULT_SHADOW
           }
+          
         });
 
         subscribe(`/topic/game/room/${gameId}/help`, (message) => {
@@ -555,19 +561,19 @@ export default function BattleGameIngamePage() {
       </LeftSidebar>
       <Row style={{ padding: "10px 10px 10px 0", width: "80%", boxSizing: "border-box" }}>
         <Board id="gameBoard">
-          <PlayPuzzle
-            category="battle"
-            shapes={parsePuzzleShapes(
-              gameData[`${getTeam()}Puzzle`].board,
-              gameData.picture.widthPieceCnt,
-              gameData.picture.lengthPieceCnt,
-            )}
-            board={gameData[`${getTeam()}Puzzle`].board}
-            picture={gameData.picture}
-            bundles={Object.values(gameData[`${getTeam()}Puzzle`].bundles)}
-            itemPieces={gameData[`${getTeam()}Puzzle`].itemPiece}
-            players={players}
-          />
+        <PlayPuzzle
+          category="battle"
+          shapes={parsePuzzleShapes(
+            gameData[`${getTeam()}Puzzle`].board,
+            gameData.picture.widthPieceCnt,
+            gameData.picture.lengthPieceCnt,
+          )}
+          board={gameData[`${getTeam()}Puzzle`].board}
+          picture={gameData.picture}
+          bundles={Object.values(gameData[`${getTeam()}Puzzle`].bundles)}
+          itemPieces={gameData[`${getTeam()}Puzzle`].itemPiece}
+          players={players}
+        />
         </Board>
         <GameInfo>
           <img
@@ -589,9 +595,19 @@ export default function BattleGameIngamePage() {
             </ProgressContainer>
             <Col>
               <OtherTeam>
-                <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
-                  상대팀 화면
-                </div>
+              <EnemyPuzzle
+                category="battle"
+                shapes={parsePuzzleShapes(
+                  gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].board,
+                  gameData.picture.widthPieceCnt,
+                  gameData.picture.lengthPieceCnt,
+                )}
+                board={gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].board}
+                picture={gameData.picture}
+                bundles={Object.values(gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].bundles)}
+                itemPieces={gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].itemPiece}
+              />
+
               </OtherTeam>
               <Timer num={time} />
               <Inventory slots={slots} useItem={useItem}></Inventory>

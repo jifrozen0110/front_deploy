@@ -33,6 +33,19 @@ const createPuzzleConfig = () => {
 
     config = attachedItemToAllPieceConfig;
   };
+  const enemyInitializePuzzle = ({ canvasRef, puzzleImg, level, shapes, board = [], picture }) => {
+    // 단계별 config 설정
+    Paper.setup(canvasRef.current);
+    const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes, picture });
+    const attachedMoveEventConfig = setMoveEvent({ config: initializedConfig });
+    const attachedItemToAllPieceConfig = setItemStyleToAllPiece({
+      config: attachedMoveEventConfig,
+      itemList: searchItemList(board),
+    });
+
+    config = attachedItemToAllPieceConfig;
+  };
+  
 
   const initializePuzzle2 = (config2, itemList = []) => {
     const attachedItemToAllPieceConfig = setItemStyleToAllPiece({
@@ -161,6 +174,7 @@ const createPuzzleConfig = () => {
 
   return {
     initializePuzzle,
+    enemyInitializePuzzle,
     initializePuzzle2,
     getConfig,
     lockPuzzle,

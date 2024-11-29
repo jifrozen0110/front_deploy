@@ -29,6 +29,9 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
 
   useEffect(() => {
     if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      canvas.width = 1000;
+      canvas.height = 750;
       initializePuzzle({ canvasRef, puzzleImg, level, shapes, board, picture });
       const config = getConfig()
       groupPuzzlePieces({ config, bundles })
@@ -82,7 +85,7 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
       >
         {players?.filter(p => p.playerId != userId)
         .map(p => <Pointer path={pointerPath} id={`user${p.playerId}`} color={p.color} key={`user${p.playerId}`}/>)}
-        <Canvas ref={canvasRef} id="canvas" onMouseMove={mouseMove}/>
+        <Canvas ref={canvasRef} width={1000} height={750} id="canvas" onMouseMove={mouseMove}/>
       </div>
     </>
   );
@@ -99,10 +102,6 @@ const Pointer = styled.div`
 `
 
 const Canvas = styled.canvas`
-  width: 1000px;
-  height: 750px;
-  // width: 2580px;
-  // height: 1440px;
   border: 1px solid #ccc;
   border-radius: 10px;
 `;
