@@ -143,9 +143,8 @@ const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
           <ThemeProvider theme={theme}>
             <IconButton
               aria-label="mic"
-              color={color}
               onClick={toggleMute}
-              sx={{ marginRight: "3px" }}
+              sx={{ color: "white" }}
             >
               {isUnMuted ? <MicOffIcon fontSize="inherit" /> : <MicIcon fontSize="inherit" />}
             </IconButton>
