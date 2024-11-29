@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { styled, css, keyframes } from "styled-components";
+import { styled } from "styled-components";
 import { Plus } from "lucide-react";
 import {
   Button,
@@ -203,6 +203,7 @@ export default function CreateRoomButton({ category }) {
             fontSize: "15px",
             height: "80%",
             backgroundColor: "#fff",
+            border: `1px solid ${deepPurple[700]}`,
             "&:hover": {
               backgroundColor: deepPurple[100],
             },
@@ -313,7 +314,7 @@ export default function CreateRoomButton({ category }) {
                 placeholder="이미지 URL을 입력하세요"
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} style={{ paddingTop: "0"}}>
               <Typography variant="subtitle1">이미지 미리보기:</Typography>
               <img
                 src={puzzleImage}

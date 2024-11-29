@@ -143,6 +143,7 @@ const Dialog = styled.div`
   justify-content: center;
   align-items: center;
   backdrop-filter: blur(7px);
+  z-index: 10;
 `;
 
 const DialogWrapper = styled.div`

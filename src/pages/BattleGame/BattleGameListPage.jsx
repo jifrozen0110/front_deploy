@@ -173,6 +173,7 @@ const Wrapper = styled.div`
   background-image: url(${backgroundPath});
   background-size: cover;
   background-attachment: fixed;
+  user-select: none; /* 텍스트 선택 금지 */
 
   &::before {
     content: "";
