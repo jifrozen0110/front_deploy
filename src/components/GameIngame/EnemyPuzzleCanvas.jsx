@@ -14,11 +14,13 @@ export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, pic
   const scale = 0.5;
 
   useEffect(() => {
-    if (canvasRef.current) {
-      
-    const canvas = canvasRef.current;
+    if (canvasRef.current) {  
+      const canvas = canvasRef.current;
+      const canvasId = "enemyCanvas"
+      canvas.width = 1000*scale;
+      canvas.height = 750*scale;
       // 퍼즐 초기화
-      initializePuzzle({ canvasRef, puzzleImg, level, shapes, board, picture });
+      initializePuzzle({ canvasRef, puzzleImg, level, shapes, board, picture, canvasId });
 
       // 퍼즐 조각 그룹화
       const config = getConfig();
@@ -39,7 +41,7 @@ export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, pic
 
   return (
     <CanvasWrapper id="enemyCanvasContainer" scale={scale}>
-      <EnemyCanvas ref={canvasRef} id="enemyCanvas" scale={scale} />
+      <EnemyCanvas ref={canvasRef} id={canvasId} scale={scale} />
     </CanvasWrapper>
   );
 }
@@ -51,8 +53,6 @@ const CanvasWrapper = styled.div`
 `;
 
 const EnemyCanvas = styled.canvas`
-  width: ${props => props.scale * 1000}px;
-  height: ${props => props.scale * 750}px;
   border: 1px solid #ccc;
   border-radius: 10px;
 `;

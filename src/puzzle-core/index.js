@@ -20,16 +20,18 @@ export const groupPuzzlePieces = ({ config, bundles }) => {
 const createPuzzleConfig = () => {
   let config = {};
 
-  const initializePuzzle = ({ canvasRef, puzzleImg, level, shapes, board = [], picture }) => {
+  const initializePuzzle = ({ canvasRef, puzzleImg, level, shapes, board = [], picture, canvasId }) => {
     // 단계별 config 설정
-    Paper.setup(canvasRef.current);
-    const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes, picture });
+    // const scope = new Paper.PaperScope();
+    // scope.setup(canvasRef.current); 
+    // console.log(scope)
+    // Paper.setup(canvasRef.current);
+    const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes, picture, canvasId });
     const attachedMoveEventConfig = setMoveEvent({ config: initializedConfig });
     const attachedItemToAllPieceConfig = setItemStyleToAllPiece({
       config: attachedMoveEventConfig,
       itemList: searchItemList(board),
     });
-
     config = attachedItemToAllPieceConfig;
   };
 

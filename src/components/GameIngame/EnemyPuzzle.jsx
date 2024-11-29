@@ -46,7 +46,6 @@ const EnemyPuzzle = ({ category, shapes, board, picture, bundles, itemPieces }) 
             picture={picture}
             bundles={bundles}
             itemPieces={itemPieces}
-            type="enemy"
           />
         )}
       </div>
