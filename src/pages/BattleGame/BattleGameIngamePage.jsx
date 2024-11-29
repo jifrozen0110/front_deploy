@@ -677,9 +677,18 @@ export default function BattleGameIngamePage() {
             />
           </ImageContainer>
           <OtherTeam>
-            <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
-              상대팀 화면
-            </div>
+            <EnemyPuzzle
+                  category="battle"
+                  shapes={parsePuzzleShapes(
+                    gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].board,
+                    gameData.picture.widthPieceCnt,
+                    gameData.picture.lengthPieceCnt,
+                  )}
+                  board={gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].board}
+                  picture={gameData.picture}
+                  bundles={Object.values(gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].bundles)}
+                  itemPieces={gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].itemPiece}
+                />
           </OtherTeam>
           <ProgressContainer>
             <ProgressWrapper>
@@ -748,7 +757,6 @@ export default function BattleGameIngamePage() {
             </Dialog>
           </ThemeProvider> */}
 
-      // ResultModal에 데이터 전달
       <ResultModal
         isOpenedDialog={isOpenedDialog}
         handleCloseGame={handleCloseGame}
