@@ -1,49 +1,11 @@
-import { useEffect, useState } from "react";
 import { styled } from "styled-components";
-import Grid from "@mui/material/Grid";
-import Card from "@mui/material/Card";
-import Button from "@mui/material/Button";
 import GameCard from "@/components/GameRoomList/GameCard";
-import LeftTriangle from "@/assets/icons/gameRoom/left_triangle.png";
-import RightTriangle from "@/assets/icons/gameRoom/right_triangle.png";
-import { authRequest } from "../../apis/requestBuilder";
 
 export default function GameRoomListBoard({ category, roomList }) {
-  const [rooms, setRooms] = useState([]);
-  const [page, setPage] = useState(0);
-  const [totalPage, setTotalPage] = useState(0);
-  const [isFetching, setIsFetching] = useState(false); // 중복 요청 방지
-
-  // 초기 roomList 설정
-  useEffect(() => {
-    setRooms(roomList ?? []);
-  }, [roomList]);
-
-  // 페이지 변경 시 데이터 요청
-  useEffect(() => {
-    fetchRoomsByPage(page);
-  }, [page]);
-
-  // 데이터 요청 함수
-  const fetchRoomsByPage = async (currentPage) => {
-    if (isFetching) return; // 중복 요청 방지
-
-    setIsFetching(true);
-    try {
-      const res = await authRequest().get(`/api/rooms`);
-      const { data } = res;
-      setRooms(data ?? []);
-    } catch (error) {
-      console.error("Failed to fetch rooms:", error);
-    } finally {
-      setIsFetching(false);
-    }
-  };
-
   return (
     <Wrapper>
       <GridContainer>
-        {rooms.map((room) => (
+        {roomList.map((room) => (
           <GameCard key={room.roomId} room={room} category={category} />
         ))}
       </GridContainer>
@@ -88,40 +50,5 @@ const GridContainer = styled.div`
 
   &::-webkit-scrollbar-track {
     background: transparent; /* 스크롤 트랙 배경 투명화 */
-  }
-`;
-
-const EmptyCard = styled(Card)`
-  width: 100%;
-  height: 100%;
-  border-radius: 8px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-  background-color: rgba(255, 255, 255, 0.2); /* 반투명 배경 */
-  backdrop-filter: blur(40px); /* 블러 효과 */
-`;
-
-const PagingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  height: 50px;
-  gap: 10px;
-`;
-
-const PageButton = styled(Button)`
-  background-color: orange;
-  border-radius: 8px;
-  padding: 10px 20px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-  box-sizing: border-box;
-  height: 35px;
-
-  &:hover {
-    background-color: darkorange;
-  }
-
-  &:disabled {
-    background-color: rgba(255, 255, 255, 0.5); /* 반투명 배경 */
-    cursor: not-allowed;
   }
 `;

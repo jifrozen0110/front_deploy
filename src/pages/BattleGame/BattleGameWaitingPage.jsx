@@ -19,10 +19,7 @@ import { useGameInfo } from "../../hooks/useGameInfo";
 import Typography from "@mui/material/Typography";
 import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
 
-import LeftArrow from "@/assets/icons/gameRoom/left_arrow.png";
-import Gear from "@/assets/icons/gameRoom/gear.png";
-import Invite from "@/assets/icons/gameRoom/invite.png";
-import TeamChange from "@/assets/icons/gameRoom/team_change.png";
+import { ArrowLeft, ArrowLeftRight, Settings, UserPlus } from "lucide-react";
 import { setTeam } from "../../socket-utils/storage";
 import InviteModal from "@/components/GameWaiting/InviteModal";
 import InviteAlertModal from "@/components/GameWaiting/InviteAlertModal";
@@ -269,45 +266,25 @@ export default function BattleGameWaitingPage() {
           <ButtonGroup>
             <TopButton onClick={() => navigate("/game/battle")}>
               <div style={{ textAlign: "center" }}>
-                <img
-                  src={LeftArrow}
-                  alt="나가기"
-                  className="icon"
-                  style={{ display: "block", margin: "0 auto" }}
-                />
+                <ArrowLeft style={{ display: "block", margin: "0 auto" }} />
                 나가기
               </div>
             </TopButton>
             <TopButton onClick={switchTeam}>
               <div style={{ textAlign: "center" }}>
-                <img
-                  src={TeamChange}
-                  alt="이동"
-                  className="icon"
-                  style={{ display: "block", margin: "0 auto" }}
-                />
+                <ArrowLeftRight style={{ display: "block", margin: "0 auto" }} />
                 이동
               </div>
             </TopButton>
             <TopButton>
               <div style={{ textAlign: "center" }}>
-                <img
-                  src={Gear}
-                  alt="설정"
-                  className="icon"
-                  style={{ display: "block", margin: "0 auto" }}
-                />
+                <Settings style={{ display: "block", margin: "0 auto" }} />
                 설정
               </div>
             </TopButton>
             <TopButton onClick={handleInviteClick}>
               <div style={{ textAlign: "center" }}>
-                <img
-                  src={Invite}
-                  alt="초대"
-                  className="icon"
-                  style={{ display: "block", margin: "0 auto" }}
-                />
+                <UserPlus style={{ display: "block", margin: "0 auto" }} />
                 초대
               </div>
             </TopButton>
