@@ -1,29 +1,96 @@
 import { styled } from "styled-components";
 import LinearProgress from "@mui/material/LinearProgress";
-import { getTeam } from "@/socket-utils/storage";
-import { red, blue, deepPurple } from "@mui/material/colors";
+import { red, blue } from "@mui/material/colors";
+import React, { useState, useEffect } from "react";
 
 export default function PrograssBar({ percent, teamColor }) {
   const barColor = teamColor === "red" ? red[400] : blue[400];
+  const [displayedPercent, setDisplayedPercent] = useState(percent);
+
+  useEffect(() => {
+    const roundedPercent = Math.round(percent * 10) / 10; // 목표값: 소수 첫 번째 자리까지 반올림
+    const duration = 500; // 전체 목표 도달 시간 (밀리초)
+    const steps = Math.abs(roundedPercent - displayedPercent) * 10; // 소수 첫 번째 자리 기준 단계 수
+    const intervalTime = duration / steps; // 각 단계별 속도 (밀리초)
+    const step =
+      roundedPercent > displayedPercent
+        ? 0.1
+        : roundedPercent < displayedPercent
+        ? -0.1
+        : 0;
+  
+    const interval = setInterval(() => {
+      setDisplayedPercent((prev) => {
+        const nextValue = Math.round((prev + step) * 10) / 10; // 소수 첫 번째 자리로 반올림
+        if (nextValue === roundedPercent) {
+          clearInterval(interval);
+          return roundedPercent; // 최종 값도 반올림된 값
+        }
+        return nextValue;
+      });
+    }, intervalTime); // 숫자가 변화하는 속도를 단계별로 설정
+    return () => clearInterval(interval);
+  }, [percent, displayedPercent]);
 
   return (
-    <BorderLinearProgress
-      variant="determinate"
-      value={percent}
-      sx={{
-        backgroundColor: "white",
-        "& span.MuiLinearProgress-bar": {
-          transform: `translateY(-${100 - percent}%) !important`,
-          backgroundColor: barColor,
-          borderRadius: "8px",
-        },
-      }}
-    />
+    <ProgressContainer>
+      <PercentText style={{ color: `${barColor}` }}>{displayedPercent}%</PercentText>
+      <BorderLinearProgress
+        variant="determinate"
+        value={percent}
+        sx={{
+          backgroundColor: "white",
+          "& span.MuiLinearProgress-bar": {
+            transform: `translateX(-${100 - percent}%) !important`,
+            backgroundColor: barColor,
+            borderRadius: "8px",
+          },
+          border: `2px solid ${barColor}`,
+        }}
+      />
+    </ProgressContainer>
   );
 }
 
+// 중앙 정렬을 위한 ProgressContainer 스타일
+const ProgressContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const PercentText = styled.span`
+  margin-top: -3px;
+  position: absolute;
+  z-index: 1; /* 진행 바 위에 표시되도록 설정 */
+  font-size: 30px;
+  font-weight: bold;
+  text-shadow: 
+    2px 2px 2px white,
+    -2px -2px 2px white,
+    2px -2px 2px white,
+    -2px 2px 2px white,
+    2px 0px 2px white,
+    -2px 0px 2px white,
+    0px -2px 2px white,
+    0px 2px 2px white,
+    2px 2px 2px white,
+    -2px -2px 2px white,
+    2px -2px 2px white,
+    -2px 2px 2px white,
+    2px 0px 2px white,
+    -2px 0px 2px white,
+    0px -2px 2px white,
+    0px 2px 2px white;
+  pointer-events: none;
+`;
+
 const BorderLinearProgress = styled(LinearProgress)`
-  width: 20px;
+  width: 100%;
   height: 100%;
   border-radius: 8px;
+  box-sizing: border-box;
 `;

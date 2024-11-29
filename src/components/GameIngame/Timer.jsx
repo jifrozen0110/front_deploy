@@ -5,7 +5,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
 import { useMemo } from "react";
 
-export default function Timer({ num, isCooperation = false }) {
+export default function Timer({ num, isCooperation = false, color }) {
   const isPressing = useMemo(() => {
     return !isCooperation && num <= 30; // 배틀게임이고, 30초 이하라면
   }, [isCooperation, num]);
@@ -35,7 +35,7 @@ export default function Timer({ num, isCooperation = false }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <Wrapper>
+      <Wrapper color={color}>
         <Typography variant="h3" sx={TypoStyle}>
           {min} : {sec}
         </Typography>
@@ -47,8 +47,8 @@ export default function Timer({ num, isCooperation = false }) {
 const Wrapper = styled.div`
   width: 100%;
   text-align: center;
-  background-color: rgba(255, 255, 255, 0.4); /* 반투명 배경 */
-  backdrop-filter: blur(40px); /* 블러 효과 */
-  padding: 25px 0 30px;
-  border-radius: 10px;
+  padding: 15px 0;
+  border-right: 4px solid ${getTeam() === "red" ? red[400] : blue[400]};
+  border-bottom: 4px solid ${getTeam() === "red" ? red[400] : blue[400]};
+  border-radius: 0 0 10px 0;
 `;

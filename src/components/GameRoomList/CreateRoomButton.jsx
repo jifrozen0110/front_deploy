@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
+import { Plus } from "lucide-react";
 import {
   Button,
   Modal,
@@ -202,6 +203,7 @@ export default function CreateRoomButton({ category }) {
             fontSize: "15px",
             height: "80%",
             backgroundColor: "#fff",
+            border: `1px solid ${deepPurple[700]}`,
             "&:hover": {
               backgroundColor: deepPurple[100],
             },
@@ -260,7 +262,9 @@ export default function CreateRoomButton({ category }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <CreateButton onClick={() => setIsOpenedModal(true)}>방 만들기</CreateButton>
+      <CreateButton onClick={() => setIsOpenedModal(true)}>
+        <RotatingIcon size="28" />방 만들기
+      </CreateButton>
       <Modal
         open={isOpenedModal}
         onClose={handleClose}
@@ -310,7 +314,7 @@ export default function CreateRoomButton({ category }) {
                 placeholder="이미지 URL을 입력하세요"
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} style={{ paddingTop: "0"}}>
               <Typography variant="subtitle1">이미지 미리보기:</Typography>
               <img
                 src={puzzleImage}
@@ -359,5 +363,13 @@ const CreateButton = styled(Button)`
   padding: 10px 20px;
   &:hover {
     background-color: darkorange;
+    svg {
+      transform: rotate(90deg);
+    }
   }
+`;
+
+const RotatingIcon = styled(Plus)`
+  margin-right: 5px;
+  transition: transform 0.3s;
 `;

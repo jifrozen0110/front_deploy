@@ -11,8 +11,9 @@ const { send } = socket;
 
 export default function Chatting({ chatHistory, isIngame = false, isBattle = false }) {
   const [message, setMessage] = useState("");
-  const [lastHeight, setLastHeight] = useState(null);
   const chatElement = useRef();
+  const [isChatVisible, setIsChatVisible] = useState(true); // 채팅 컨테이너 가시성 상태
+  const [visibilityTimer, setVisibilityTimer] = useState(null); // 타이머 관리
 
   const handleMessageSend = (e) => {
     e.preventDefault();
@@ -33,23 +34,32 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
     }
   };
 
+  // 새 메시지가 추가될 때 채팅 컨테이너를 보이게 하고 자동 스크롤
   useEffect(() => {
-    const { scrollTop, scrollHeight, clientHeight } = chatElement.current;
+    if (chatHistory.length > 0) {
+      setIsChatVisible(true);
 
-    if (scrollTop + clientHeight >= scrollHeight - 100) {
-      chatElement.current.scrollTop = scrollHeight;
-      return;
-    }
+      // 타이머 설정
+      if (visibilityTimer) clearTimeout(visibilityTimer);
+      const timer = setTimeout(() => setIsChatVisible(false), 3000);
+      setVisibilityTimer(timer);
 
-    if (!lastHeight) {
-      chatElement.current.scrollTop = scrollHeight;
-    } else {
-      if (scrollTop === 0) {
-        const diff = scrollHeight - lastHeight;
-        chatElement.current.scrollTop = diff;
+      // 스크롤 자동 이동
+      if (chatElement.current) {
+        chatElement.current.scrollTop = chatElement.current.scrollHeight;
       }
     }
-  }, [chatHistory, lastHeight]);
+  }, [chatHistory]);
+
+  const handleFocus = () => {
+    setIsChatVisible(true);
+    if (visibilityTimer) clearTimeout(visibilityTimer); // 타이머 제거
+  };
+
+  const handleBlur = () => {
+    const timer = setTimeout(() => setIsChatVisible(false), 3000);
+    setVisibilityTimer(timer);
+  };
 
   const theme = createTheme({
     typography: {
@@ -92,32 +102,38 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
     <ThemeProvider theme={theme}>
       <Wrapper $isIngame={isIngame} $color={currentScrollbarTheme}>
         {chatHistory && (
-          <div
-            ref={chatElement}
-            style={{
-              flexGrow: 1,
-              margin: "10px",
-              overflowY: "scroll",
-              scrollbarColor: `${currentScrollbarTheme} rgba(255, 255, 255, 0)`,
-            }}
-          >
-
+          <ChatContainer ref={chatElement} $isChatVisible={isChatVisible}>
             {/* 채팅 기록을 화면에 출력 */}
-            {chatHistory.map((chat, index) => (
+            {chatHistory.map((chat, index) => {
+              return (
               <>
                 {chat.userId == getSender() ? (
-                  <MyChatDiv key={index} $color={currentChatTheme}>
+                  <MyChatDiv
+                    key={index}
+                    $color={currentChatTheme}
+                    style={{
+                      opacity: isChatVisible  ? 1 : 0, // 투명화 상태에 따라 설정
+                      transition: "opacity 0.5s ease-in-out",
+                    }}
+                  >
                     <strong>{chat.userName}: </strong>
                     {chat.message}
                   </MyChatDiv>
                 ) : (
-                  <ChatDiv key={index} $color={currentChatTheme}>
+                  <ChatDiv
+                    key={index}
+                    $color={currentChatTheme}
+                    style={{
+                      opacity: isChatVisible  ? 1 : 0, // 투명화 상태에 따라 설정
+                      transition: "opacity 0.5s ease-in-out",
+                    }}
+                  >
                     {chat.userName}: {chat.message}
                   </ChatDiv>
                 )}
               </>
-            ))}
-          </div>
+            )})}
+          </ChatContainer>
         )}
 
         <Form onSubmit={handleMessageSend}>
@@ -132,11 +148,13 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
           )}
           <ChatInput
             type="text"
-            placeholder="채팅"
+            placeholder="메시지를 입력하세요"
             size="small"
-            color={currentTheme}
             autoComplete="off"
+            color={currentTheme}
             value={message}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             onChange={(e) => setMessage(e.target.value)}
           />
           <ChatBtn variant="outlined" color={currentTheme} type="submit">
@@ -152,48 +170,70 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  height: ${(props) => {
-    if (props.$isIngame) {
-      return "";
-    } else {
-      return "200px";
-    }
-  }};
-  border: ${(props) => {
-    if (props.$isIngame) {
-      return `1px solid ${props.$color}`;
-    } else {
-      return "";
-    }
-  }};
+  max-height: 500px;
   border-radius: 0 10px 0 0;
-  background-color: rgba(255, 255, 255, 0.6); /* 반투명 배경 */
-  backdrop-filter: blur(40px); /* 블러 효과 */
-
   overflow-y: hidden;
 `;
 
+const ChatContainer = styled.div`
+  flex-grow: 1;
+  margin: 10px;
+  overflow-y: auto; /* 스크롤 동작 가능 */
+  opacity: ${(props) => (props.$isChatVisible ? 1 : 0)};
+  transition: opacity 0.5s ease-in-out;
+
+  /* 오버레이 스타일 */
+  scrollbar-gutter: stable; /* Firefox 및 표준 브라우저 */
+  scrollbar-width: thin;
+  scrollbar-color: ${getTeam() === "red" ? red[300] : blue[300]} transparent;
+
+  /* Webkit 브라우저 스타일 */
+  &::-webkit-scrollbar {
+    width: 8px; /* 항상 같은 넓이 */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+`;
+
+
 const Form = styled.form`
-  height: 50px;
+  padding: 5px 5px 0 0;
   display: flex;
+  background-color: ${getTeam() === "red" ? red[400] : blue[400]};
+  border-radius: 0 5px 0 0;
+  WebkitTextStroke: "2px white", // 글자 테두리
 `;
 
 const ChatInput = styled(TextField)`
-  width: 74%;
-  height: 50px;
-  margin: 0;
-  margin-left: auto;
-
-  & .MuiInputBase-input {
-    padding: 10px 14px;
-    height: 20px;
-  }
+  flex: 1;
+  margin-right: 5px;
+  background-color: white;
+  border-radius: 5px;
+  border: none;
+  outline: none;
 `;
 
 const ChatBtn = styled(Button)`
   width: 16%;
-  margin: 0 4px;
   height: 40px;
+  background-color: white;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    border: none;
+    background-color: white;
+  }
+  &:active {
+    transform: scale(0.98); /* 클릭 시 살짝 축소 */
+  }
 `;
 
 const ChatDiv = styled.div`
@@ -225,7 +265,6 @@ const MyChatDiv = styled.div`
   position: relative;
   margin: 15px;
   padding: 10px;
-  // width:400px;
   background-color: white;
   border: 1px solid ${(props) => props.$color};
   border-radius: 10px;

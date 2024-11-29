@@ -11,19 +11,15 @@ const { connect, send, subscribe, disconnect } = socket;
 export default function ResultModal({
   isOpenedDialog,
   handleCloseGame,
-  ourPercent = 0, // 기본값 설정
-  enemyPercent = 0, // 기본값 설정
-  ourTeam = [], // 기본값 설정
-  enemyTeam = [], // 기본값 설정
+  ourPercent = 0,
+  enemyPercent = 0,
+  ourTeam = [],
+  enemyTeam = [],
   numOfUsingItemRed,
   numOfUsingItemBlue,
   isGameEndingRef,
+  image, // 퍼즐 이미지 추가
 }) {
-  const bluePercent = getTeam() === "blue" ? ourPercent : enemyPercent;
-  const redPercent = getTeam() === "red" ? ourPercent : enemyPercent;
-
-  const { image } = useGameInfo();
-
   const resultState = useMemo(() => {
     if (ourPercent > enemyPercent) {
       return "win";
@@ -35,38 +31,15 @@ export default function ResultModal({
   }, [ourPercent, enemyPercent]);
 
   const resultText = resultState === "win" ? "WIN!!" : resultState === "lose" ? "LOSE" : "DRAW";
-  const resultTextColor = resultState === "win" ? "#ffc107" : resultState === "lose" ? "#373737" : "#a985ff";
-  const roomId = localStorage.getItem('roomId');
+  const resultTextColor =
+    resultState === "win" ? "#ffc107" : resultState === "lose" ? "#373737" : "#a985ff";
+
+  const roomId = localStorage.getItem("roomId");
 
   const navigateToWaitingPage = () => {
     isGameEndingRef.current = true;
     window.location.replace(`/game/battle/waiting/${roomId}`);
   };
-
-  ourTeam = [
-    {
-      id: 1,
-      name: "이누야샤",
-      avatar: "https://via.placeholder.com/50", // 유저 아바타 이미지
-    },
-    {
-      id: 2,
-      name: "카구라",
-      avatar: "https://via.placeholder.com/50",
-    }
-  ]
-  enemyTeam = [
-    {
-      id: 3,
-      name: "셋쇼마루",
-      avatar: "https://via.placeholder.com/50",
-    },
-    {
-      id: 4,
-      name: "미로쿠",
-      avatar: "https://via.placeholder.com/50",
-    },
-  ]
 
   return (
     <Dialog open={isOpenedDialog}>
@@ -74,7 +47,12 @@ export default function ResultModal({
         {/* 결과 텍스트 */}
         <ResultTextWrapper state={resultState} color={resultTextColor}>
           {resultText.split("").map((char, index) => (
-            <AnimatedLetter key={index} index={index} state={resultState} color={resultTextColor}>
+            <AnimatedLetter
+              key={index}
+              index={index}
+              state={resultState}
+              color={resultTextColor}
+            >
               {char}
             </AnimatedLetter>
           ))}
@@ -83,19 +61,19 @@ export default function ResultModal({
         {/* 팀 정보 */}
         <ResultContainer>
           <TeamWrapper>
-            <TeamName color="#3b82f6">Blue</TeamName>
-            <TeamPercent color="#3b82f6">{bluePercent}%</TeamPercent>
+            <TeamName color="#ef4444">Red</TeamName>
+            <TeamPercent color="#ef4444">{ourPercent}%</TeamPercent>
             <TeamPlayers>
-              {ourTeam.length > 0 ? (
-                ourTeam.map((player) => (
-                  <Player key={player.id}>
-                    <PlayerAvatar src={player.avatar} alt={player.name} />
-                    <PlayerName>{player.name}</PlayerName>
-                  </Player>
-                ))
-              ) : (
-                <NoPlayers>플레이어 정보가 없습니다</NoPlayers>
-              )}
+            {ourTeam.length > 0 ? (
+              ourTeam.map((player) => (
+                <Player key={player.id}>
+                  <PlayerAvatar src={player.avatar} alt={player.name} />
+                  <PlayerName>{player.name}</PlayerName>
+                </Player>
+              ))
+            ) : (
+              <NoPlayers>플레이어 정보가 없습니다</NoPlayers>
+            )}
             </TeamPlayers>
           </TeamWrapper>
 
@@ -110,23 +88,22 @@ export default function ResultModal({
           </CenterContainer>
 
           <TeamWrapper>
-            <TeamName color="#ef4444">Red</TeamName>
-            <TeamPercent color="#ef4444">{redPercent}%</TeamPercent>
+            <TeamName color="#3b82f6">Blue</TeamName>
+            <TeamPercent color="#3b82f6">{enemyPercent}%</TeamPercent>
             <TeamPlayers>
-              {enemyTeam.length > 0 ? (
-                enemyTeam.map((player) => (
-                  <Player key={player.id}>
-                    <PlayerAvatar src={player.avatar} alt={player.name} />
-                    <PlayerName>{player.name}</PlayerName>
-                  </Player>
-                ))
-              ) : (
-                <NoPlayers>플레이어 정보가 없습니다</NoPlayers>
-              )}
+            {enemyTeam.length > 0 ? (
+              enemyTeam.map((player) => (
+                <Player key={player.id}>
+                  <PlayerAvatar src={player.avatar} alt={player.name} />
+                  <PlayerName>{player.name}</PlayerName>
+                </Player>
+              ))
+            ) : (
+              <NoPlayers>플레이어 정보가 없습니다</NoPlayers>
+            )}
             </TeamPlayers>
           </TeamWrapper>
         </ResultContainer>
-
       </DialogWrapper>
     </Dialog>
   );
@@ -143,6 +120,7 @@ const Dialog = styled.div`
   justify-content: center;
   align-items: center;
   backdrop-filter: blur(7px);
+  z-index: 10;
 `;
 
 const DialogWrapper = styled.div`

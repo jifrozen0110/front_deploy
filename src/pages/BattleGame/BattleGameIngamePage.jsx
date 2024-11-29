@@ -7,11 +7,11 @@ import EnemyPuzzle from "@/components/GameIngame/EnemyPuzzle";
 import Loading from "@/components/Loading";
 import Timer from "@/components/GameIngame/Timer";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
-import Chatting2 from "@/components/GameWaiting/Chatting";
-import Chatting from "@/components/Chatting";
+import Chatting from "@/components/GameIngame/Chatting";
 import ResultModal from "@/components/GameIngame/ResultModal";
 import useExitRoom from "@/components/ExitRoom";
 
+import { LogOut, ArrowLeft, Settings, DoorOpen, XCircle } from "lucide-react";
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
@@ -59,7 +59,9 @@ import blackholeAudioPath from "@/assets/audio/blackhole.mp3";
 import frameAudioPath from "@/assets/audio/frame2.mp3";
 
 import './ani.css';
+import { authRequest } from "../../apis/requestBuilder";
 import { colors } from "../../puzzle-core/color";
+
 
 const { connect, send, subscribe, disconnect } = socket;
 // const {
@@ -77,6 +79,7 @@ export default function BattleGameIngamePage() {
   const navigate = useNavigate();
   const { roomId: gameId } = useParams();
   const [gameData, setGameData] = useState(null);
+  const [gameDataDto, setGameDataDto] = useState(null);
   const [isOpenedDialog, setIsOpenedDialog] = useState(false);
 
   const [time, setTime] = useState(0);
@@ -85,8 +88,69 @@ export default function BattleGameIngamePage() {
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
   const [slots, setSlots] = useState(Array(8).fill(0));
+  const [startTime, setStartTime] = useState(null);
+
+  // 게임 결과 데이터를 저장할 상태 변수
+  const [ourTeamData, setOurTeamData] = useState([]);
+  const [enemyTeamData, setEnemyTeamData] = useState([]);
+  const [ourProgressPercent, setOurProgressPercent] = useState(0);
+  const [enemyProgressPercent, setEnemyProgressPercent] = useState(0);
+  const [puzzleImage, setPuzzleImage] = useState("");
+
+
+  // 게임 데이터를 백엔드 서버로 보내기 위한 함수 정의
+  const sendGameDataToBackend = async (data, finishTime) => {
+
+    if (!data.game) {
+      console.error('게임 데이터가 응답에 없습니다.');
+      return;
+    }
+
+    // 총 퍼즐 조각 수 계산
+    const totalPieceCount = data.game.picture.widthPieceCnt * data.game.picture.lengthPieceCnt;
+    // 퍼즐 이미지 URL 설정
+    const puzzleImage = data.game.picture.imageUrl || data.game.picture.encodedString;
+
+    // 팀 정보 포맷팅 함수
+    const formatTeam = (team) => team ? team.map(player => ({
+      playerId: player.playerId,
+      playerImage: player.playerImage,
+      playerName: player.playerName,
+    })) : null;
+
+    // 백엔드로 보낼 데이터 포맷팅
+    const gameDataDto = {
+      gameName: data.game.gameName,
+      gameType: data.game.gameType,
+      redTeam: formatTeam(data.game.redTeam),
+      blueTeam: formatTeam(data.game.blueTeam),
+      players: formatTeam(data.game.players),
+      redProgressPercent: data.redProgressPercent !== undefined ? Math.round(data.redProgressPercent) : null,
+      blueProgressPercent: data.blueProgressPercent !== undefined ? Math.round(data.blueProgressPercent) : null,
+      puzzleImage: puzzleImage,
+      totalPieceCount: totalPieceCount,
+      startTime: data.game.startTime ? new Date(data.game.startTime).toISOString() : null,
+      finishTime: data.game.finishTime ? new Date(data.game.finishTime).toISOString() : null,
+    };
+
+    console.log('전송할 게임 데이터:', gameDataDto);
+
+    // 백엔드 서버로 데이터 전송
+    const userId = getSender(); // 또는 다른 방법으로 userId를 얻으세요.
+
+    await authRequest()
+    .post(`/games/end/${userId}`, gameDataDto)
+    .then(response => {
+      console.log('게임 결과를 백엔드로 전송했습니다.');
+    })
+    .catch(error => {
+      console.error('게임 결과 전송 중 오류 발생', error);
+    });
+  };
+
   const [players, setPlayers] = useState([])
   const isGameEndingRef = useRef(false);
+
 
   const itemFunc = useMemo(() => {    
     return {
@@ -333,15 +397,37 @@ export default function BattleGameIngamePage() {
         subscribe(`/topic/game/room/${gameId}`, (message) => {
           const data = JSON.parse(message.body);
           if(data.message !== 'MOVE'){
+            console.log("##################");
             console.log(data);
           }
 
           // 매번 게임이 끝났는지 체크
           if (data.isFinished === true) {
-            // if (temp === true) {
-            // disconnect();
-            console.log("게임 끝남 !"); // TODO : 게임 끝났을 때 effect
-            console.log(data, gameData);
+
+            const ourTeamKey = `${getTeam()}Team`;
+            const enemyTeamKey = getTeam() === "red" ? "blueTeam" : "redTeam";
+
+            const formatTeamData = (team) => {
+              return team.map(player => ({
+                id: player.playerId,
+                name: player.playerName,
+                avatar: player.playerImage,
+              }));
+            };
+
+            setOurTeamData(formatTeamData(data.game[ourTeamKey] || []));
+            setEnemyTeamData(formatTeamData(data.game[enemyTeamKey] || []));
+
+            setOurProgressPercent(getTeam() === "red" ? data.redProgressPercent : data.blueProgressPercent);
+            setEnemyProgressPercent(getTeam() === "red" ? data.blueProgressPercent : data.redProgressPercent);
+
+            const puzzleImageUrl = data.game.picture.imageUrl || data.game.picture.encodedString;
+            setPuzzleImage(puzzleImageUrl);
+
+            // 백엔드로 게임 데이터 전송
+            sendGameDataToBackend(data, data.game.finishTime);
+            // ----------------------------------------------------------------------
+
             setTimeout(() => {
               setIsOpenedDialog(true);
             }, 1000);
@@ -552,72 +638,57 @@ export default function BattleGameIngamePage() {
 
   return (
     <Wrapper>
-      <LeftSidebar>
-        <OutButton onClick={() => navigate("/game/battle")}>
-          나가기
-        </OutButton>
-        <Chatting2 chatHistory={chatHistory} isIngame={true} isBattle={true} />
-        {/* <Chatting /> */}
-      </LeftSidebar>
-      <Row style={{ padding: "10px 10px 10px 0", width: "80%", boxSizing: "border-box" }}>
+      <Row style={{ padding: "10px", width: "100%" }}>
         <Board id="gameBoard">
-        <PlayPuzzle
-          category="battle"
-          shapes={parsePuzzleShapes(
-            gameData[`${getTeam()}Puzzle`].board,
-            gameData.picture.widthPieceCnt,
-            gameData.picture.lengthPieceCnt,
-          )}
-          board={gameData[`${getTeam()}Puzzle`].board}
-          picture={gameData.picture}
-          bundles={Object.values(gameData[`${getTeam()}Puzzle`].bundles)}
-          itemPieces={gameData[`${getTeam()}Puzzle`].itemPiece}
-          players={players}
-        />
+          <div style={{position: "absolute", top: "0px", left: "0px", width: "250px"}}>
+            <Timer num={time} color={getTeam()} />
+          </div>
+          <div style={{position: "absolute", top: "10px", right: "10px"}}>
+            <OutButton onClick={() => navigate("/game/battle")}>
+              <DoorOpen size="40" style={{margin: "auto"}} />
+            </OutButton>
+          </div>
+          <div style={{position: "absolute", bottom: "0px", left: "0px"}}>
+            <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} style={{width: "200px"}} />
+          </div>
+          <div style={{position: "absolute", bottom: "0px", right: "0px", maxWidth: "50%"}}>
+            <Inventory slots={slots} useItem={useItem} color={getTeam()}></Inventory>
+          </div>
+          <PlayPuzzle
+            category="battle"
+            shapes={parsePuzzleShapes(
+              gameData[`${getTeam()}Puzzle`].board,
+              gameData.picture.widthPieceCnt,
+              gameData.picture.lengthPieceCnt,
+            )}
+            board={gameData[`${getTeam()}Puzzle`].board}
+            picture={gameData.picture}
+            bundles={Object.values(gameData[`${getTeam()}Puzzle`].bundles)}
+            itemPieces={gameData[`${getTeam()}Puzzle`].itemPiece}
+            players={players}
+          />
         </Board>
         <GameInfo>
-          <img
-            src={pictureSrc}
-            alt="퍼즐 그림"
-            style={{ width: "100%" }}
-          />
-          <Row>
-            <ProgressContainer>
-              <ProgressWrapper>
-                <PrograssBar
-                  percent={ourPercent}
-                  teamColor={getTeam() === "red" ? "red" : "blue"}
-                />
-              </ProgressWrapper>
-              <ProgressWrapper>
+          <ImageContainer>
+            <img
+              src={pictureSrc}
+              alt="퍼즐 그림"
+              style={{ maxWidth: "100%", lineHeight: "0", verticalAlign: "top", objectFit: "contain" }}
+            />
+          </ImageContainer>
+          <OtherTeam>
+            <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
+              상대팀 화면
+            </div>
+          </OtherTeam>
+          <ProgressContainer>
+            <ProgressWrapper>
               <PrograssBar percent={enemyPercent} teamColor={getTeam() !== "red"? "red":"blue"} />
-              </ProgressWrapper>
-            </ProgressContainer>
-            <Col>
-              <OtherTeam>
-              <EnemyPuzzle
-                category="battle"
-                shapes={parsePuzzleShapes(
-                  gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].board,
-                  gameData.picture.widthPieceCnt,
-                  gameData.picture.lengthPieceCnt,
-                )}
-                board={gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].board}
-                picture={gameData.picture}
-                bundles={Object.values(gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].bundles)}
-                itemPieces={gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].itemPiece}
-              />
-
-              </OtherTeam>
-              <Timer num={time} />
-              <Inventory slots={slots} useItem={useItem}></Inventory>
-              {/* <MiniMap>
-                <div style={{ width: "100%", textAlign: "center", fontSize: "50px"}}>
-                  미니맵
-                </div>
-              </MiniMap> */}
-            </Col>
-          </Row>
+            </ProgressWrapper>
+            <ProgressWrapper>
+              <PrograssBar percent={ourPercent} teamColor={getTeam() === "red"? "red":"blue"} />
+            </ProgressWrapper>
+          </ProgressContainer>
         </GameInfo>
       </Row>
 
@@ -677,13 +748,15 @@ export default function BattleGameIngamePage() {
             </Dialog>
           </ThemeProvider> */}
 
+      // ResultModal에 데이터 전달
       <ResultModal
         isOpenedDialog={isOpenedDialog}
         handleCloseGame={handleCloseGame}
-        ourPercent={ourPercent}
-        enemyPercent={enemyPercent}
-        ourTeam={gameData[`${getTeam()}Team`].players}
-        enemyTeam={getTeam() === "red" ? gameData.blueTeam.players : gameData.redTeam.players}
+        ourPercent={ourProgressPercent}
+        enemyPercent={enemyProgressPercent}
+        ourTeam={ourTeamData}
+        enemyTeam={enemyTeamData}
+        image={puzzleImage}
         numOfUsingItemRed={numOfUsingItemRed}
         numOfUsingItemBlue={numOfUsingItemBlue}
         isGameEndingRef={isGameEndingRef}
@@ -706,44 +779,28 @@ const Wrapper = styled.div`
   user-select: none; /* 텍스트 선택 금지 */
 `;
 
-const LeftSidebar = styled.div`
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  height: 100%;
-  width: 20%;
-`;
-
-const ProgressContainer = styled.div`
-  display: flex;
-  box-sizing: border-box;
-  gap: 10px;
-`;
+const ImageContainer = styled.div`
+  width: 100%;
+  max-height: 50%;
+  text-align: center;
+  background-color: rgba(0,0,0, 0.4);
+  border-radius: 5px;
+  overflow: hidden;
+`
 
 const Row = styled(Box)`
   display: flex;
   justify-content: space-between;
   box-sizing: border-box;
-  height: 100%;
-  width: 100%;
   gap: 10px;
-`;
-
-const Col = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  gap: 10px;
-  flex-grow: 1;
-  align-items: center;
 `;
 
 const GameInfo = styled(Box)`
+  flex: 1;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   gap: 10px;
-  width: 30%;
   align-items: center;
 `;
 
@@ -751,46 +808,38 @@ const OtherTeam = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  height: 200px;
-  background-color: lightgrey;
-  aspect-ratio: 3 / 4;
+  border-radius: 10px;
+  box-sizing: border-box;
+  border: 6px solid ${getTeam() === "red" ? blue[400] : red[400]};
+  background-color: rgba(255, 255, 255, 0.8);
+  aspect-ratio: 4 / 3;
 `;
 
 const Board = styled.div`
-  width: 70%;
-  height: 100%;
   display: flex;
   box-sizing: border-box;
+  height: 100%;
+  width: 66%;
   border-radius: 10px;
   border: 6px solid ${getTeam() === "red" ? red[400] : blue[400]};
   background-color: rgba(255, 255, 255, 0.8);
   position: relative;
 `;
 
-const ItemContainer = styled.div`
+const ProgressContainer = styled.div`
+  flex: 1;
   display: flex;
-  align-items: center;
-
-  width: 100%;
-  height: 100%;
+  flex-direction: column;
   box-sizing: border-box;
-  border-radius: 10px;
-  border: 4px solid white;
-  background-color: ${getTeam() === "red" ? red[400] : blue[400]};
-`;
-
-const MiniMap = styled.div`
-  display: flex;
-  align-items: center;
+  padding: 5px;
+  gap: 5px;
   width: 100%;
-  height: 100%;
-  border-radius: 10px;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 5px;
 `;
 
 const ProgressWrapper = styled(Box)`
-  display: inline-block;
-  transform: rotate(180deg);
+  height: 100%;
 `;
 
 const OutButton = styled.button`
@@ -799,10 +848,10 @@ const OutButton = styled.button`
   box-sizing: border-box;
   color: white;
   border: none;
-  border-radius: 0 0 10px 0;
-  width: 100%;
-  font-size: 2.4em;
-  padding: 10px;
+  border-radius: 5px;
+  width: 60px;
+  height: 60px;
+  padding: 0;
   cursor: pointer;
   &:hover {
     background-color: darkorange;

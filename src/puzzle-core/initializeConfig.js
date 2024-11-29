@@ -20,13 +20,9 @@ const setConfig = (img, level, picture,paperScope) => {
   const originHeight = picture.length;
   const originWidth = picture.width;
   const imgWidth =
-    originHeight >= originWidth
-      ? Math.round((levelSize[level] * originWidth) / originHeight / 100) * 100
-      : levelSize[level];
+    picture.imgWidth
   const imgHeight =
-    originHeight >= originWidth
-      ? levelSize[level]
-      : Math.round((levelSize[level] * originHeight) / originWidth / 100) * 100;
+    picture.imgHeight
   const tileWidth = 40;
 
   const config = {
