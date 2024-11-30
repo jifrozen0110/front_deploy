@@ -47,8 +47,11 @@ const createPuzzleConfig = () => {
 
   const lockPuzzle = (index, color) => {
     config.tiles[index].locked = true
-    config.tiles[index].strokeColor = colors[color.toUpperCase()]
-    config.tiles[index].shadowColor = colors[color.toUpperCase()]
+    config.tiles[index].children[2].strokeColor = colors[color.toUpperCase()]
+    config.tiles[index].children[2].strokeWidth = 3
+    config.tiles[index].children[2].shadowBlur = 0
+    config.tiles[index].children[2].opacity = 1
+    config.tiles[index].children[2].shadowColor = colors[color.toUpperCase()]
     config.tiles[index].bringToFront()
 
   };
@@ -59,8 +62,10 @@ const createPuzzleConfig = () => {
 
   const unLockPuzzle = (index) => {
     config.tiles[index].locked = false
-    config.tiles[index].strokeColor = config.tiles[index].originStroke ?? colors.DEFAULT_STROKE
-    config.tiles[index].shadowColor = config.tiles[index].originShadow ?? colors.DEFAULT_SHADOW
+    config.tiles[index].children[2].strokeColor = config.tiles[index].originStroke ?? colors.DEFAULT_STROKE
+    config.tiles[index].children[2].strokeWidth = 1
+    config.tiles[index].children[2].opacity = 0
+    config.tiles[index].children[2].shadowColor = config.tiles[index].originShadow ?? colors.DEFAULT_SHADOW
   };
 
   const addPiece = ({ fromIndex, toIndex }, bundles = []) => {

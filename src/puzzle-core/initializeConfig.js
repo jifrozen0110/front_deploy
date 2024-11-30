@@ -88,13 +88,13 @@ const initConfig = ({ config, board }) => {
         config.imgWidth,
         config.imgHeight,
       );
-      const maskSquare = getMaskSquare(
+      const maskCircle = getMaskCircle(
         config.tileWidth,
         config.project,
         config.imgWidth,
         config.imgHeight,
       );
-      
+
       if (mask === undefined) {
         continue;
       }
@@ -120,15 +120,16 @@ const initConfig = ({ config, board }) => {
       border.originStroke = new config.project.Color("#ddd");
 
       const clippedImg = new config.project.Group([mask, img]); // mask와 img를 그룹화
-      // clippedImg.shadowColor = new config.project.Color("black");
-      // clippedImg.originShadow = new config.project.Color("black");
       clippedImg.clipped = true; // mask를 기준으로 img 자르기
-      
+
       // 피스 생성
-      const tile = new config.project.Group([maskSquare, clippedImg, border]);
+      const tile = new config.project.Group([maskCircle, clippedImg, border]);
       tile.clipped = false; // tile 그룹 자체는 클리핑하지 않음
-      // tile.shadowBlur = 1.5;
-      // tile.shadowOffset = new Point(-1, -1);
+      tile.shadowColor = new config.project.Color("black");
+      tile.originStroke = new config.project.Color("black");
+      tile.originShadow = new config.project.Color("black");
+      tile.shadowBlur = 1.5;
+      tile.shadowOffset = new Point(-0.5, -0.5);
       tile.opacity = constant.tileOpacity;
       tile.position = new Point(constant.orgTileLoc, constant.orgTileLoc);
       config.tiles.push(tile);
@@ -160,10 +161,10 @@ const getMaskSquare = (
   const mask = new project.Path();
 
   // 사각형의 네 꼭짓점 계산
-  const topLeftEdge = new Point(-imgWidth / 2 - tileWidth/2, -imgHeight / 2 - tileWidth/2);
-  const topRightEdge = new Point(topLeftEdge.x + tileWidth*2, topLeftEdge.y);
-  const bottomRightEdge = new Point(topRightEdge.x, topRightEdge.y + tileWidth*2);
-  const bottomLeftEdge = new Point(topLeftEdge.x, topLeftEdge.y + tileWidth*2);
+  const topLeftEdge = new Point(-imgWidth / 2 - tileWidth / 2, -imgHeight / 2 - tileWidth / 2);
+  const topRightEdge = new Point(topLeftEdge.x + tileWidth * 2, topLeftEdge.y);
+  const bottomRightEdge = new Point(topRightEdge.x, topRightEdge.y + tileWidth * 2);
+  const bottomLeftEdge = new Point(topLeftEdge.x, topLeftEdge.y + tileWidth * 2);
 
   // 정사각형의 네 꼭짓점을 순서대로 이동하며 경로 생성
   mask.moveTo(topLeftEdge);
@@ -171,6 +172,24 @@ const getMaskSquare = (
   mask.lineTo(bottomRightEdge);
   mask.lineTo(bottomLeftEdge);
   mask.closePath(); // 마지막 선을 첫 번째 점과 연결하여 닫힘
+
+  return mask;
+};
+
+const getMaskCircle = (tileWidth, project, imgWidth, imgHeight) => {
+  // 원형의 중심점 계산
+  const center = new Point(-imgWidth / 2 + tileWidth / 2, -imgHeight / 2 + tileWidth / 2);
+
+  // 원형의 반지름 (타일 너비를 기준으로 설정)
+  const radius = tileWidth;
+
+  // 원형 Path 생성
+  const mask = new project.Path.Circle({
+    center: center,
+    radius: radius,
+    strokeColor: null, // 테두리가 필요하면 설정
+    fillColor: null,   // 필요 시 색상 설정
+  });
 
   return mask;
 };
