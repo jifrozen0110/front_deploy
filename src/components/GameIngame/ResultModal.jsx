@@ -18,13 +18,18 @@ export default function ResultModal({
   numOfUsingItemRed,
   numOfUsingItemBlue,
   isGameEndingRef,
+  image,
 }) {
   const bluePercent = getTeam() === "blue" ? ourPercent : enemyPercent;
   const redPercent = getTeam() === "red" ? ourPercent : enemyPercent;
   const blueTeam = getTeam() === "blue" ? ourTeam : enemyTeam;
   const redTeam = getTeam() === "red" ? ourTeam : enemyTeam;
 
-  const { image } = useGameInfo();
+  // **Round the percentages to one decimal place**
+  const bluePercentRounded = bluePercent.toFixed(1);
+  const redPercentRounded = redPercent.toFixed(1);
+
+  // const { image } = useGameInfo();
 
   const resultState = useMemo(() => {
     if (ourPercent > enemyPercent) {
@@ -62,7 +67,7 @@ export default function ResultModal({
         <ResultContainer>
           <TeamWrapper>
             <TeamName color="#3b82f6">Blue</TeamName>
-            <TeamPercent color="#3b82f6">{bluePercent}%</TeamPercent>
+            <TeamPercent color="#3b82f6">{bluePercentRounded}%</TeamPercent>
             <TeamPlayers>
               {blueTeam.length > 0 ? (
                 blueTeam.map((player) => (
@@ -89,7 +94,7 @@ export default function ResultModal({
 
           <TeamWrapper>
             <TeamName color="#ef4444">Red</TeamName>
-            <TeamPercent color="#ef4444">{redPercent}%</TeamPercent>
+            <TeamPercent color="#ef4444">{redPercentRounded}%</TeamPercent>
             <TeamPlayers>
               {redTeam.length > 0 ? (
                 redTeam.map((player) => (
