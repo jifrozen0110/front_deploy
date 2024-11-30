@@ -32,7 +32,7 @@ export default function Header({ parentUpdate }) {
   });
 
   useEffect(() => {
-    const token = getCookie("jwt");
+    const token = localStorage.getItem("jwt");
     if (!token)
       authRequest()
         .get("/api/user/refresh")
