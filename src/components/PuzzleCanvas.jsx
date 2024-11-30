@@ -3,7 +3,7 @@ import { styled } from "styled-components";
 import { playerConfig } from "../puzzle-core";
 import { Color } from "paper/dist/paper-core";
 import { socket } from "@/socket-utils/socket2";
-import pointerPath from "@/assets/icons/gameRoom/pointer.png";
+import pointerPath from "@/assets/icons/gameRoom/pointer2.png";
 import { getTeam } from "../socket-utils/storage";
 import { colors } from "../puzzle-core/color";
 
@@ -87,7 +87,9 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
         style={{ position: "relative", display: "flex", justifyContent: "center" }}
       >
         {players?.filter(p => p.playerId != userId)
-        .map(p => <Pointer path={pointerPath} id={`user${p.playerId}`} color={p.color} key={`user${p.playerId}`}/>)}
+        .map(p => 
+        <Pointer path={pointerPath} id={`user${p.playerId}`} color={p.color} key={`user${p.playerId}`}></Pointer>
+        )}
         <Canvas ref={canvasRef} id="canvas" onMouseMove={mouseMove}/>
       </div>
     </>

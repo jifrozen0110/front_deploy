@@ -12,6 +12,7 @@ import {
 import { setMoveEvent } from "./setMoveEvent";
 import { uniteTiles } from "./uniteTiles";
 import { cleanBorderStyle, switchDirection, updateGroupByBundles } from "./utils";
+import { colors } from "./color";
 export const groupPuzzlePieces = ({ config, bundles }) => {
   updateGroupByBundles({ config, bundles });
   return config;
