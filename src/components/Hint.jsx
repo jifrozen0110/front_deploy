@@ -1,9 +1,9 @@
 import { styled } from "styled-components";
 import hintEffect from "@/assets/effects/hint.gif";
 import { useCallback, useMemo } from "react";
-import { configStore } from "../puzzle-core";
+import { playerConfig } from "../puzzle-core";
 
-const { getConfig } = configStore;
+const { getConfig } = playerConfig;
 
 // TODO: 다른 사람 화면에는 힌트 위치가 다른 이슈가 있음..
 export default function Hint({ hintList, setHintList }) {
