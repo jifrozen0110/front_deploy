@@ -4,22 +4,31 @@ import { enemyConfig } from "../../puzzle-core";
 
 const { initializePuzzle, groupPuzzlePieces, getConfig } = enemyConfig;
 
-export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, picture, bundles, itemPieces }) {
-  // console.log("img:",puzzleImg);
-  // console.log("level:",level);
-  // console.log("shapes:",shapes);
-  // console.log("board:",board);
-  // console.log("picture:",picture);
+export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, picture, bundles, itemPieces, enemyCanvasScale }) {
+  console.log("img:",puzzleImg);
+  console.log("level:",level);
+  console.log("shapes:",shapes);
+  console.log("board:",board);
+  console.log("picture:",picture);
   const canvasRef = useRef(null);
-  const scale = 0.5;
   const canvasId = "enemyCanvas"
+
+  const scaledBoard = board.map(row => 
+    row.map(piece => ({
+      ...piece, // 기존 데이터 유지
+      position_x: piece.position_x * enemyCanvasScale, // x값에 scale 곱하기
+      position_y: piece.position_y * enemyCanvasScale, // y값에 scale 곱하기
+    }))
+  );
+  console.log("scaledBoard:",scaledBoard)
+  
   useEffect(() => {
     if (canvasRef.current) {  
       const canvas = canvasRef.current;
-      canvas.width = 1000*scale;
-      canvas.height = 750*scale;
+      canvas.width = 1000*enemyCanvasScale;
+      canvas.height = 750*enemyCanvasScale;
       // 퍼즐 초기화
-      initializePuzzle({ canvasRef, puzzleImg, level, shapes, board, picture, canvasId });
+      initializePuzzle({  puzzleImg, level, shapes, board : scaledBoard, picture, canvasId, enemyCanvasScale });
 
       // 퍼즐 조각 그룹화
       const config = getConfig();
@@ -36,11 +45,11 @@ export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, pic
         });
       }
     }
-  }, [canvasRef,scale]);
+  }, [canvasRef,enemyCanvasScale]);
 
   return (
-    <CanvasWrapper id="enemyCanvasContainer" scale={scale}>
-      <EnemyCanvas ref={canvasRef} id={canvasId} scale={scale} />
+    <CanvasWrapper id="enemyCanvasContainer" >
+      <EnemyCanvas ref={canvasRef} id={canvasId} />
     </CanvasWrapper>
   );
 }

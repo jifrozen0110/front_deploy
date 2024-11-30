@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import EnemyPuzzleCanvas from "./EnemyPuzzleCanvas";
 
-const EnemyPuzzle = ({ category, shapes, board, picture, bundles, itemPieces }) => {
+const EnemyPuzzle = ({ category, shapes, board, picture, bundles, itemPieces,enemyCanvasScale }) => {
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef(null);
   const [puzzleInfo, setPuzzleInfo] = useState({
@@ -46,6 +46,7 @@ const EnemyPuzzle = ({ category, shapes, board, picture, bundles, itemPieces }) 
             picture={picture}
             bundles={bundles}
             itemPieces={itemPieces}
+            enemyCanvasScale = {enemyCanvasScale}
           />
         )}
       </div>

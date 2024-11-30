@@ -96,6 +96,7 @@ export default function BattleGameIngamePage() {
   const [ourProgressPercent, setOurProgressPercent] = useState(0);
   const [enemyProgressPercent, setEnemyProgressPercent] = useState(0);
   const [puzzleImage, setPuzzleImage] = useState("");
+  const [enemyCanvasScale, setEnemyCanvasScale] = useState(0.6);
 
 
   // 게임 데이터를 백엔드 서버로 보내기 위한 함수 정의
@@ -504,10 +505,12 @@ export default function BattleGameIngamePage() {
               return;
             }
           }else{
-            const { targets } = data;
-            const targetList = JSON.parse(targets);
-            targetList.forEach(({ x, y, index }) => enemyConfig.movePuzzle(x, y, index));
-            return;
+            if (data.message && data.message === "MOVE"){
+              const { targets } = data;
+              const targetList = JSON.parse(targets);
+              targetList.forEach(({ x, y, index }) => enemyConfig.movePuzzle(x*enemyCanvasScale, y*enemyCanvasScale, index));
+              return;
+            }
           }
         });
 
@@ -604,7 +607,7 @@ export default function BattleGameIngamePage() {
     //   });
     //   return;
     // }
-
+    setEnemyCanvasScale(0.6) // 상대편 화면 scale 설정
     connectSocket();
 
     // eslint-disable-next-line
@@ -688,6 +691,7 @@ export default function BattleGameIngamePage() {
                   picture={gameData.picture}
                   bundles={Object.values(gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].bundles)}
                   itemPieces={gameData[`${getTeam() === "red" ? "blue" : "red"}Puzzle`].itemPiece}
+                  enemyCanvasScale = {enemyCanvasScale}
                 />
           </OtherTeam>
           <ProgressContainer>

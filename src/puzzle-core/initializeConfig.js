@@ -2,12 +2,12 @@ import Paper from "paper";
 import { Size, Point } from "paper/dist/paper-core";
 import { getRandomShapes } from "./getRandomShapes";
 
-export const initializeConfig = ({ img, level, shapes, board, picture, canvasId="canvas" }) => {
+export const initializeConfig = ({ img, level, shapes, board, picture, canvasId,enemyCanvasScale }) => {
   const paperScope = new Paper.PaperScope(); // 새로운 Paper 프로젝트 생성
   const canvasElement = document.getElementById(canvasId); // canvas 요소 가져오기
   paperScope.setup(canvasElement); //프로젝트 초기화
-
-  const config1 = setConfig(img, level, picture, paperScope);
+  const isEnemyCanvas = canvasId !== "canvas"
+  const config1 = setConfig(img, level, picture, paperScope,isEnemyCanvas,enemyCanvasScale);
   const config2 = createTiles({ config: config1, shapes });
   const config3 = initConfig({ config: config2, board });
   return config3;
@@ -16,14 +16,14 @@ export const initializeConfig = ({ img, level, shapes, board, picture, canvasId=
 // level 임의로 3단계로
 const levelSize = { 1: 400, 2: 500, 3: 600 };
 
-const setConfig = (img, level, picture,paperScope) => {
+const setConfig = (img, level, picture,paperScope,isEnemyCanvas,enemyCanvasScale) => {
   const originHeight = picture.length;
   const originWidth = picture.width;
-  const imgWidth =
-    picture.imgWidth
-  const imgHeight =
-    picture.imgHeight
-  const tileWidth = 40;
+  const imgWidth = isEnemyCanvas ? 
+    picture.imgWidth*enemyCanvasScale: picture.imgWidth
+  const imgHeight = isEnemyCanvas ? 
+    picture.imgHeight*enemyCanvasScale: picture.imgHeight
+  const tileWidth = isEnemyCanvas? 40*enemyCanvasScale : 40;
 
   const config = {
     originHeight: originHeight, // 실제 사진의 높이
