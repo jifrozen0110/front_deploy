@@ -89,12 +89,6 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
         {players?.filter(p => p.playerId != userId)
         .map(p => 
         <Pointer path={pointerPath} id={`user${p.playerId}`} color={p.color} key={`user${p.playerId}`}></Pointer>
-        // <img src={pointerPath} id={`user${p.playerId}`} style={{
-        //   width:25,
-        //   height:25,
-        //   transition: "left 0.1s ease, top 0.1s ease",
-        //   position:"absolute"
-        // }}/>
         )}
         <Canvas ref={canvasRef} id="canvas" onMouseMove={mouseMove}/>
       </div>
