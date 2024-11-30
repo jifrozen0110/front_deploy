@@ -3,7 +3,7 @@ import { styled } from "styled-components";
 import Paper from "paper";
 import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
 import { createTiles } from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/CreatePuzzle";
-import { configStore } from "../../../puzzle-core";
+import { playerConfig } from "../../../puzzle-core";
 
 // level 임의로 3단계로
 const levelSize = { 1: 400, 2: 500, 3: 600 };
@@ -53,7 +53,7 @@ const setConfig = (img, level, picture) => {
   return config;
 };
 
-const { initializePuzzle2 } = configStore;
+const { initializePuzzle2 } = playerConfig;
 
 export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture }) {
   const canvasRef = useRef(null);
