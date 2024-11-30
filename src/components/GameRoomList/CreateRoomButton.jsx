@@ -427,6 +427,7 @@ const CreateButton = styled(Button)`
   color: white;
   font-size: 25px;
   padding: 10px 20px;
+  border: none;
   &:hover {
     background-color: darkorange;
     svg {
