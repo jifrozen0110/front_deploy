@@ -64,16 +64,16 @@ import { colors } from "../../puzzle-core/color";
 
 
 const { connect, send, subscribe, disconnect } = socket;
-// const {
-//   getConfig,
-//   lockPuzzle,
-//   movePuzzle,
-//   unLockPuzzle,
-//   addPiece,
-//   usingItemFire,
-//   usingItemTyphoon,
-//   usingItemFrame,
-// } = playerConfig;
+const {
+  getConfig,
+  lockPuzzle,
+  movePuzzle,
+  unLockPuzzle,
+  addPiece,
+  usingItemFire,
+  usingItemTyphoon,
+  usingItemFrame,
+} = playerConfig;
 
 export default function BattleGameIngamePage() {
   const navigate = useNavigate();
@@ -481,13 +481,15 @@ export default function BattleGameIngamePage() {
 
           // 우리팀 event
           if (data.message && data.team === getTeam().toUpperCase()) {
+            console.log("화긴11!!!!!!!!!!",data.senderId)
+            console.log("화긴22!!!!!!!!!!",getSender())
             if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
               const { targets } = data;
               const targetList = JSON.parse(targets);
               targetList.forEach(({ x, y, index }) => lockPuzzle(index, data.team));
               return;
             }
-
+            
             if (data.message && data.message === "MOVE" && data.senderId !== getSender()) {
               const { targets } = data;
               const targetList = JSON.parse(targets);
