@@ -95,9 +95,14 @@ export default function BattleGameIngamePage() {
   const [enemyTeamData, setEnemyTeamData] = useState([]);
   const [ourProgressPercent, setOurProgressPercent] = useState(0);
   const [enemyProgressPercent, setEnemyProgressPercent] = useState(0);
+  const [ourTeamKey, setOurTeamKey] = useState("");
+  const [enemyTeamKey, setEnemyTeamKey] = useState("");
   const [puzzleImage, setPuzzleImage] = useState("");
   const [enemyCanvasScale, setEnemyCanvasScale] = useState(0.6);
 
+  // 진행도 상태 변수 변경
+  const [redProgressPercent, setRedProgressPercent] = useState(0);
+  const [blueProgressPercent, setBlueProgressPercent] = useState(0);
 
   // 게임 데이터를 백엔드 서버로 보내기 위한 함수 정의
   const sendGameDataToBackend = async (data, finishTime) => {
@@ -416,11 +421,19 @@ export default function BattleGameIngamePage() {
               }));
             };
 
+            setOurTeamKey(ourTeamKey)
+            setEnemyTeamKey(enemyTeamKey)
+
             setOurTeamData(formatTeamData(data.game[ourTeamKey] || []));
             setEnemyTeamData(formatTeamData(data.game[enemyTeamKey] || []));
 
             setOurProgressPercent(getTeam() === "red" ? data.redProgressPercent : data.blueProgressPercent);
             setEnemyProgressPercent(getTeam() === "red" ? data.blueProgressPercent : data.redProgressPercent);
+            
+            // 게임 종료 시 진행도 설정
+            setRedProgressPercent(data.redProgressPercent);
+            setBlueProgressPercent(data.blueProgressPercent);
+
 
             const puzzleImageUrl = data.game.picture.imageUrl || data.game.picture.encodedString;
             setPuzzleImage(puzzleImageUrl);
@@ -678,7 +691,7 @@ export default function BattleGameIngamePage() {
             <img
               src={pictureSrc}
               alt="퍼즐 그림"
-              style={{ maxWidth: "100%", lineHeight: "0", verticalAlign: "top", objectFit: "contain" }}
+              style={{ maxWidth: "100%", maxHeight: "100%", lineHeight: "0", verticalAlign: "top", objectFit: "contain" }}
             />
           </ImageContainer>
           <OtherTeam>
@@ -756,18 +769,18 @@ export default function BattleGameIngamePage() {
         onClose={handleSnackClose}
         message={snackMessage}
       />
-
       {/* <ThemeProvider theme={theme}>
             <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
               <DialogTitle>게임 결과</DialogTitle>
             </Dialog>
           </ThemeProvider> */}
-
       <ResultModal
         isOpenedDialog={isOpenedDialog}
         handleCloseGame={handleCloseGame}
         ourPercent={ourProgressPercent}
         enemyPercent={enemyProgressPercent}
+        ourTeamKey={ourTeamKey}
+        enemyTeamKey={enemyTeamKey}
         ourTeam={ourTeamData}
         enemyTeam={enemyTeamData}
         image={puzzleImage}

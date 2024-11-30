@@ -162,10 +162,6 @@ export default function ProfilePage() {
               <SubValue>{battleWinRate.toFixed(1)}%</SubValue>
               <SubDetail>{totalWins}승 / {totalDraws}무 / {totalLosses}패 / {totalGames}게임</SubDetail>
             </SubSection>
-            <SubSection>
-              <Subtitle>랭킹</Subtitle>
-              <SubValue>#127</SubValue> {/* 임의의 값 */}
-            </SubSection>
           </Battle>
         </InfoWraper>
 
