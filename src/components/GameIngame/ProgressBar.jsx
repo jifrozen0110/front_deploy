@@ -37,13 +37,13 @@ export default function PrograssBar({ percent, teamColor }) {
       <PercentText style={{ color: `${barColor}` }}>{displayedPercent}%</PercentText>
       <BorderLinearProgress
         variant="determinate"
-        value={percent}
+        value={displayedPercent}
         sx={{
           backgroundColor: "white",
           "& span.MuiLinearProgress-bar": {
-            transform: `translateX(-${100 - percent}%) !important`,
+            transform: `translateX(-${100 - displayedPercent}%) !important`,
             backgroundColor: barColor,
-            borderRadius: "8px",
+            borderRadius: "5px",
           },
           border: `2px solid ${barColor}`,
         }}
