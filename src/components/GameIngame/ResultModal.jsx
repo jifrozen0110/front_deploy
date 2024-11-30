@@ -11,15 +11,21 @@ const { connect, send, subscribe, disconnect } = socket;
 export default function ResultModal({
   isOpenedDialog,
   handleCloseGame,
-  ourPercent = 0,
-  enemyPercent = 0,
-  ourTeam = [],
-  enemyTeam = [],
+  ourPercent = 0, // 기본값 설정
+  enemyPercent = 0, // 기본값 설정
+  ourTeam = [], // 기본값 설정
+  enemyTeam = [], // 기본값 설정
   numOfUsingItemRed,
   numOfUsingItemBlue,
   isGameEndingRef,
-  image, // 퍼즐 이미지 추가
 }) {
+  const bluePercent = getTeam() === "blue" ? ourPercent : enemyPercent;
+  const redPercent = getTeam() === "red" ? ourPercent : enemyPercent;
+  const blueTeam = getTeam() === "blue" ? ourTeam : enemyTeam;
+  const redTeam = getTeam() === "red" ? ourTeam : enemyTeam;
+
+  const { image } = useGameInfo();
+
   const resultState = useMemo(() => {
     if (ourPercent > enemyPercent) {
       return "win";
@@ -33,7 +39,6 @@ export default function ResultModal({
   const resultText = resultState === "win" ? "WIN!!" : resultState === "lose" ? "LOSE" : "DRAW";
   const resultTextColor =
     resultState === "win" ? "#ffc107" : resultState === "lose" ? "#373737" : "#a985ff";
-
   const roomId = localStorage.getItem("roomId");
 
   const navigateToWaitingPage = () => {
@@ -47,12 +52,7 @@ export default function ResultModal({
         {/* 결과 텍스트 */}
         <ResultTextWrapper state={resultState} color={resultTextColor}>
           {resultText.split("").map((char, index) => (
-            <AnimatedLetter
-              key={index}
-              index={index}
-              state={resultState}
-              color={resultTextColor}
-            >
+            <AnimatedLetter key={index} index={index} state={resultState} color={resultTextColor}>
               {char}
             </AnimatedLetter>
           ))}
@@ -61,19 +61,19 @@ export default function ResultModal({
         {/* 팀 정보 */}
         <ResultContainer>
           <TeamWrapper>
-            <TeamName color="#ef4444">Red</TeamName>
-            <TeamPercent color="#ef4444">{ourPercent}%</TeamPercent>
+            <TeamName color="#3b82f6">Blue</TeamName>
+            <TeamPercent color="#3b82f6">{bluePercent}%</TeamPercent>
             <TeamPlayers>
-            {ourTeam.length > 0 ? (
-              ourTeam.map((player) => (
-                <Player key={player.id}>
-                  <PlayerAvatar src={player.avatar} alt={player.name} />
-                  <PlayerName>{player.name}</PlayerName>
-                </Player>
-              ))
-            ) : (
-              <NoPlayers>플레이어 정보가 없습니다</NoPlayers>
-            )}
+              {blueTeam.length > 0 ? (
+                blueTeam.map((player) => (
+                  <Player key={player.id}>
+                    <PlayerAvatar src={player.avatar} alt={player.name} />
+                    <PlayerName>{player.name}</PlayerName>
+                  </Player>
+                ))
+              ) : (
+                <NoPlayers>플레이어 정보가 없습니다</NoPlayers>
+              )}
             </TeamPlayers>
           </TeamWrapper>
 
@@ -88,19 +88,19 @@ export default function ResultModal({
           </CenterContainer>
 
           <TeamWrapper>
-            <TeamName color="#3b82f6">Blue</TeamName>
-            <TeamPercent color="#3b82f6">{enemyPercent}%</TeamPercent>
+            <TeamName color="#ef4444">Red</TeamName>
+            <TeamPercent color="#ef4444">{redPercent}%</TeamPercent>
             <TeamPlayers>
-            {enemyTeam.length > 0 ? (
-              enemyTeam.map((player) => (
-                <Player key={player.id}>
-                  <PlayerAvatar src={player.avatar} alt={player.name} />
-                  <PlayerName>{player.name}</PlayerName>
-                </Player>
-              ))
-            ) : (
-              <NoPlayers>플레이어 정보가 없습니다</NoPlayers>
-            )}
+              {redTeam.length > 0 ? (
+                redTeam.map((player) => (
+                  <Player key={player.id}>
+                    <PlayerAvatar src={player.avatar} alt={player.name} />
+                    <PlayerName>{player.name}</PlayerName>
+                  </Player>
+                ))
+              ) : (
+                <NoPlayers>플레이어 정보가 없습니다</NoPlayers>
+              )}
             </TeamPlayers>
           </TeamWrapper>
         </ResultContainer>
@@ -120,7 +120,6 @@ const Dialog = styled.div`
   justify-content: center;
   align-items: center;
   backdrop-filter: blur(7px);
-  z-index: 10;
 `;
 
 const DialogWrapper = styled.div`
@@ -164,22 +163,28 @@ const AnimatedLetter = styled.span`
     props.state === "win"
       ? "winEffect 1.5s infinite"
       : props.state === "lose"
-      ? "loseEffect 5s infinite"
-      : "drawEffect 1.5s infinite"};
-  animation-delay: ${(props) => props.state === "lose"? 0 : props.index * 0.1}s;
+        ? "loseEffect 5s infinite"
+        : "drawEffect 1.5s infinite"};
+  animation-delay: ${(props) => (props.state === "lose" ? 0 : props.index * 0.1)}s;
 
   @keyframes winEffect {
     0% {
       transform: translateY(0);
-      text-shadow: 0 0 20px ${(props) => props.color}, 0 0 40px ${(props) => props.color};
+      text-shadow:
+        0 0 20px ${(props) => props.color},
+        0 0 40px ${(props) => props.color};
     }
     50% {
       transform: translateY(-15px);
-      text-shadow: 0 0 30px white, 0 0 60px ${(props) => props.color};
+      text-shadow:
+        0 0 30px white,
+        0 0 60px ${(props) => props.color};
     }
     100% {
       transform: translateY(0);
-      text-shadow: 0 0 20px ${(props) => props.color}, 0 0 40px ${(props) => props.color};
+      text-shadow:
+        0 0 20px ${(props) => props.color},
+        0 0 40px ${(props) => props.color};
     }
   }
 
@@ -202,8 +207,6 @@ const AnimatedLetter = styled.span`
     }
   }
 
-
-
   @keyframes drawEffect {
     0% {
       transform: rotate(0);
@@ -223,9 +226,7 @@ const AnimatedLetter = styled.span`
   }
 `;
 
-const GameImageWrapper = styled.div`
-
-`;
+const GameImageWrapper = styled.div``;
 
 const GameImage = styled.img`
   max-width: 50vw;
@@ -260,7 +261,8 @@ const TeamPercent = styled.div`
   margin-top: -30px;
   font-size: 70px;
   font-weight: bold;
-  color: white;
+  color: ${(props) => props.color};
+  -webkit-text-stroke: 4px white;
 `;
 
 const TeamPlayers = styled.div`
