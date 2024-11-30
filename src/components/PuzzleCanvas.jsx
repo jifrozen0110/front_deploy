@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 import { styled } from "styled-components";
-import { configStore } from "../puzzle-core";
+import { playerConfig } from "../puzzle-core";
 import { Color } from "paper/dist/paper-core";
 import { socket } from "@/socket-utils/socket2";
 import pointerPath from "@/assets/icons/gameRoom/pointer.png";
 import { getTeam } from "../socket-utils/storage";
 import { colors } from "../puzzle-core/color";
 
-const { initializePuzzle, groupPuzzlePieces, getConfig } = configStore;
+const { initializePuzzle, groupPuzzlePieces, getConfig } = playerConfig;
 const { connect, send, subscribe } = socket;
 
 const myPointer = {x : 0, y : 0}
@@ -29,16 +29,22 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
 
   useEffect(() => {
     if (canvasRef.current) {
-      initializePuzzle({ canvasRef, puzzleImg, level, shapes, board, picture });
+      const canvas = canvasRef.current;
+      canvas.width = 1000;
+      canvas.height = 750;
+      initializePuzzle({ puzzleImg, level, shapes, board, picture });
       const config = getConfig()
       groupPuzzlePieces({ config, bundles })
       if (itemPieces) {
         Object.entries(itemPieces).forEach(([idx, bool]) => {
           if (!bool) {
-            config.tiles[idx].strokeColor = colors.PURPLE
-            config.tiles[idx].shadowColor = colors.PURPLE
-            config.tiles[idx].originStroke = colors.PURPLE
-            config.tiles[idx].originShadow = colors.PURPLE
+            config.tiles[idx].children[0].strokeColor = colors.YELLOW
+            config.tiles[idx].children[0].shadowColor = colors.YELLOW
+            config.tiles[idx].children[0].strokeWidth = 5
+            config.tiles[idx].children[0].shadowBlur = 5
+            config.tiles[idx].children[0].opacity = 0.5
+            config.tiles[idx].children[0].originStroke = colors.YELLOW
+            config.tiles[idx].children[0].originShadow = colors.YELLOW
           }
         });
       }
@@ -99,10 +105,6 @@ const Pointer = styled.div`
 `
 
 const Canvas = styled.canvas`
-  width: 1000px;
-  height: 750px;
-  // width: 2580px;
-  // height: 1440px;
   border: 1px solid #ccc;
   border-radius: 10px;
 `;

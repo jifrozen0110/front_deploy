@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import { Plus } from "lucide-react";
@@ -8,51 +8,55 @@ import {
   Box,
   Grid,
   Typography,
-  TextField,
   FormControl,
   FormLabel,
-  FormControlLabel,
   RadioGroup,
   Radio,
   Alert,
+  TextField,
+  FormControlLabel,
+  ToggleButtonGroup,
+  ToggleButton,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import { authRequest } from "../../apis/requestBuilder";
 
-const DEFAULT_IMAGE_URL =
-  "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp";
+const predefinedImages = [
+  {
+    name: "짱구",
+    url: "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+  },
+  {
+    name: "치이카와",
+    url: "https://ynoblesse.com/wp-content/uploads/2023/07/358520758_1425769678257003_8801872512201663407_n.jpg",
+  },
+  {
+    name: "배틀그라운드",
+    url: "https://i.namu.wiki/i/zLs_c5RLdQZF3lf3QN-rrVFa-8C0QcMRsEk0UhoAwOEEW56lvrUh51E04eQu0Uuvmsgx-Wu-6F_eAIzAxk0hXw.webp",
+  },
+];
+
+const DEFAULT_IMAGE_URL = predefinedImages[0].url; // 기본 이미지 설정
 
 export default function CreateRoomButton({ category }) {
   const navigate = useNavigate();
   const [roomName, setRoomName] = useState("퍼즐 한 판 !!");
-  const [gameMode, setGameMode] = useState("battle"); // Default value
-  const [puzzleImage, setPuzzleImage] = useState(DEFAULT_IMAGE_URL); // Default image
+  const [puzzleImage, setPuzzleImage] = useState(DEFAULT_IMAGE_URL);
+  const [customImageUrl, setCustomImageUrl] = useState(""); // 사용자 정의 이미지 URL
+  const [validatedImageUrl, setValidatedImageUrl] = useState(DEFAULT_IMAGE_URL); // 유효성 검사된 이미지 URL
 
-  const [puzzlePiece, setPuzzlePiece] = useState(100); // Default puzzle pieces
-  const [maxPlayers, setMaxPlayers] = useState(4); // Default max players
+  const [maxPlayers, setMaxPlayers] = useState(4);
   const [isOpenedModal, setIsOpenedModal] = useState(false);
 
-  // width과 length 상태는 더 이상 사용되지 않으므로 제거
-  // const [width, setWidth] = useState(0);
-  // const [length, setLength] = useState(0);
-
-  const [isImageLoading, setIsImageLoading] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertSeverity, setAlertSeverity] = useState("info"); // 'success', 'error', 'warning', 'info'
+  const [alertMessage, setAlertMessage] = useState(
+    "이미지 URL을 입력하고 퍼즐 생성 버튼을 눌러주세요.",
+  );
+  const [alertSeverity, setAlertSeverity] = useState("info");
 
   const playerId = localStorage.getItem("userId");
   const playerImage = localStorage.getItem("image");
   const playerName = localStorage.getItem("userName");
-
-  const handleGameMode = (e) => {
-    setGameMode(e.target.value);
-  };
-
-  const handlePuzzlePiece = (e) => {
-    setPuzzlePiece(e.target.value);
-  };
 
   const handleRoomSize = (e) => {
     const count = Number(e.target.value);
@@ -61,80 +65,74 @@ export default function CreateRoomButton({ category }) {
     }
   };
 
-  const handlePuzzleImageChange = (e) => {
-    const inputValue = e.target.value.trim();
+  const handleCustomImageUrlChange = (e) => {
+    setCustomImageUrl(e.target.value.trim());
+  };
 
-    if (inputValue === "짱구.jpg") {
-      setPuzzleImage(DEFAULT_IMAGE_URL);
-      setAlertMessage("짱구.jpg는 기본 이미지로 대체되었습니다.");
-      setAlertSeverity("warning");
-    } else {
-      setPuzzleImage(inputValue);
-      setAlertMessage("");
-      setAlertSeverity("info");
+  const handlePredefinedImageSelect = (event, newImageUrl) => {
+    if (newImageUrl) {
+      setPuzzleImage(newImageUrl);
+      setCustomImageUrl("");
+      setValidatedImageUrl(newImageUrl);
+      setAlertMessage("미리 정의된 이미지를 선택했습니다.");
+      setAlertSeverity("success");
     }
   };
 
-  // 이미지 크기 요청
-  useEffect(() => {
-    if (!puzzleImage) return;
+  // 이미지 URL 유효성 검사 함수
+  const validateImageUrl = async () => {
+    let imageUrl = customImageUrl || puzzleImage;
 
-    const fetchImageDimensions = async () => {
-      setIsImageLoading(true);
-      setImageError(false);
-      setAlertMessage("");
-      try {
-        const response = await authRequest().post("/api/rooms/image/dimensions", null, {
-          params: { imageUrl: puzzleImage },
-        });
+    if (!imageUrl) {
+      setAlertMessage("이미지 URL을 입력하거나 이미지를 선택하세요.");
+      setAlertSeverity("warning");
+      return;
+    }
 
-        const isValid = response.data;
+    try {
+      const response = await authRequest().post("/api/rooms/image/dimensions", null, {
+        params: { imageUrl },
+      });
 
-        if (isValid) {
-          setAlertMessage("이미지 URL이 유효합니다.");
-          setAlertSeverity("success");
-        } else {
-          setAlertMessage("이미지 URL이 유효하지 않아 기본 이미지가 사용되었습니다.");
+      const isValid = response.data;
+
+      if (isValid) {
+        setValidatedImageUrl(imageUrl);
+        setAlertMessage("이미지 URL이 유효합니다.");
+        setAlertSeverity("success");
+      } else {
+        setAlertMessage("이미지 URL이 유효하지 않아 기본 이미지가 사용되었습니다.");
+        setAlertSeverity("warning");
+        setValidatedImageUrl(DEFAULT_IMAGE_URL);
+      }
+    } catch (error) {
+      console.error("이미지 유효성 검사 실패:", error);
+      if (error.response) {
+        const { error: errorCode, message } = error.response.data;
+
+        if (errorCode === "InvalidImageUrl") {
+          setAlertMessage("이미지 URL이 유효하지 않습니다. 기본 이미지로 대체됩니다.");
           setAlertSeverity("warning");
-          setPuzzleImage(DEFAULT_IMAGE_URL);
-        }
-      } catch (error) {
-        console.error("이미지 크기 가져오기 실패:", error);
-        if (error.response) {
-          const { error: errorCode, message } = error.response.data;
-
-          if (errorCode === "InvalidImageUrl") {
-            setAlertMessage("이미지 URL이 유효하지 않습니다. 기본 이미지로 대체됩니다.");
-            setAlertSeverity("warning");
-            setPuzzleImage(DEFAULT_IMAGE_URL);
-          } else {
-            setAlertMessage(message || "이미지 처리 중 오류가 발생했습니다.");
-            setAlertSeverity("error");
-          }
+          setValidatedImageUrl(DEFAULT_IMAGE_URL);
         } else {
-          setAlertMessage("이미지 처리 중 네트워크 오류가 발생했습니다.");
+          setAlertMessage(message || "이미지 처리 중 오류가 발생했습니다.");
           setAlertSeverity("error");
         }
-        setImageError(true);
-      } finally {
-        setIsImageLoading(false);
+      } else {
+        setAlertMessage("이미지 처리 중 네트워크 오류가 발생했습니다.");
+        setAlertSeverity("error");
       }
-    };
-
-    fetchImageDimensions();
-  }, [puzzleImage]);
+    }
+  };
 
   const handleClose = () => {
-    setGameMode("battle");
-    setPuzzlePiece(100);
     setRoomName("퍼즐 한 판 !!");
     setMaxPlayers(4);
     setPuzzleImage(DEFAULT_IMAGE_URL);
-    // setWidth(0);
-    // setLength(0);
+    setCustomImageUrl("");
+    setValidatedImageUrl(DEFAULT_IMAGE_URL);
     setIsOpenedModal(false);
-    setImageError(false);
-    setAlertMessage("");
+    setAlertMessage("이미지 URL을 입력하고 퍼즐 생성 버튼을 눌러주세요.");
     setAlertSeverity("info");
   };
 
@@ -148,20 +146,22 @@ export default function CreateRoomButton({ category }) {
   };
 
   const createRoom = async () => {
-    if (!roomName || !puzzleImage || isImageLoading || imageError) {
-      alert("필수 정보가 누락되었거나 이미지 처리에 실패했습니다.");
+    let imageUrl = validatedImageUrl;
+
+    if (!roomName || !imageUrl) {
+      alert("필수 정보가 누락되었습니다.");
       return;
     }
 
-    if (!isValidImageUrl(puzzleImage)) {
-      alert("유효한 이미지 URL을 입력해주세요.");
+    if (!isValidImageUrl(imageUrl)) {
+      alert("유효한 이미지 URL을 입력하고 퍼즐 생성 버튼을 눌러주세요.");
       return;
     }
 
     const requestData = {
       roomName,
       gameMode: "battle",
-      puzzleImage,
+      puzzleImage: imageUrl,
       puzzlePiece: 100,
       maxPlayers,
       playerId,
@@ -172,7 +172,7 @@ export default function CreateRoomButton({ category }) {
 
     try {
       const { data } = await authRequest().post("/api/rooms", requestData);
-      const { roomId } = data; // Assume roomId is returned
+      const { roomId } = data;
       console.log(`${roomId} : 방 만들기 성공`);
       navigate(`/game/${category}/waiting/${roomId}`);
     } catch (error) {
@@ -184,7 +184,7 @@ export default function CreateRoomButton({ category }) {
         error.response.data.error === "InvalidImageUrl"
       ) {
         alert("이미지 URL이 유효하지 않습니다. 기본 이미지로 대체됩니다.");
-        setPuzzleImage(DEFAULT_IMAGE_URL);
+        setValidatedImageUrl(DEFAULT_IMAGE_URL);
       } else {
         alert("방 생성 중 오류가 발생했습니다.");
       }
@@ -242,9 +242,6 @@ export default function CreateRoomButton({ category }) {
         styleOverrides: {
           root: {
             color: deepPurple[200],
-            "&.Mui-focused": {
-              color: deepPurple[400],
-            },
           },
         },
       },
@@ -253,6 +250,20 @@ export default function CreateRoomButton({ category }) {
           root: {
             "&.Mui-checked": {
               color: deepPurple[400],
+            },
+          },
+        },
+      },
+      MuiToggleButton: {
+        styleOverrides: {
+          root: {
+            border: `1px solid ${deepPurple[200]}`,
+            "&.Mui-selected": {
+              borderColor: deepPurple[700],
+              backgroundColor: deepPurple[100],
+            },
+            "&:hover": {
+              backgroundColor: deepPurple[50],
             },
           },
         },
@@ -277,75 +288,130 @@ export default function CreateRoomButton({ category }) {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 800,
             bgcolor: "background.paper",
             border: "1px solid #ccc",
             borderRadius: "10px",
             boxShadow: 24,
             p: 4,
-            display: "flex",
-            flexDirection: "column",
           }}
         >
-          {alertMessage && (
-            <Alert severity={alertSeverity} sx={{ mb: 2 }}>
-              {alertMessage}
-            </Alert>
-          )}
-          <Typography id="modal-modal-title" variant="h5">
+          {/* 알림 메시지를 표시 */}
+          <Alert severity={alertSeverity} sx={{ mb: 2 }}>
+            {alertMessage}
+          </Alert>
+
+          <Typography id="modal-modal-title" variant="h5" sx={{ mb: 2 }}>
             {category === "cooperation" ? "협동" : "배틀"}방 만들기
           </Typography>
-          <Grid container id="modal-modal-description" spacing={2} sx={{ mt: 0.5 }}>
-            <Grid item xs={12}>
+          <Grid container spacing={2}>
+            {/* 왼쪽: 입력 부분 */}
+            <Grid item xs={12} md={6}>
               <TextField
                 label="방 제목"
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
                 autoFocus
-                sx={{ width: "100%" }}
+                fullWidth
+                sx={{ mb: 2 }}
               />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="퍼즐 이미지 URL"
+
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                이미지 선택:
+              </Typography>
+              <ToggleButtonGroup
                 value={puzzleImage}
-                onChange={handlePuzzleImageChange}
-                sx={{ width: "100%" }}
-                placeholder="이미지 URL을 입력하세요"
-              />
-            </Grid>
-            <Grid item xs={12} style={{ paddingTop: "0"}}>
-              <Typography variant="subtitle1">이미지 미리보기:</Typography>
-              <img
-                src={puzzleImage}
-                alt="퍼즐 이미지 미리보기"
-                style={{ width: "100%", maxHeight: "300px", objectFit: "contain" }}
-                onError={() => {
-                  setPuzzleImage(DEFAULT_IMAGE_URL);
-                  setAlertMessage("이미지 로딩에 실패했습니다. 기본 이미지로 대체되었습니다.");
-                  setAlertSeverity("warning");
+                exclusive
+                onChange={handlePredefinedImageSelect}
+                fullWidth
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-around",
+                  mb: 2,
                 }}
-              />
-            </Grid>
-            <Grid item xs={9}>
-              <FormControl>
-                <FormLabel id="radio-room-size">최대 인원수</FormLabel>
-                <RadioGroup row value={maxPlayers} onChange={handleRoomSize}>
+              >
+                {predefinedImages.map((image) => (
+                  <ToggleButton key={image.name} value={image.url} sx={{ padding: 1 }}>
+                    <img
+                      src={image.url}
+                      alt={image.name}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "cover",
+                        borderRadius: "5px",
+                      }}
+                    />
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
+
+              {/* 설명 추가 부분 */}
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                원하는 이미지로 퍼즐 만들기:
+              </Typography>
+              <Grid container alignItems="center">
+                <Grid item xs={8}>
+                  <TextField
+                    label="이미지 URL"
+                    value={customImageUrl}
+                    onChange={handleCustomImageUrlChange}
+                    fullWidth
+                    placeholder="이미지 URL을 입력하세요"
+                  />
+                </Grid>
+                <Grid item xs={4} sx={{ pl: 2 }}>
+                  <Button
+                    variant="outlined"
+                    onClick={validateImageUrl}
+                    sx={{ height: "56px" }}
+                    fullWidth
+                  >
+                    퍼즐 생성
+                  </Button>
+                </Grid>
+              </Grid>
+
+              <FormControl component="fieldset" fullWidth sx={{ mt: 2 }}>
+                <FormLabel component="legend">최대 인원수</FormLabel>
+                <RadioGroup
+                  row
+                  value={maxPlayers}
+                  onChange={handleRoomSize}
+                  sx={{ justifyContent: "space-around", mt: 1 }}
+                >
                   <FormControlLabel value={2} control={<Radio />} label="2" />
                   <FormControlLabel value={4} control={<Radio />} label="4" />
                   <FormControlLabel value={6} control={<Radio />} label="6" />
                   <FormControlLabel value={8} control={<Radio />} label="8" />
                 </RadioGroup>
               </FormControl>
-            </Grid>
-            <Grid item xs={3}>
               <Button
                 disabled={!roomName}
                 onClick={createRoom}
-                sx={{ width: "100%", height: "50px", padding: "2%", margin: "15% auto" }}
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ height: "50px", marginTop: "20px" }}
               >
                 방 만들기
               </Button>
+            </Grid>
+            {/* 오른쪽: 이미지 미리보기 */}
+            <Grid item xs={12} md={6}>
+              <Typography variant="subtitle1">이미지 미리보기</Typography>
+              <img
+                src={validatedImageUrl}
+                alt="퍼즐 이미지 미리보기"
+                style={{
+                  width: "100%",
+                  maxHeight: "500px",
+                  objectFit: "contain",
+                  borderRadius: "10px",
+                  border: "1px solid #ccc",
+                  marginTop: "10px",
+                }}
+              />
             </Grid>
           </Grid>
         </Box>

@@ -1,4 +1,4 @@
-import { configStore } from "@/puzzle-core";
+import { playerConfig } from "@/puzzle-core";
 import { getPuzzlePositionByIndex, updateGroupByBundles } from "@/puzzle-core/utils";
 import { getTeam } from "@/socket-utils/storage";
 
@@ -11,7 +11,7 @@ import fireAudioPath from "@/assets/audio/fire.mp3";
 import rocketAudioPath from "@/assets/audio/rocket.wav";
 import tornadoAudioPath from "@/assets/audio/tornado.mp3";
 
-const { getConfig, usingItemFire, usingItemRocket, usingItemEarthquake } = configStore;
+const { getConfig, usingItemFire, usingItemRocket, usingItemEarthquake } = playerConfig;
 
 export const addAudio = (audioPath) => {
   const audio = new Audio(audioPath);

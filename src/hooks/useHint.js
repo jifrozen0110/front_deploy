@@ -1,9 +1,9 @@
 import { useCallback, useState } from "react";
 import { getPuzzlePositionByIndex } from "../puzzle-core/utils";
-import { configStore } from "../puzzle-core";
+import { playerConfig } from "../puzzle-core";
 import { v4 as uuidv4 } from "uuid";
 
-const { getConfig } = configStore;
+const { getConfig } = playerConfig;
 
 export const useHint = () => {
   const [hintList, setHintList] = useState([]);
