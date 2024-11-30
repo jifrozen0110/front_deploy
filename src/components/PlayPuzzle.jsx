@@ -32,8 +32,13 @@ const PlayPuzzle = ({ category, shapes, board, picture, bundles, itemPieces, pla
   }, [initialize]);
 
   return (
-    <div>
-      <div>
+    <div style={{
+      alignItems: "center",
+      display: "flex",
+      textAlign: "center",
+      width: "100%",
+    }}>
+      <div style={{margin:"0 auto"}}>
         <img
           ref={imgRef}
           id="puzzleImage"
