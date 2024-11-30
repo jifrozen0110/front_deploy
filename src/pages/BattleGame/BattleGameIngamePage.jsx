@@ -742,7 +742,6 @@ export default function BattleGameIngamePage() {
             </Dialog>
           </ThemeProvider> */}
 
-      // ResultModal에 데이터 전달
       <ResultModal
         isOpenedDialog={isOpenedDialog}
         handleCloseGame={handleCloseGame}

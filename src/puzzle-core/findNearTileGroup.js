@@ -153,7 +153,7 @@ export const fitTiles = ({
   width,
   isCombo = false,
 }) => {
-  const xChange = findXChange(nowShape, preShape, width);
+  // const xChange = findXChange(nowShape, preShape, width);
   const yChange = findYChange(nowShape, preShape, width);
   const xUp = findXUp(nowShape, preShape, width);
   const yUp = findYUp(nowShape, preShape, width);
@@ -177,8 +177,8 @@ export const fitTiles = ({
       ) {
         // console.log("좌", nowTile.position, range, xChange, yChange);
         nowTile.position = new Point(
-          preTile.position._x + range + xChange,
-          preTile.position._y + yChange,
+          preTile.position._x + range,
+          preTile.position._y,
         );
         uniteFlag = true;
         console.log("보정값 적용된거 ", nowTile.position);
@@ -195,8 +195,8 @@ export const fitTiles = ({
       ) {
         // console.log("우", nowTile.position, range, xChange, yChange);
         nowTile.position = new Point(
-          preTile.position._x - (range + xChange),
-          preTile.position._y + yChange,
+          preTile.position._x - (range),
+          preTile.position._y,
         );
         uniteFlag = true;
         console.log("보정값 적용된거 ", nowTile.position);
@@ -212,7 +212,7 @@ export const fitTiles = ({
         flag === false
       ) {
         // console.log("상", nowTile.position, range, xUp, yUp);
-        nowTile.position = new Point(preTile.position._x + xUp, preTile.position._y + range + yUp);
+        nowTile.position = new Point(preTile.position._x, preTile.position._y + range);
         uniteFlag = true;
         console.log("보정값 적용된거 ", nowTile.position);
 
@@ -228,8 +228,8 @@ export const fitTiles = ({
       ) {
         // console.log("하", nowTile.position, range, xUp, yUp);
         nowTile.position = new Point(
-          preTile.position._x + xUp,
-          preTile.position._y - (range + yUp),
+          preTile.position._x,
+          preTile.position._y - (range),
         );
         uniteFlag = true;
         console.log("보정값 적용된거 ", nowTile.position);
