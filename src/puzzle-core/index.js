@@ -93,13 +93,16 @@ const createPuzzleConfig = () => {
 
 
   // 공격형 아이템 fire
-  const usingItemFire = (bundles, targetList) => {
+  const usingItemFire = (bundles, targetList, isPlayerTeam, enemyCanvasScale) => {
     updateGroupByBundles({ config, bundles })
-
     bundles.forEach(bundle => {
       bundle.forEach(({ index, position_x, position_y }) => {
         if (targetList.includes(index)) {
-          config.tiles[index].position = new Point(position_x, position_y)
+          if(isPlayerTeam){
+            config.tiles[index].position = new Point(position_x, position_y)
+          }else{
+            config.tiles[index].position = new Point(position_x*enemyCanvasScale, position_y*enemyCanvasScale)
+          }
         }
       })
     })
@@ -120,19 +123,24 @@ const createPuzzleConfig = () => {
   };
 
   // 공격형 아이템 earthquake
-  const usingItemTyphoon = (targetList, bundles) => {
+  const usingItemTyphoon = (targetList, bundles, isPlayerTeam, enemyCanvasScale) => {
     const targetSet = new Set(targetList)
 
     bundles.forEach(bundle => {
       bundle.forEach(({ index, position_x, position_y }) => {
         if (targetSet.has(index)) {
-          config.tiles[index].position = new Point(position_x, position_y)
+          if(isPlayerTeam){
+            config.tiles[index].position = new Point(position_x, position_y)
+          }else{
+            config.tiles[index].position = new Point(position_x*enemyCanvasScale, position_y*enemyCanvasScale)
+          }
+          
         }
       })
     })
   };
 
-  const usingItemFrame = (targetList, bundles = []) => {
+  const usingItemFrame = (targetList, bundles = [], isPlayerTeam, enemyCanvasScale) => {
     // TODO: Toast를 통해 액자 아이템을 사용했다는 UI 보여주기
     // TODO: 액자를 사용할 곳이 없다면 UI 보여주기
     const targetSet = new Set(targetList)
@@ -140,7 +148,11 @@ const createPuzzleConfig = () => {
     bundles.forEach(bundle => {
       bundle.forEach(({ index, position_x, position_y }) => {
         if (targetSet.has(index)) {
-          config.tiles[index].position = new Point(position_x, position_y)
+          if(isPlayerTeam){
+            config.tiles[index].position = new Point(position_x, position_y)
+          }else{
+            config.tiles[index].position = new Point(position_x*enemyCanvasScale, position_y*enemyCanvasScale)
+          }
         }
       })
     })

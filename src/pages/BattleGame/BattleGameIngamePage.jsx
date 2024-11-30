@@ -196,7 +196,7 @@ export default function BattleGameIngamePage() {
           setTimeout(() => {
             if (fireImgCopy.parentNode) {
               console.log("불 효과 삭제");
-              usingItemFire(bundles, targetList);
+              usingItemFire(bundles, targetList, isPlayerTeam, enemyCanvasScale);
               fireImgCopy.parentNode.removeChild(fireImgCopy);
             }
           }, 2000);
@@ -247,7 +247,7 @@ export default function BattleGameIngamePage() {
 
         addAudio(tornadoAudioPath);
         gameBoard.appendChild(tornadoImg);
-        setTimeout(() => usingItemTyphoon(targetList, bundles), 500);
+        setTimeout(() => usingItemTyphoon(targetList, bundles, isPlayerTeam, enemyCanvasScale), 500);
         setTimeout(() => {
           if (tornadoImg.parentNode) {
             tornadoImg.parentNode.removeChild(tornadoImg);
@@ -276,7 +276,7 @@ export default function BattleGameIngamePage() {
         addAudio(blackholeAudioPath);
         gameBoard.appendChild(bloomImg);
 
-        setTimeout(() => usingItemTyphoon(targetList, bundles), 1000);
+        setTimeout(() => usingItemTyphoon(targetList, bundles, isPlayerTeam, enemyCanvasScale), 1000);
         setTimeout(() => {
           if (bloomImg.parentNode) {
             bloomImg.parentNode.removeChild(bloomImg);
@@ -304,7 +304,7 @@ export default function BattleGameIngamePage() {
         addAudio(frameAudioPath);
         gameBoard.appendChild(frame);
 
-        setTimeout(() => usingItemFrame(targetList, bundles), 1000);
+        setTimeout(() => usingItemFrame(targetList, bundles, isPlayerTeam, enemyCanvasScale), 1000);
         setTimeout(() => {
           if (frame.parentNode) {
             frame.parentNode.removeChild(frame);
