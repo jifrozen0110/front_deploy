@@ -296,11 +296,6 @@ export default function CreateRoomButton({ category }) {
             p: 4,
           }}
         >
-          {/* 알림 메시지를 표시 */}
-          <Alert severity={alertSeverity} sx={{ mb: 2 }}>
-            {alertMessage}
-          </Alert>
-
           <Typography id="modal-modal-title" variant="h5" sx={{ mb: 2 }}>
             {category === "cooperation" ? "협동" : "배틀"}방 만들기
           </Typography>
@@ -399,7 +394,10 @@ export default function CreateRoomButton({ category }) {
             </Grid>
             {/* 오른쪽: 이미지 미리보기 */}
             <Grid item xs={12} md={6}>
-              <Typography variant="subtitle1">이미지 미리보기</Typography>
+              {/* 알림 메시지를 표시 */}
+              <Alert severity={alertSeverity} sx={{ marginTop: "12px" }}>
+                {alertMessage}
+              </Alert>
               <img
                 src={validatedImageUrl}
                 alt="퍼즐 이미지 미리보기"

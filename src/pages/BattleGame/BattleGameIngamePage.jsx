@@ -798,7 +798,7 @@ const Wrapper = styled.div`
   background-size: cover;
   background-attachment: fixed;
   box-sizing: border-box;
-
+  overflow: hidden;
   display: flex; /* Flex 컨테이너 */
   justify-content: space-between;
   gap: 10px;
@@ -810,7 +810,7 @@ const ImageContainer = styled.div`
   max-height: 50%;
   text-align: center;
   background-color: rgba(0,0,0, 0.4);
-  border-radius: 5px;
+  border-radius: 10px;
   overflow: hidden;
 `
 
@@ -861,7 +861,7 @@ const ProgressContainer = styled.div`
   gap: 5px;
   width: 100%;
   background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 5px;
+  border-radius: 10px;
 `;
 
 const ProgressWrapper = styled(Box)`
