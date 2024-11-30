@@ -19,11 +19,13 @@ export default function ResultModal({
   numOfUsingItemBlue,
   isGameEndingRef,
 }) {
-  const bluePercent = getTeam() === "blue" ? ourPercent : enemyPercent;
-  const redPercent = getTeam() === "red" ? ourPercent : enemyPercent;
+  const bluePercent = getTeam() === "blue" ? roundTo(ourPercent, 2) : roundTo(enemyPercent, 2);
+  const redPercent = getTeam() === "red" ? roundTo(ourPercent, 2) : roundTo(enemyPercent, 2);
   const blueTeam = getTeam() === "blue" ? ourTeam : enemyTeam;
   const redTeam = getTeam() === "red" ? ourTeam : enemyTeam;
-
+  const roundTo = (num, decimals) => {
+    return parseFloat(num.toFixed(decimals));
+  };
   const { image } = useGameInfo();
 
   const resultState = useMemo(() => {
@@ -37,8 +39,9 @@ export default function ResultModal({
   }, [ourPercent, enemyPercent]);
 
   const resultText = resultState === "win" ? "WIN!!" : resultState === "lose" ? "LOSE" : "DRAW";
-  const resultTextColor = resultState === "win" ? "#ffc107" : resultState === "lose" ? "#373737" : "#a985ff";
-  const roomId = localStorage.getItem('roomId');
+  const resultTextColor =
+    resultState === "win" ? "#ffc107" : resultState === "lose" ? "#373737" : "#a985ff";
+  const roomId = localStorage.getItem("roomId");
 
   const navigateToWaitingPage = () => {
     isGameEndingRef.current = true;
@@ -103,7 +106,6 @@ export default function ResultModal({
             </TeamPlayers>
           </TeamWrapper>
         </ResultContainer>
-
       </DialogWrapper>
     </Dialog>
   );
@@ -163,22 +165,28 @@ const AnimatedLetter = styled.span`
     props.state === "win"
       ? "winEffect 1.5s infinite"
       : props.state === "lose"
-      ? "loseEffect 5s infinite"
-      : "drawEffect 1.5s infinite"};
-  animation-delay: ${(props) => props.state === "lose"? 0 : props.index * 0.1}s;
+        ? "loseEffect 5s infinite"
+        : "drawEffect 1.5s infinite"};
+  animation-delay: ${(props) => (props.state === "lose" ? 0 : props.index * 0.1)}s;
 
   @keyframes winEffect {
     0% {
       transform: translateY(0);
-      text-shadow: 0 0 20px ${(props) => props.color}, 0 0 40px ${(props) => props.color};
+      text-shadow:
+        0 0 20px ${(props) => props.color},
+        0 0 40px ${(props) => props.color};
     }
     50% {
       transform: translateY(-15px);
-      text-shadow: 0 0 30px white, 0 0 60px ${(props) => props.color};
+      text-shadow:
+        0 0 30px white,
+        0 0 60px ${(props) => props.color};
     }
     100% {
       transform: translateY(0);
-      text-shadow: 0 0 20px ${(props) => props.color}, 0 0 40px ${(props) => props.color};
+      text-shadow:
+        0 0 20px ${(props) => props.color},
+        0 0 40px ${(props) => props.color};
     }
   }
 
@@ -201,8 +209,6 @@ const AnimatedLetter = styled.span`
     }
   }
 
-
-
   @keyframes drawEffect {
     0% {
       transform: rotate(0);
@@ -222,9 +228,7 @@ const AnimatedLetter = styled.span`
   }
 `;
 
-const GameImageWrapper = styled.div`
-
-`;
+const GameImageWrapper = styled.div``;
 
 const GameImage = styled.img`
   max-width: 50vw;
