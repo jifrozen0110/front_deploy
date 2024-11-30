@@ -10,6 +10,6 @@ export const colors = {
     WHITE: new Color(1, 1, 1),
     BLACK: new Color(0, 0, 0),
     DEEPPINK: new Color(0.65, 0.26, -0.01),
-    DEFAULT_SHADOW: new Color("#666"),
+    DEFAULT_SHADOW: new Color("black"),
     DEFAULT_STROKE: new Color("#ddd"),
 }
