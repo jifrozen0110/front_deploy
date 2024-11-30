@@ -20,8 +20,8 @@ export default function ResultModal({
   isGameEndingRef,
   image,
 }) {
-  const bluePercent = getTeam() === "blue" ? roundTo(ourPercent, 2) : roundTo(enemyPercent, 2);
-  const redPercent = getTeam() === "red" ? roundTo(ourPercent, 2) : roundTo(enemyPercent, 2);
+  const bluePercent = getTeam() === "blue" ? ourPercent : enemyPercent;
+  const redPercent = getTeam() === "red" ? ourPercent : enemyPercent;
   const blueTeam = getTeam() === "blue" ? ourTeam : enemyTeam;
   const redTeam = getTeam() === "red" ? ourTeam : enemyTeam;
 

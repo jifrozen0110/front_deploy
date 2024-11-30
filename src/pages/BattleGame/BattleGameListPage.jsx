@@ -11,7 +11,6 @@ import { authRequest } from "@/apis/requestBuilder";
 import backgroundPath from "@/assets/backgrounds/background.png";
 import { socket } from "@/socket-utils/socket2";
 import UserListSidebar from "@/components/GameRoomList/UserListSidebar";
-import music from "@/assets/audio/wait_game.mp3";
 import InviteAlertModal from "@/components/GameWaiting/InviteAlertModal";
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -19,7 +18,6 @@ export default function BattleGameListPage() {
   const navigate = useNavigate();
   const [roomList, setRoomList] = useState(null);
   const isLoading = useMemo(() => roomList === null, [roomList]);
-  const audioTag = useRef(null);
   const [chatList, setChatList] = useState([]);
   const playerId = localStorage.getItem("userId");
   const playerImage = localStorage.getItem("image");
@@ -89,7 +87,6 @@ export default function BattleGameListPage() {
 
   useEffect(() => {
     fetchAllRoom();
-    audioTag.current.muted = false;
     connect(() => {
       subscribe("/topic/chat/main", (message) => {
         const data = JSON.parse(message.body);
@@ -112,7 +109,6 @@ export default function BattleGameListPage() {
 
   return (
     <>
-      <audio ref={audioTag} src={music} autoPlay loop muted></audio>
       {isLoading ? (
         <Wrapper>
           <Header />
