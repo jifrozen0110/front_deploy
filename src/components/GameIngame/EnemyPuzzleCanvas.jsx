@@ -12,11 +12,10 @@ export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, pic
   // console.log("picture:",picture);
   const canvasRef = useRef(null);
   const scale = 0.5;
-
+  const canvasId = "enemyCanvas"
   useEffect(() => {
     if (canvasRef.current) {  
       const canvas = canvasRef.current;
-      const canvasId = "enemyCanvas"
       canvas.width = 1000*scale;
       canvas.height = 750*scale;
       // 퍼즐 초기화
