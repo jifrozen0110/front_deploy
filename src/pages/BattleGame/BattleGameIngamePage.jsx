@@ -421,9 +421,6 @@ export default function BattleGameIngamePage() {
               }));
             };
 
-            setOurTeamKey(ourTeamKey)
-            setEnemyTeamKey(enemyTeamKey)
-
             setOurTeamData(formatTeamData(data.game[ourTeamKey] || []));
             setEnemyTeamData(formatTeamData(data.game[enemyTeamKey] || []));
 
