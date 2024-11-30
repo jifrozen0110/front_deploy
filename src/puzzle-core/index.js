@@ -30,6 +30,15 @@ const createPuzzleConfig = () => {
     config = attachedItemToAllPieceConfig;
   };
 
+  const enemyIntializePuzzle = ({ puzzleImg, level, shapes, board = [], picture, canvasId="canvas", enemyCanvasScale=1}) => {
+    const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes, picture, canvasId, enemyCanvasScale});
+    const attachedItemToAllPieceConfig = setItemStyleToAllPiece({
+      config: initializedConfig,
+      itemList: searchItemList(board),
+    });
+    config = attachedItemToAllPieceConfig;
+  };
+
   const initializePuzzle2 = (config2, itemList = []) => {
     const attachedItemToAllPieceConfig = setItemStyleToAllPiece({
       config: config2,
@@ -166,6 +175,7 @@ const createPuzzleConfig = () => {
 
   return {
     initializePuzzle,
+    enemyIntializePuzzle,
     initializePuzzle2,
     getConfig,
     lockPuzzle,

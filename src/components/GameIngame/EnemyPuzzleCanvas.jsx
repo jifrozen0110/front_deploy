@@ -2,14 +2,9 @@ import { useEffect, useRef } from "react";
 import { styled } from "styled-components";
 import { enemyConfig } from "../../puzzle-core";
 
-const { initializePuzzle, groupPuzzlePieces, getConfig } = enemyConfig;
+const { enemyIntializePuzzle, groupPuzzlePieces, getConfig } = enemyConfig;
 
 export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, picture, bundles, itemPieces, enemyCanvasScale }) {
-  console.log("img:",puzzleImg);
-  console.log("level:",level);
-  console.log("shapes:",shapes);
-  console.log("board:",board);
-  console.log("picture:",picture);
   const canvasRef = useRef(null);
   const canvasId = "enemyCanvas"
 
@@ -20,7 +15,6 @@ export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, pic
       position_y: piece.position_y * enemyCanvasScale, // y값에 scale 곱하기
     }))
   );
-  console.log("scaledBoard:",scaledBoard)
   
   useEffect(() => {
     if (canvasRef.current) {  
@@ -28,7 +22,7 @@ export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, pic
       canvas.width = 1000*enemyCanvasScale;
       canvas.height = 750*enemyCanvasScale;
       // 퍼즐 초기화
-      initializePuzzle({  puzzleImg, level, shapes, board : scaledBoard, picture, canvasId, enemyCanvasScale });
+      enemyIntializePuzzle({  puzzleImg, level, shapes, board : scaledBoard, picture, canvasId, enemyCanvasScale });
 
       // 퍼즐 조각 그룹화
       const config = getConfig();
