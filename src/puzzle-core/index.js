@@ -20,8 +20,8 @@ export const groupPuzzlePieces = ({ config, bundles }) => {
 const createPuzzleConfig = () => {
   let config = {};
 
-  const initializePuzzle = ({ puzzleImg, level, shapes, board = [], picture, canvasId="canvas", enemyCanvasScale=1}) => {
-    const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes, picture, canvasId, enemyCanvasScale});
+  const initializePuzzle = ({ puzzleImg, level, shapes, board = [], picture, canvasId = "canvas", enemyCanvasScale = 1 }) => {
+    const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes, picture, canvasId, enemyCanvasScale });
     const attachedMoveEventConfig = setMoveEvent({ config: initializedConfig });
     const attachedItemToAllPieceConfig = setItemStyleToAllPiece({
       config: attachedMoveEventConfig,
@@ -30,8 +30,8 @@ const createPuzzleConfig = () => {
     config = attachedItemToAllPieceConfig;
   };
 
-  const enemyIntializePuzzle = ({ puzzleImg, level, shapes, board = [], picture, canvasId="canvas", enemyCanvasScale=1}) => {
-    const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes, picture, canvasId, enemyCanvasScale});
+  const enemyIntializePuzzle = ({ puzzleImg, level, shapes, board = [], picture, canvasId = "canvas", enemyCanvasScale = 1 }) => {
+    const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes, picture, canvasId, enemyCanvasScale });
     const attachedItemToAllPieceConfig = setItemStyleToAllPiece({
       config: initializedConfig,
       itemList: searchItemList(board),
@@ -50,19 +50,27 @@ const createPuzzleConfig = () => {
 
   const getConfig = () => ({ ...config });
 
-  const lockPuzzle = (x, y, index) => {
-    console.log(x, y, index);
-    // TODO: "Lock"이 걸려있다는 처리해야함
-    // 피그마처럼 유저별로 "색깔"을 지정해두고 border 색깔을 변경하는 것도 좋을듯?
+  const lockPuzzle = (index, color) => {
+    config.tiles[index].locked = true
+    config.tiles[index].children[2].strokeColor = colors[color.toUpperCase()]
+    config.tiles[index].children[2].strokeWidth = 3
+    config.tiles[index].children[2].shadowBlur = 0
+    config.tiles[index].children[2].opacity = 1
+    config.tiles[index].children[2].shadowColor = colors[color.toUpperCase()]
+    config.tiles[index].bringToFront()
+
   };
 
   const movePuzzle = (x, y, index) => {
     config.tiles[index].position = new Point(x, y);
   };
 
-  const unLockPuzzle = (x, y, index) => {
-    console.log(x, y, index);
-    // TODO: 여기서 Lock에 대한 UI처리를 해제한다.
+  const unLockPuzzle = (index) => {
+    config.tiles[index].locked = false
+    config.tiles[index].children[2].strokeColor = config.tiles[index].originStroke ?? colors.DEFAULT_STROKE
+    config.tiles[index].children[2].strokeWidth = 1
+    config.tiles[index].children[2].opacity = 0
+    config.tiles[index].children[2].shadowColor = config.tiles[index].originShadow ?? colors.DEFAULT_SHADOW
   };
 
   const addPiece = ({ fromIndex, toIndex }, bundles = []) => {
@@ -107,10 +115,10 @@ const createPuzzleConfig = () => {
     bundles.forEach(bundle => {
       bundle.forEach(({ index, position_x, position_y }) => {
         if (targetList.includes(index)) {
-          if(isPlayerTeam){
+          if (isPlayerTeam) {
             config.tiles[index].position = new Point(position_x, position_y)
-          }else{
-            config.tiles[index].position = new Point(position_x*enemyCanvasScale, position_y*enemyCanvasScale)
+          } else {
+            config.tiles[index].position = new Point(position_x * enemyCanvasScale, position_y * enemyCanvasScale)
           }
         }
       })
@@ -138,12 +146,12 @@ const createPuzzleConfig = () => {
     bundles.forEach(bundle => {
       bundle.forEach(({ index, position_x, position_y }) => {
         if (targetSet.has(index)) {
-          if(isPlayerTeam){
+          if (isPlayerTeam) {
             config.tiles[index].position = new Point(position_x, position_y)
-          }else{
-            config.tiles[index].position = new Point(position_x*enemyCanvasScale, position_y*enemyCanvasScale)
+          } else {
+            config.tiles[index].position = new Point(position_x * enemyCanvasScale, position_y * enemyCanvasScale)
           }
-          
+
         }
       })
     })
@@ -157,10 +165,10 @@ const createPuzzleConfig = () => {
     bundles.forEach(bundle => {
       bundle.forEach(({ index, position_x, position_y }) => {
         if (targetSet.has(index)) {
-          if(isPlayerTeam){
+          if (isPlayerTeam) {
             config.tiles[index].position = new Point(position_x, position_y)
-          }else{
-            config.tiles[index].position = new Point(position_x*enemyCanvasScale, position_y*enemyCanvasScale)
+          } else {
+            config.tiles[index].position = new Point(position_x * enemyCanvasScale, position_y * enemyCanvasScale)
           }
         }
       })
@@ -193,6 +201,6 @@ const createPuzzleConfig = () => {
 };
 
 
-export const playerConfig = createPuzzleConfig(); 
-export const enemyConfig  = createPuzzleConfig();
+export const playerConfig = createPuzzleConfig();
+export const enemyConfig = createPuzzleConfig();
 

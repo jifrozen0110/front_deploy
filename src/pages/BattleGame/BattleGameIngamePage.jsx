@@ -492,7 +492,9 @@ export default function BattleGameIngamePage() {
             if (data.message && data.message === "ADD_PIECE") {
               const { targets, combo, comboCnt, team } = data;
               const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-              addPiece({ fromIndex, toIndex });
+              if (team == getTeam()) {
+                addPiece({ fromIndex, toIndex });
+              }
 
               if (team === "RED") {
                 redCleanHint({ fromIndex, toIndex });
@@ -534,10 +536,10 @@ export default function BattleGameIngamePage() {
           if (data.team.toUpperCase() == getTeam().toUpperCase()) {
             setSlots(data.inventory)
             const config = getConfig()
-            config.tiles[data.fitPieceIndex].strokeColor = colors.DEFAULT_STROKE
-            config.tiles[data.fitPieceIndex].shadowColor = colors.DEFAULT_SHADOW
-            config.tiles[data.fitPieceIndex].originStroke = colors.DEFAULT_STROKE
-            config.tiles[data.fitPieceIndex].originShadow = colors.DEFAULT_SHADOW
+            config.tiles[data.fitPieceIndex].children[0].strokeColor = undefined
+            config.tiles[data.fitPieceIndex].children[0].shadowColor = undefined
+            config.tiles[data.fitPieceIndex].children[0].originStroke = colors.DEFAULT_STROKE
+            config.tiles[data.fitPieceIndex].children[0].originShadow = colors.DEFAULT_SHADOW
           }
           
         });

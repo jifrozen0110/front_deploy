@@ -38,10 +38,13 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
       if (itemPieces) {
         Object.entries(itemPieces).forEach(([idx, bool]) => {
           if (!bool) {
-            config.tiles[idx].strokeColor = colors.PURPLE
-            config.tiles[idx].shadowColor = colors.PURPLE
-            config.tiles[idx].originStroke = colors.PURPLE
-            config.tiles[idx].originShadow = colors.PURPLE
+            config.tiles[idx].children[0].strokeColor = colors.YELLOW
+            config.tiles[idx].children[0].shadowColor = colors.YELLOW
+            config.tiles[idx].children[0].strokeWidth = 5
+            config.tiles[idx].children[0].shadowBlur = 5
+            config.tiles[idx].children[0].opacity = 0.5
+            config.tiles[idx].children[0].originStroke = colors.YELLOW
+            config.tiles[idx].children[0].originShadow = colors.YELLOW
           }
         });
       }
