@@ -123,8 +123,6 @@ export default function BattleGameListPage() {
           <Header />
           <ContentContainer>
             <LeftSidebar>
-              <CreateRoomButtonContainer>
-              </CreateRoomButtonContainer>
               <Chatting chatList={chatList} path={"/pub/chat/main"} />
             </LeftSidebar>
             <CenterContaier>
@@ -192,15 +190,6 @@ const Wrapper = styled.div`
   }
 `;
 
-const CreateRoomButtonContainer = styled.div`
-  display: flex;
-  background-color: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(40px);
-  flex-direction: column;
-  padding: 15px; 10px;
-  gap: 15px;
-`;
-
 const ContentContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -211,14 +200,14 @@ const LeftSidebar = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 25%;
+  width: 20%;
 `;
 
 const CenterContaier = styled.div`
   display: flex;
+  flex: 1;
   flex-direction: column;
   flex-grow: 1;
-  width: 100%;
   height: 100%;
   padding: 0 20px;
 `
