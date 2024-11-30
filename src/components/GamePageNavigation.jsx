@@ -1,14 +1,37 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { styled } from "styled-components";
 import { Link, useLocation } from "react-router-dom";
 import { Box, Tabs, Tab } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
+import music from "@/assets/audio/wait_game.mp3";
+import muteImg from "@/assets/icons/mute.png";
+import plauMusicImg from "@/assets/icons/playMusic.png";
+import "./sound.css";
+
 
 export default function GamePageNavigation() {
   const url = useLocation().pathname.split("/")[2] || "battle";
   const isGame = useLocation().pathname.split("/")[1] === "game" ? true : false;
   const [value, setValue] = useState(url);
+  const audioRef = useRef(null);
+  const [isMute, setIsMute] = useState(true);
+  const [volume, setVolume] = useState(0.5);
+
+
+  const toggleMusic = () => {
+    if (!audioRef.current) return;
+    audioRef.current.muted = !isMute;
+    setIsMute(!isMute);
+  };
+
+  const handleVolumeChange = (event) => {
+    const newVolume = parseFloat(event.target.value);
+    setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+  };
 
   const theme = createTheme({
     typography: {
@@ -41,27 +64,38 @@ export default function GamePageNavigation() {
     },
   });
 
+  useEffect(() => {
+    audioRef.current.play()
+  },[])
+
   return (
     <Container>
       <ThemeProvider theme={theme}>
-        {isGame && (
-          <Tabs value={value}>
-            {/* <Tab
-              label="싱글"
-              value="single"
-              component={Link}
-              to="/game/single"
-              sx={{ marginLeft: "10%" }}
-            /> */}
-            <Tab
-              label="배틀"
-              value="battle"
-              component={Link}
-              to="/game/battle"
-              sx={{ marginLeft: "10%" }}
-            />
-          </Tabs>
-        )}
+        <div style={{
+          display:"flex",
+          paddingLeft:50,
+          height:60,
+          alignItems:"center"
+        }}>
+            <div onClick={toggleMusic} style={{
+              backgroundImage: `url(${isMute ? muteImg : plauMusicImg})`,
+              backgroundSize:"contain",
+              backgroundRepeat:"no-repeat",
+              width:35,
+              height:35
+            }}></div>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value={volume}
+            onChange={handleVolumeChange}
+            className="volume-slider"
+          />
+          <audio ref={audioRef} src={music} loop autoPlay muted={isMute}></audio>
+        </div>
+
       </ThemeProvider>
     </Container>
   );

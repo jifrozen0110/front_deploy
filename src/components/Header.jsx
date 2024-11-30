@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import ImageIcon from "./ImageIcon";
-import HeaderPuzzleImage from "@/assets/icons/header_puzzle.png";
-import HeaderRankImage from "@/assets/icons/header_rank.png";
 import Logo from "@/assets/logo.png";
 import { AppBar, Toolbar, Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -66,7 +64,7 @@ export default function Header({ parentUpdate }) {
     <HeaderBar>
       <Toolbar sx={{ flexWrap: "wrap" }}>
         <ImageIcon imageSource={Logo} size="lg" onClick={() => navigate("/home")} />
-        {/* <GamePageNavigation /> */}
+        <GamePageNavigation />
 
         <nav style={{ display: "flex", gap: "20px" }}>
           <ThemeProvider theme={theme}>
@@ -84,6 +82,5 @@ export default function Header({ parentUpdate }) {
 }
 
 const HeaderBar = styled(AppBar)`
-  position: static;
   background-color: /* #c4b6fb */ white;
 `;
