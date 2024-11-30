@@ -370,12 +370,12 @@ const LeftSidebar = styled.div`
 
 const Content = styled.div`
   display: flex;
+  flex: 1;
   flex-direction: column;
   justify-content: center;
   align-item: center;
   padding: 0 30px;
   boxsizing: border-box;
-  width: 80%;
   height: 100%;
 `;
 
