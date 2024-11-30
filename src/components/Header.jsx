@@ -32,7 +32,7 @@ export default function Header({ parentUpdate }) {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem("jwt");
+    const token = getCookie("jwt");
     if (!token)
       authRequest()
         .get("/api/user/refresh")
@@ -66,7 +66,7 @@ export default function Header({ parentUpdate }) {
     <HeaderBar>
       <Toolbar sx={{ flexWrap: "wrap" }}>
         <ImageIcon imageSource={Logo} size="lg" onClick={() => navigate("/home")} />
-        <GamePageNavigation />
+        {/* <GamePageNavigation /> */}
 
         <nav style={{ display: "flex", gap: "20px" }}>
           <ThemeProvider theme={theme}>

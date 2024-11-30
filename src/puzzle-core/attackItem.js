@@ -16,6 +16,7 @@ const { getConfig, usingItemFire, usingItemRocket, usingItemEarthquake } = playe
 export const addAudio = (audioPath) => {
   const audio = new Audio(audioPath);
   audio.loop = false;
+  audio.volume = 0.4;
   audio.crossOrigin = "anonymous";
   audio.load();
   try {
