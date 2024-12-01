@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import GalleryWall from "@/components/MyPage/GalleryWall";
 import { Camera, ChevronRight, Swords, Handshake, User, Star } from "lucide-react";
+import { Button } from "@mui/material";
 
 const width = 100;
 
@@ -160,7 +161,11 @@ export default function ProfilePage() {
             <SubSection>
               <Subtitle>승률</Subtitle>
               <SubValue>{battleWinRate.toFixed(1)}%</SubValue>
-              <SubDetail>{totalWins}승 / {totalDraws}무 / {totalLosses}패 / {totalGames}게임</SubDetail>
+            </SubSection>
+            <SubSection>
+              <Subtitle>전적</Subtitle>
+              <SubValue>{totalWins}승 {totalDraws}무 {totalLosses}패</SubValue>
+              <SubDetail>{totalGames}게임</SubDetail>
             </SubSection>
           </Battle>
         </InfoWraper>
@@ -248,19 +253,20 @@ export default function ProfilePage() {
 }
 
 // 스타일 컴포넌트는 기존과 동일하게 유지합니다.
-const RecordCard = styled.div`
+const RecordCard = styled(Button)`
   display: flex;
   align-items: center;
-  padding: 15px 20px;
+  padding: 0 20px 0 0;
+  gap: 20px;
+  height: 100px;
   background-color: #f5f5f5;
   border-radius: 10px;
-  gap: 20px; /* 이미지와 컨텐츠 간 간격 */
+  overflow: hidden;
 `;
 
 const PuzzleImage = styled.img`
-  width: 40px;
-  height: 40px;
-  border-radius: 5px;
+  width: 160px;
+  height: 100%;
   object-fit: cover;
 `;
 
@@ -274,6 +280,7 @@ const RecordInfo = styled.div`
 const RecordContent = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: start;
 `;
 
 const RecordTitle = styled.div`
@@ -345,10 +352,6 @@ const Profile = styled.div`
   gap: 35px;
   width: 100%;
   box-sizing: border-box;
-`
-
-const MoreButton = styled.button`
-
 `
 
 const Battle = styled.div`
