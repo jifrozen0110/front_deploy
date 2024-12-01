@@ -21,19 +21,21 @@ import {
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import { authRequest } from "../../apis/requestBuilder";
-
 const predefinedImages = [
   {
     name: "짱구",
     url: "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+    puzzlePiece: 72, // 짱구 이미지의 퍼즐 조각 수
   },
   {
     name: "치이카와",
     url: "https://ynoblesse.com/wp-content/uploads/2023/07/358520758_1425769678257003_8801872512201663407_n.jpg",
+    puzzlePiece: 72, // 치이카와 이미지의 퍼즐 조각 수
   },
   {
     name: "배틀그라운드",
     url: "https://i.namu.wiki/i/zLs_c5RLdQZF3lf3QN-rrVFa-8C0QcMRsEk0UhoAwOEEW56lvrUh51E04eQu0Uuvmsgx-Wu-6F_eAIzAxk0hXw.webp",
+    puzzlePiece: 144, // 배틀그라운드 이미지의 퍼즐 조각 수
   },
 ];
 
@@ -45,7 +47,7 @@ export default function CreateRoomButton({ category }) {
   const [puzzleImage, setPuzzleImage] = useState(DEFAULT_IMAGE_URL);
   const [customImageUrl, setCustomImageUrl] = useState(""); // 사용자 정의 이미지 URL
   const [validatedImageUrl, setValidatedImageUrl] = useState(DEFAULT_IMAGE_URL); // 유효성 검사된 이미지 URL
-
+  const [puzzlePiece, setPuzzlePiece] = useState();
   const [maxPlayers, setMaxPlayers] = useState(4);
   const [isOpenedModal, setIsOpenedModal] = useState(false);
 
@@ -57,6 +59,8 @@ export default function CreateRoomButton({ category }) {
   const playerId = localStorage.getItem("userId");
   const playerImage = localStorage.getItem("image");
   const playerName = localStorage.getItem("userName");
+
+  const [battleTimer, setBattleTimer] = useState(60);
 
   const handleRoomSize = (e) => {
     const count = Number(e.target.value);
@@ -71,11 +75,15 @@ export default function CreateRoomButton({ category }) {
 
   const handlePredefinedImageSelect = (event, newImageUrl) => {
     if (newImageUrl) {
-      setPuzzleImage(newImageUrl);
-      setCustomImageUrl("");
-      setValidatedImageUrl(newImageUrl);
-      setAlertMessage("미리 정의된 이미지를 선택했습니다.");
-      setAlertSeverity("success");
+      const selectedImage = predefinedImages.find((image) => image.url === newImageUrl);
+      if (selectedImage) {
+        setPuzzleImage(newImageUrl);
+        setCustomImageUrl("");
+        setValidatedImageUrl(newImageUrl);
+        setPuzzlePiece(selectedImage.puzzlePiece); // 선택된 이미지의 퍼즐 조각 수 설정
+        setAlertMessage("미리 정의된 이미지를 선택했습니다.");
+        setAlertSeverity("success");
+      }
     }
   };
 
@@ -94,10 +102,11 @@ export default function CreateRoomButton({ category }) {
         params: { imageUrl },
       });
 
-      const isValid = response.data;
+      const puzzlePiece = response.data;
 
-      if (isValid) {
+      if (puzzlePiece !== 0) {
         setValidatedImageUrl(imageUrl);
+        setPuzzlePiece(puzzlePiece);
         setAlertMessage("이미지 URL이 유효합니다.");
         setAlertSeverity("success");
       } else {
@@ -131,6 +140,7 @@ export default function CreateRoomButton({ category }) {
     setPuzzleImage(DEFAULT_IMAGE_URL);
     setCustomImageUrl("");
     setValidatedImageUrl(DEFAULT_IMAGE_URL);
+    setBattleTimer(180);
     setIsOpenedModal(false);
     setAlertMessage("이미지 URL을 입력하고 퍼즐 생성 버튼을 눌러주세요.");
     setAlertSeverity("info");
@@ -162,12 +172,17 @@ export default function CreateRoomButton({ category }) {
       roomName,
       gameMode: "battle",
       puzzleImage: imageUrl,
-      puzzlePiece: 100,
+      puzzlePiece,
       maxPlayers,
       playerId,
       playerImage,
       playerName,
     };
+
+    if (category === "battle") {
+      requestData.battleTimer = battleTimer;
+    }
+
     console.log("방 생성 요청 데이터:", requestData);
 
     try {
@@ -386,6 +401,28 @@ export default function CreateRoomButton({ category }) {
                   <FormControlLabel value={8} control={<Radio />} label="8" />
                 </RadioGroup>
               </FormControl>
+              {category === "battle" && (
+                <FormControl component="fieldset" fullWidth sx={{ mt: 2 }}>
+                  <FormLabel component="legend">배틀 타이머</FormLabel>
+                  <ToggleButtonGroup
+                    value={battleTimer}
+                    exclusive
+                    onChange={(event, newTimer) => {
+                      if (newTimer !== null) {
+                        setBattleTimer(newTimer);
+                      }
+                    }}
+                    fullWidth
+                    sx={{ mt: 1, display: "flex", justifyContent: "space-around" }}
+                  >
+                    <ToggleButton value={60}>1분</ToggleButton>
+                    <ToggleButton value={180}>3분</ToggleButton>
+                    <ToggleButton value={300}>5분</ToggleButton>
+                    <ToggleButton value={480}>8분</ToggleButton>
+                    <ToggleButton value={600}>10분</ToggleButton>
+                  </ToggleButtonGroup>
+                </FormControl>
+              )}
               <Button
                 disabled={!roomName}
                 onClick={createRoom}
@@ -412,6 +449,12 @@ export default function CreateRoomButton({ category }) {
                   marginTop: "10px",
                 }}
               />
+              {/* 알림 메시지 아래에 퍼즐 조각 수 표시 */}
+              {puzzlePiece && (
+                <Typography variant="subtitle1" sx={{ mb: 2, color: "deepPurple.500" }}>
+                  선택된 퍼즐 조각 수: {puzzlePiece}
+                </Typography>
+              )}
             </Grid>
           </Grid>
         </Box>
