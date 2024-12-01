@@ -5,7 +5,7 @@ import { BackGround } from "../components/styled/styled";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import GalleryWall from "@/components/MyPage/GalleryWall";
-import { Camera, ChevronRight, Swords, Handshake, User, Star } from "lucide-react";
+import { Camera, ChevronLeft, ChevronRight, Swords, Star,  } from "lucide-react";
 import { Button } from "@mui/material";
 
 const width = 100;
@@ -237,13 +237,13 @@ export default function ProfilePage() {
           </Record>
           <Navigation>
             <button onClick={handlePreviousPage} disabled={currentPage === 0}>
-              이전
+              <ChevronLeft size="20" />
             </button>
-            <span>
+            <span style={{marginBottom: "3px"}}>
               {currentPage + 1} / {totalPages}
             </span>
             <button onClick={handleNextPage} disabled={currentPage === totalPages - 1}>
-              다음
+              <ChevronRight size="20" />
             </button>
         </Navigation>
         </InfoWraper>
@@ -406,21 +406,15 @@ const Navigation = styled.div`
   margin-top: 20px;
 
   button {
-    background-color: #007bff;
-    color: white;
+    background-color: white;
+    color: black;
     border: none;
-    padding: 5px 10px;
     margin: 0 10px;
     cursor: pointer;
-    border-radius: 5px;
 
     &:disabled {
-      background-color: #cccccc;
+      color: #cccccc;
       cursor: not-allowed;
     }
-  }
-
-  span {
-    font-size: 16px;
   }
 `;
