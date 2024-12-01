@@ -27,17 +27,6 @@ export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, pic
       // 퍼즐 조각 그룹화
       const config = getConfig();
       groupPuzzlePieces({ config, bundles });
-      // 특수 조각 렌더링
-      if (itemPieces) {
-        Object.entries(itemPieces).forEach(([idx, bool]) => {
-          if (!bool) {
-            config.tiles[idx].strokeColor = "rgba(128, 0, 128, 0.8)"; // 보라색 테두리
-            config.tiles[idx].shadowColor = "rgba(128, 0, 128, 0.4)";
-            config.tiles[idx].originStroke = "rgba(128, 0, 128, 0.4)";
-            config.tiles[idx].originShadow = "rgba(128, 0, 128, 0.4)";
-          }
-        });
-      }
     }
   }, [canvasRef,enemyCanvasScale]);
 
