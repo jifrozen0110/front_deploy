@@ -26,8 +26,8 @@ export default function ResultModal({
   const redTeam = getTeam() === "red" ? ourTeam : enemyTeam;
 
   // **Round the percentages to one decimal place**
-  const bluePercentRounded = bluePercent.toFixed(1);
-  const redPercentRounded = redPercent.toFixed(1);
+  const bluePercentRounded = parseFloat(bluePercent.toFixed(1));
+  const redPercentRounded = parseFloat(redPercent.toFixed(1));
 
   const resultState = useMemo(() => {
     if (ourPercent > enemyPercent) {
@@ -123,6 +123,7 @@ const Dialog = styled.div`
   justify-content: center;
   align-items: center;
   backdrop-filter: blur(7px);
+  z-index: 10;
 `;
 
 const DialogWrapper = styled.div`

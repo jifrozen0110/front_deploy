@@ -5,7 +5,8 @@ import { BackGround } from "../components/styled/styled";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import GalleryWall from "@/components/MyPage/GalleryWall";
-import { Camera, ChevronRight, Swords, Handshake, User, Star } from "lucide-react";
+import { Camera, ChevronLeft, ChevronRight, Swords, Star,  } from "lucide-react";
+import { Button } from "@mui/material";
 
 const width = 100;
 
@@ -20,7 +21,7 @@ export default function ProfilePage() {
   const [totalGames, setTotalGames] = useState(0);
   const [currentPage, setCurrentPage] = useState(0); // 현재 페이지
   const [totalPages, setTotalPages] = useState(0); // 총 페이지 수
-
+  const [galleryImages, setGalleryImages] = useState([]);
 
   const navigate = useNavigate()
   const forceUpdate = () => setForUpdate(forUpdate + 1)
@@ -66,6 +67,29 @@ export default function ProfilePage() {
         setGameRecords(processedRecords);
         setCurrentPage(data.currentPage);
         setTotalPages(data.totalPages);
+
+        const galleryRes = await authRequest().get(`/games/${userId}/records/gallery`);
+      const galleryData = galleryRes.data;
+
+      console.log(galleryData)
+
+      const processedGallery = galleryData.map((record) => ({
+        id: record.recordId,
+        url: record.puzzleImage,
+        roomTitle: record.gameName || "게임 이름 없음",
+        description: "추가적인 설명란 필요?", // 필요에 따라 수정 가능
+        piece: record.totalPieceCount.toString(),
+        pieceCount: record.totalPieceCount,
+        clearTime: `${record.durationInMinutes}초`,
+        date: new Date(record.playedAt).toLocaleString(),
+        whos: record.teamMates ? JSON.parse(record.teamMates) : [],
+        opponents: record.opponents ? JSON.parse(record.opponents) : [],
+        userTeam: record.userTeam, // 실제 데이터에 따라 설정
+      }));
+
+      console.log(processedGallery)
+      setGalleryImages(processedGallery);
+
       }
     } catch (error) {
       console.error("사용자 정보 또는 게임 기록을 가져오는 중 오류 발생:", error);
@@ -88,7 +112,6 @@ export default function ProfilePage() {
       getUserInfo(currentPage - 1);
     }
   };
-
 
   const moveGalleryWall = async () => {
     navigate(`/user/gallery`);
@@ -136,7 +159,7 @@ export default function ProfilePage() {
             <InfoTitle>
               <Camera size={20} color="#3B82F6" />
               갤러리
-              <SubDetail>17</SubDetail> {/* 갤러리 수는 임의의 값 */}
+              <SubDetail style={{ marginLeft: "10px" }}>{galleryImages.length}</SubDetail>
             </InfoTitle>
             <div
               onClick={moveGalleryWall}
@@ -146,7 +169,7 @@ export default function ProfilePage() {
               <ChevronRight size={20} style={{ margin: "auto 0" }} />
             </div>
           </SubSection>
-          <GalleryWall count={3} />
+          <GalleryWall count={3} data={galleryImages}/>
         </InfoWraper>
 
         <InfoWraper style={{ zIndex: "0" }}>
@@ -158,9 +181,13 @@ export default function ProfilePage() {
               </InfoTitle>
             </SubSection>
             <SubSection>
+              <Subtitle>전적</Subtitle>
+              <SubValue>{totalWins}승 {totalDraws}무 {totalLosses}패</SubValue>
+              <SubDetail>{totalGames}게임</SubDetail>
+            </SubSection>
+            <SubSection>
               <Subtitle>승률</Subtitle>
               <SubValue>{battleWinRate.toFixed(1)}%</SubValue>
-              <SubDetail>{totalWins}승 / {totalDraws}무 / {totalLosses}패 / {totalGames}게임</SubDetail>
             </SubSection>
           </Battle>
         </InfoWraper>
@@ -205,7 +232,10 @@ export default function ProfilePage() {
                           <TeamMembers>
                             {record.opponents && Array.isArray(record.opponents) && record.opponents.length > 0 ? (
                               record.opponents.map((member, index) => (
-                                <MemberName key={index}>{member}</MemberName>
+                                <MemberName key={index}>
+                                  {member}
+                                  {index < record.opponents.length - 1 && ","} {/* 마지막 멤버가 아니라면 쉼표 추가 */}
+                                </MemberName>
                               ))
                             ) : (
                               <MemberName>상대 팀원 정보 없음</MemberName>
@@ -232,13 +262,13 @@ export default function ProfilePage() {
           </Record>
           <Navigation>
             <button onClick={handlePreviousPage} disabled={currentPage === 0}>
-              이전
+              <ChevronLeft size="20" />
             </button>
-            <span>
+            <span style={{marginBottom: "3px"}}>
               {currentPage + 1} / {totalPages}
             </span>
             <button onClick={handleNextPage} disabled={currentPage === totalPages - 1}>
-              다음
+              <ChevronRight size="20" />
             </button>
         </Navigation>
         </InfoWraper>
@@ -248,19 +278,20 @@ export default function ProfilePage() {
 }
 
 // 스타일 컴포넌트는 기존과 동일하게 유지합니다.
-const RecordCard = styled.div`
+const RecordCard = styled(Button)`
   display: flex;
   align-items: center;
-  padding: 15px 20px;
+  padding: 0 20px 0 0;
+  gap: 20px;
+  height: 100px;
   background-color: #f5f5f5;
   border-radius: 10px;
-  gap: 20px; /* 이미지와 컨텐츠 간 간격 */
+  overflow: hidden;
 `;
 
 const PuzzleImage = styled.img`
-  width: 40px;
-  height: 40px;
-  border-radius: 5px;
+  width: 160px;
+  height: 100%;
   object-fit: cover;
 `;
 
@@ -274,6 +305,7 @@ const RecordInfo = styled.div`
 const RecordContent = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: start;
 `;
 
 const RecordTitle = styled.div`
@@ -347,10 +379,6 @@ const Profile = styled.div`
   box-sizing: border-box;
 `
 
-const MoreButton = styled.button`
-
-`
-
 const Battle = styled.div`
   box-sizing: border-box;
   display: flex;
@@ -403,21 +431,15 @@ const Navigation = styled.div`
   margin-top: 20px;
 
   button {
-    background-color: #007bff;
-    color: white;
+    background-color: white;
+    color: black;
     border: none;
-    padding: 5px 10px;
     margin: 0 10px;
     cursor: pointer;
-    border-radius: 5px;
 
     &:disabled {
-      background-color: #cccccc;
+      color: #cccccc;
       cursor: not-allowed;
     }
-  }
-
-  span {
-    font-size: 16px;
   }
 `;

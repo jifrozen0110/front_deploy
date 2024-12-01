@@ -3,7 +3,7 @@ import { styled } from "styled-components";
 import { playerConfig } from "../puzzle-core";
 import { Color } from "paper/dist/paper-core";
 import { socket } from "@/socket-utils/socket2";
-import pointerPath from "@/assets/icons/gameRoom/pointer.png";
+import pointerPath from "@/assets/icons/gameRoom/pointer2.png";
 import { getTeam } from "../socket-utils/storage";
 import { colors } from "../puzzle-core/color";
 
@@ -18,6 +18,7 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
   const currentUrl = window.location.href
   const gameId = currentUrl.substring(currentUrl.lastIndexOf('/')+1)
   const userId = localStorage.getItem('userId')
+  const userName = localStorage.getItem('userName')
   const myColor = localStorage.getItem('myColor')
   const team = getTeam()
   
@@ -68,6 +69,7 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
           send(`/pub/game/${gameId}/mouse`, {}, 
             JSON.stringify({
               playerId : userId,
+              playerName : userName,
               x : myPointer.x,
               y : myPointer.y,
               color : myColor,
@@ -87,22 +89,46 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
         style={{ position: "relative", display: "flex", justifyContent: "center" }}
       >
         {players?.filter(p => p.playerId != userId)
-        .map(p => <Pointer path={pointerPath} id={`user${p.playerId}`} color={p.color} key={`user${p.playerId}`}/>)}
+        .map(p => 
+            <Pointer path={pointerPath} id={`user${p.playerId}`} color={p.color} key={`user${p.playerId}`} name={p.playerName}></Pointer>
+        )}
         <Canvas ref={canvasRef} id="canvas" onMouseMove={mouseMove}/>
       </div>
     </>
   );
 }
 
-const Pointer = styled.div`
-  width: 25px;
-  height: 25px;
-  position: absolute;
-  background: ${(props) => props.color};
-  mask: url(${(props)=> props.path}) no-repeat center / contain;
-  transition: left 0.1s ease, top 0.1s ease;
-  pointer-events: none;
-`
+const Pointer = ({color, path, name, id,}) => {
+  return (
+    <div id={id}
+    style={{
+      position:"absolute",
+      pointerEvents:"none",
+      transition: "left 0.1s ease, top 0.1s ease",
+    }}>
+      <div style={{
+        width:25,
+        height:25,
+        background: color,
+        mask: `url(${path}) no-repeat center / contain`,
+      }}></div>
+      <div style={{
+        color:"white",
+        background: color,
+        fontWeight:600,
+      }}>{name}</div>
+    </div>
+  )
+}
+// const Pointer = styled.div`
+//   width: 25px;
+//   height: 25px;
+//   position: absolute;
+//   background: ${(props) => props.color};
+//   mask: url(${(props)=> props.path}) no-repeat center / contain;
+//   transition: left 0.1s ease, top 0.1s ease;
+//   pointer-events: none;
+// `
 
 const Canvas = styled.canvas`
   border: 1px solid #ccc;

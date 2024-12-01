@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { styled } from "styled-components";
 import Button from "@mui/material/Button";
 import ChatSend from "@/assets/icons/chat_send.png";
@@ -6,15 +6,12 @@ import { socket } from "@/socket-utils/socket2"; // 소켓 유틸리티
 const { send } = socket;
 
 function ChatComponent({ chatList, path, defualtData = {} }) {
-  // const [messages, setMessages] = useState([]); // 메시지 목록
-  // const [input, setInput] = useState(""); // 입력 필드 값
   const inputTag = useRef(null);
+  const chatMessagesRef = useRef(null); // ChatMessages 요소의 ref 생성
 
   // 메시지 전송 핸들러
   const handleSendMessage = () => {
     if (inputTag.current.value.trim() !== "") {
-      // setMessages([...messages, { text: input, user: "me" }]);
-      // setInput(""); // 입력 필드 초기화
       send(
         path,
         {},
@@ -29,10 +26,17 @@ function ChatComponent({ chatList, path, defualtData = {} }) {
     }
   };
 
+  // chatList가 변경될 때 스크롤을 맨 아래로 이동
+  useEffect(() => {
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
+    }
+  }, [chatList]);
+
   return (
     <ChatContainer>
       {/* 채팅 메시지 목록 */}
-      <ChatMessages>
+      <ChatMessages ref={chatMessagesRef}>
         {chatList.map((chat, index) => (
           <Message key={index} isMyMessage={chat.userId == localStorage.getItem("userId")}>
             {chat.userId != localStorage.getItem("userId") && <div>{chat.userName}:</div>}
@@ -44,9 +48,7 @@ function ChatComponent({ chatList, path, defualtData = {} }) {
       {/* 채팅 입력 필드 */}
       <ChatInputContainer>
         <ChatInput
-          // value={input}
           ref={inputTag}
-          // onChange={(e) => setInput(e.target.value)}
           placeholder="메시지를 입력하세요..."
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSendMessage();
@@ -75,8 +77,27 @@ const ChatContainer = styled.div`
 
 const ChatMessages = styled.div`
   flex: 1;
+  height: 100%;
+  overflow-y: auto; /* 스크롤 활성화 */
   padding: 10px;
-  overflow-y: auto;
+
+  /* 스크롤바 스타일 */
+  &::-webkit-scrollbar {
+    width: 10px; /* 스크롤바 너비 */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3); /* 스크롤바 색상 */
+    border-radius: 10px; /* 스크롤바 둥글게 */
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.5); /* 스크롤바 hover 효과 */
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent; /* 스크롤 트랙 배경 투명화 */
+  }
 `;
 
 const Message = styled.div`
