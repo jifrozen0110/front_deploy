@@ -31,11 +31,14 @@ export default function Header({ parentUpdate }) {
 
   useEffect(() => {
     const token = getCookie("jwt");
-    if (!token)
+    if (!token){
       authRequest()
         .get("/api/user/refresh")
         .then((res) => {
           const { userId, userName, image, email, provider } = res.data;
+          if (!userId) {
+            navigate("/")
+          }
           localStorage.setItem("userId", userId);
           localStorage.setItem("userName", userName);
           localStorage.setItem("image", image);
@@ -43,6 +46,7 @@ export default function Header({ parentUpdate }) {
           localStorage.setItem("provider", provider);
         })
         .catch((err) => navigate("/"));
+      }
   }, []);
 
   const logout = async () => {
