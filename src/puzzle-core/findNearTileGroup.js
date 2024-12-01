@@ -11,6 +11,69 @@ const { send } = socket;
 export const findNearTileGroup = ({ config }) => {
   config.groupTiles.forEach((tile, tileIndex) => {
     tile[0].onMouseUp = (event) => {
+      // 위치 보정 후
+      // const group = tile[1];
+      // if (group !== undefined) {
+      //   config.groupTiles.forEach((gtile) => {
+      //     if (gtile[1] === group && gtile[2] !== tile[2]) {
+      //       findNearTile({ config, tile: gtile });
+      //     }
+      //   });
+      // }
+      // findNearTile({ config, tile });
+
+      // [group, groupIdx, idIdx]
+      const nearGtiles = []
+      for (const gtile of config.groupTiles) {
+        if (gtile[1] == tile[1]) {
+          findNearTile2({ config, tile: gtile })
+            .forEach(idx => {
+              const group = config.groupTiles[idx][1]
+              nearGtiles.push(...config.groupTiles.filter(gt => gt[1] == group))
+            })
+        }
+      }
+
+      if (nearGtiles.length) {
+        const bundleNumSet = new Set(nearGtiles.map(gtile => gtile[1]))
+        let sandData = []
+        const moveTiles = bundleNumSet.size == 1 ? config.groupTiles.filter(gtile => gtile[1] == tile[1]) : nearGtiles
+        const stdGtile = bundleNumSet.size == 1 ? config.groupTiles.find(gtile => bundleNumSet.has(gtile[1])) : tile
+        sandData = moveTiles.map(gtile => {
+          gtile[0].position = getNewPoint({ config, stdGtile, targetGtile: gtile })
+          gtile[1] = stdGtile[1]
+          return {
+            x: gtile[0].position.x,
+            y: gtile[0].position.y,
+            index: gtile[2],
+          }
+        })
+        send(
+          "/pub/game/puzzle", {},
+          JSON.stringify({
+            type: "GAME",
+            roomId: getRoomId(),
+            sender: getSender(),
+            message: "MOUSE_DRAG",
+            targets: sandData,
+          }),
+        );
+
+        moveTiles.forEach(gtile => {
+          send(
+            "/pub/game/puzzle",
+            {},
+            JSON.stringify({
+              type: "GAME",
+              roomId: getRoomId(),
+              sender: getSender(),
+              message: "ADD_PIECE",
+              targets: `${gtile[2]},${stdGtile[2]}`,
+            }),
+          );
+        })
+      }
+
       const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
       // socket 전송
       send(
@@ -26,19 +89,66 @@ export const findNearTileGroup = ({ config }) => {
           position_y: tile[0].position.y,
         }),
       );
-
-      const group = tile[1];
-      if (group !== undefined) {
-        config.groupTiles.forEach((gtile) => {
-          if (gtile[1] === group && gtile[2] !== tile[2]) {
-            findNearTile({ config, tile: gtile });
-          }
-        });
-      }
-      findNearTile({ config, tile });
     };
   });
 };
+
+export const getNewPoint = ({ config, stdGtile, targetGtile }) => {
+  const { tilesPerRow, tileWidth } = config
+  const stdY = parseInt(stdGtile[2] / tilesPerRow)
+  const stdX = stdGtile[2] % tilesPerRow
+  const targetY = parseInt(targetGtile[2] / tilesPerRow)
+  const targetX = targetGtile[2] % tilesPerRow
+  const { position } = stdGtile[0]
+
+  return new Point(
+    position.x + (targetX - stdX) * tileWidth,
+    position.y + (targetY - stdY) * tileWidth,
+  )
+}
+
+const findNearTile2 = ({ config, tile }) => {
+  const xTileCount = config.tilesPerRow;
+  const yTileCount = config.tilesPerColumn;
+
+  const nowIndex = tile[2];
+
+  // (0: 좌, 1: 우, 2: 상, 3: 하)
+  const nextIndexArr = [
+    nowIndex % xTileCount === 0 ? -1 : nowIndex - 1,
+    (nowIndex + 1) % xTileCount === 0 ? -1 : nowIndex + 1,
+    nowIndex - xTileCount < 0 ? -1 : nowIndex - xTileCount,
+    nowIndex + xTileCount >= xTileCount * yTileCount ? -1 : nowIndex + xTileCount,
+  ];
+  return nextIndexArr.filter((nextIndex, index) => {
+    return checkUndefined({ config, nowIndex, nextIndex, direction: index })
+      && isNear[index]({
+        nowTile: tile[0],
+        preTile: config.tiles[nextIndex],
+        range: config.tileWidth,
+        errorRange: config.tileWidth * 0.2,
+      })
+  })
+}
+
+const isNear = [
+  ({
+    nowTile, preTile, range, errorRange,
+  }) => Math.abs(nowTile.position._x - range - preTile.position._x) < errorRange
+    && Math.abs(nowTile.position._y - preTile.position._y) < errorRange,
+  ({
+    nowTile, preTile, range, errorRange,
+  }) => Math.abs(preTile.position._x - range - nowTile.position._x) < errorRange
+    && Math.abs(nowTile.position._y - preTile.position._y) < errorRange,
+  ({
+    nowTile, preTile, range, errorRange,
+  }) => Math.abs(preTile.position._y + range - nowTile.position._y) < errorRange
+    && Math.abs(nowTile.position._x - preTile.position._x) < errorRange,
+  ({
+    nowTile, preTile, range, errorRange,
+  }) => Math.abs(nowTile.position._y + range - preTile.position._y) < errorRange
+    && Math.abs(nowTile.position._x - preTile.position._x) < errorRange,
+]
 
 const findNearTile = ({ config, tile }, flag = true) => {
   const xTileCount = config.tilesPerRow;

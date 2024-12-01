@@ -478,8 +478,6 @@ export default function BattleGameIngamePage() {
 
           // 우리팀 event
           if (data.message && data.team === getTeam().toUpperCase()) {
-            console.log("화긴11!!!!!!!!!!",data.senderId)
-            console.log("화긴22!!!!!!!!!!",getSender())
             if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
               const { targets } = data;
               const targetList = JSON.parse(targets);
@@ -504,7 +502,7 @@ export default function BattleGameIngamePage() {
             if (data.message && data.message === "ADD_PIECE") {
               const { targets, combo, comboCnt, team } = data;
               const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-              if (team == getTeam()) {
+              if (team.toUpperCase() == getTeam().toUpperCase()) {
                 addPiece({ fromIndex, toIndex });
               }
 
