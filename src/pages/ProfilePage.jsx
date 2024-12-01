@@ -21,7 +21,7 @@ export default function ProfilePage() {
   const [totalGames, setTotalGames] = useState(0);
   const [currentPage, setCurrentPage] = useState(0); // 현재 페이지
   const [totalPages, setTotalPages] = useState(0); // 총 페이지 수
-
+  const [galleryImages, setGalleryImages] = useState([]);
 
   const navigate = useNavigate()
   const forceUpdate = () => setForUpdate(forUpdate + 1)
@@ -67,6 +67,29 @@ export default function ProfilePage() {
         setGameRecords(processedRecords);
         setCurrentPage(data.currentPage);
         setTotalPages(data.totalPages);
+
+        const galleryRes = await authRequest().get(`/games/${userId}/records/gallery`);
+      const galleryData = galleryRes.data;
+
+      console.log(galleryData)
+
+      const processedGallery = galleryData.map((record) => ({
+        id: record.recordId,
+        url: record.puzzleImage,
+        roomTitle: record.gameName || "게임 이름 없음",
+        description: "추가적인 설명란 필요?", // 필요에 따라 수정 가능
+        piece: record.totalPieceCount.toString(),
+        pieceCount: record.totalPieceCount,
+        clearTime: `${record.durationInMinutes}초`,
+        date: new Date(record.playedAt).toLocaleString(),
+        whos: record.teamMates ? JSON.parse(record.teamMates) : [],
+        opponents: record.opponents ? JSON.parse(record.opponents) : [],
+        userTeam: record.userTeam, // 실제 데이터에 따라 설정
+      }));
+
+      console.log(processedGallery)
+      setGalleryImages(processedGallery);
+
       }
     } catch (error) {
       console.error("사용자 정보 또는 게임 기록을 가져오는 중 오류 발생:", error);
@@ -89,7 +112,6 @@ export default function ProfilePage() {
       getUserInfo(currentPage - 1);
     }
   };
-
 
   const moveGalleryWall = async () => {
     navigate(`/user/gallery`);
@@ -137,7 +159,7 @@ export default function ProfilePage() {
             <InfoTitle>
               <Camera size={20} color="#3B82F6" />
               갤러리
-              <SubDetail>17</SubDetail> {/* 갤러리 수는 임의의 값 */}
+              <SubDetail style={{ marginLeft: "10px" }}>{galleryImages.length}</SubDetail>
             </InfoTitle>
             <div
               onClick={moveGalleryWall}
@@ -147,7 +169,7 @@ export default function ProfilePage() {
               <ChevronRight size={20} style={{ margin: "auto 0" }} />
             </div>
           </SubSection>
-          <GalleryWall count={3} />
+          <GalleryWall count={3} data={galleryImages}/>
         </InfoWraper>
 
         <InfoWraper style={{ zIndex: "0" }}>
@@ -159,13 +181,13 @@ export default function ProfilePage() {
               </InfoTitle>
             </SubSection>
             <SubSection>
-              <Subtitle>승률</Subtitle>
-              <SubValue>{battleWinRate.toFixed(1)}%</SubValue>
-            </SubSection>
-            <SubSection>
               <Subtitle>전적</Subtitle>
               <SubValue>{totalWins}승 {totalDraws}무 {totalLosses}패</SubValue>
               <SubDetail>{totalGames}게임</SubDetail>
+            </SubSection>
+            <SubSection>
+              <Subtitle>승률</Subtitle>
+              <SubValue>{battleWinRate.toFixed(1)}%</SubValue>
             </SubSection>
           </Battle>
         </InfoWraper>
@@ -210,7 +232,10 @@ export default function ProfilePage() {
                           <TeamMembers>
                             {record.opponents && Array.isArray(record.opponents) && record.opponents.length > 0 ? (
                               record.opponents.map((member, index) => (
-                                <MemberName key={index}>{member}</MemberName>
+                                <MemberName key={index}>
+                                  {member}
+                                  {index < record.opponents.length - 1 && ","} {/* 마지막 멤버가 아니라면 쉼표 추가 */}
+                                </MemberName>
                               ))
                             ) : (
                               <MemberName>상대 팀원 정보 없음</MemberName>
