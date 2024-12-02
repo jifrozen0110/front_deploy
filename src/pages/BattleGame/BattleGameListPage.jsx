@@ -110,13 +110,11 @@ export default function BattleGameListPage() {
   return (
     <>
       {isLoading ? (
-        <Wrapper>
-          <Header />
+        <>
           <div>Loading...</div>
-        </Wrapper>
+        </>
       ) : (
-        <Wrapper>
-          <Header />
+        <>
           <ContentContainer>
             <LeftSidebar>
               <Chatting chatList={chatList} path={"/pub/chat/main"} />
@@ -155,7 +153,8 @@ export default function BattleGameListPage() {
               </ModalContent>
             </ModalOverlay>
           )}
-        </Wrapper>
+      
+        </>
       )}
     </>
   );

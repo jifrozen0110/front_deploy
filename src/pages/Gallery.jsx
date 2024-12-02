@@ -7,7 +7,7 @@ import { styled } from "styled-components";
 import GalleryWall from "@/components/MyPage/GalleryWall";
 import { ChevronLeft } from "lucide-react";
 
-export default function Gallery() {
+export default function Gallery({goProfile}) {
   const [galleryImages, setGalleryImages] = useState([]);
   const [forUpdate, setForUpdate] = useState(0);
   const forceUpdate = () => setForUpdate(forUpdate + 1);
@@ -40,19 +40,17 @@ export default function Gallery() {
     fetchGalleryData();
   }, [forUpdate]);
 
-  const moveMyPage = () => {
-    navigate(`/user`);
-  };
+  // const moveMyPage = () => {
+  //   navigate(`/user`);
+  // };
 
   return (
     <>
-      <BackGround style={{ paddingBottom: "50px" }}>
-        <Header parentUpdate={forceUpdate} />
         <InfoWraper style={{ marginTop: "40px" }}>
           <SubSection style={{ marginBottom: "30px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <InfoTitle>
               <div
-                onClick={moveMyPage}
+                onClick={() => goProfile()}
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -68,7 +66,6 @@ export default function Gallery() {
           </SubSection>
           <GalleryWall data={galleryImages} />
         </InfoWraper>
-      </BackGround>
     </>
   );
 }
