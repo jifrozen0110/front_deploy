@@ -40,8 +40,5 @@ const Wrapper = styled.div`
     background-color: rgba(0,0,0,0.2);
   }
 
-  > * {
-    position: relative; /* 자식 요소를 블러 바깥으로 제외 */
-    z-index: 1;
-  }
+  
 `;
