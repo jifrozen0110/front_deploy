@@ -322,9 +322,7 @@ export default function BattleGameWaitingPage() {
           </MainSection>
 
           <PuzzleDetails>
-            <PuzzleImage>
-              <img src={roomData.puzzleImage} alt="Puzzle" />
-            </PuzzleImage>
+            <PuzzleImage src={roomData.puzzleImage} alt="Puzzle" />
             <Details>
               <Title>{roomData.roomName}</Title>
               <Divider />
@@ -379,7 +377,7 @@ const Content = styled.div`
   align-item: center;
   padding: 0 30px;
   boxsizing: border-box;
-  height: 100%;
+  max-height: 100%;
 `;
 
 const Team = styled.div`
@@ -477,11 +475,10 @@ const PuzzleDetails = styled.div`
   border-radius: 5px;
 `;
 
-const PuzzleImage = styled.div`
+const PuzzleImage = styled.img`
   width: 100%;
-  img {
-    width: 100%;
-  }
+  max-height: 300px;
+  object-fit: contain
 `;
 
 const Details = styled.div`

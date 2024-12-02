@@ -7,6 +7,7 @@ import { deepPurple } from "@mui/material/colors";
 import music from "@/assets/audio/wait_game.mp3";
 import muteImg from "@/assets/icons/mute.png";
 import plauMusicImg from "@/assets/icons/playMusic.png";
+import { Volume2, VolumeX } from "lucide-react";
 import "./sound.css";
 
 
@@ -74,13 +75,9 @@ export default function GamePageNavigation() {
           height:60,
           alignItems:"center"
         }}>
-            <div onClick={toggleMusic} style={{
-              backgroundImage: `url(${isMute ? muteImg : plauMusicImg})`,
-              backgroundSize:"contain",
-              backgroundRepeat:"no-repeat",
-              width:35,
-              height:35
-            }}></div>
+          <div onClick={toggleMusic} style={{paddingRight: 10, marginTop: 5}}>
+            {isMute ? <VolumeX size={30} color="black"/> : <Volume2 size={30} color="black"/>}
+          </div>
           <input
             type="range"
             min="0"
