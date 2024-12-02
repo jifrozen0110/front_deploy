@@ -180,16 +180,13 @@ export default function BattleGameIngamePage() {
           return;
         }
 
-        console.log("fire 맞을거임");
-
+        addAudio(fireAudioPath);
         for (let i = 0; i < targetList.length; i++) {
           const currentTargetIdx = targetList[i];
           const [x, y] = getPuzzlePositionByIndex({
             config: getConfig(),
             puzzleIndex: currentTargetIdx,
           });
-
-          console.log("x, y", x, y);
 
           const fireImgCopy = fireImg.cloneNode();
 
@@ -198,15 +195,13 @@ export default function BattleGameIngamePage() {
 
           canvasContainer.appendChild(fireImgCopy);
           
+          setTimeout(() => usingItemFire(bundles, targetList, isPlayerTeam, enemyCanvasScale),500)
           setTimeout(() => {
             if (fireImgCopy.parentNode) {
-              console.log("불 효과 삭제");
-              usingItemFire(bundles, targetList, isPlayerTeam, enemyCanvasScale);
               fireImgCopy.parentNode.removeChild(fireImgCopy);
             }
           }, 2000);
         }
-        addAudio(fireAudioPath);
         
       },
       MUD(data) {

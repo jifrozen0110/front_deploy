@@ -12,6 +12,7 @@ import backgroundPath from "@/assets/backgrounds/background.png";
 import { socket } from "@/socket-utils/socket2";
 import UserListSidebar from "@/components/GameRoomList/UserListSidebar";
 import InviteAlertModal from "@/components/GameWaiting/InviteAlertModal";
+import { logout } from "../../hooks/login";
 const { connect, send, subscribe, disconnect } = socket;
 
 export default function BattleGameListPage() {
@@ -82,6 +83,9 @@ export default function BattleGameListPage() {
   const fetchAllRoom = async () => {
     const res = await authRequest().get(`/api/rooms`);
     const { data: fetchedRoomList } = res;
+    if (typeof fetchedRoomList === 'string') {
+      logout()
+    }
     setRoomList(fetchedRoomList);
   };
 
