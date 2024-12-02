@@ -136,6 +136,7 @@ export default function BattleGameIngamePage() {
       blueProgressPercent: data.blueProgressPercent !== undefined ? parseFloat(data.blueProgressPercent.toFixed(1)) : null,
       puzzleImage: puzzleImage,
       totalPieceCount: totalPieceCount,
+      battleTimer: data.game.battleTimer,
       startTime: data.game.startTime ? new Date(data.game.startTime).toISOString() : null,
       finishTime: data.game.finishTime ? new Date(data.game.finishTime).toISOString() : null,
     };

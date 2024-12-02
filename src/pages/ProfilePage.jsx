@@ -69,26 +69,26 @@ export default function ProfilePage({goGallery}) {
         setTotalPages(data.totalPages);
 
         const galleryRes = await authRequest().get(`/games/${userId}/records/gallery`);
-      const galleryData = galleryRes.data;
+        const galleryData = galleryRes.data;
+          
+        console.log(galleryData);
 
-      console.log(galleryData)
+        const processedGallery = galleryData.map((record) => ({
+          id: record.recordId,
+          url: record.puzzleImage,
+          roomTitle: record.gameName || "게임 이름 없음",
+          description: "추가적인 설명란 필요?", // 필요에 따라 수정 가능
+          piece: record.totalPieceCount.toString(),
+          pieceCount: record.totalPieceCount,
+          clearTime: `${record.battleTimer}초`,
+          date: new Date(record.playedAt).toLocaleString(),
+          teamMates: record.teamMates ? JSON.parse(record.teamMates) : [],
+          opponents: record.opponents ? JSON.parse(record.opponents) : [],
+          userTeam: record.userTeam, // 실제 데이터에 따라 설정
+        }));
 
-      const processedGallery = galleryData.map((record) => ({
-        id: record.recordId,
-        url: record.puzzleImage,
-        roomTitle: record.gameName || "게임 이름 없음",
-        description: "추가적인 설명란 필요?", // 필요에 따라 수정 가능
-        piece: record.totalPieceCount.toString(),
-        pieceCount: record.totalPieceCount,
-        clearTime: `${record.durationInMinutes}초`,
-        date: new Date(record.playedAt).toLocaleString(),
-        whos: record.teamMates ? JSON.parse(record.teamMates) : [],
-        opponents: record.opponents ? JSON.parse(record.opponents) : [],
-        userTeam: record.userTeam, // 실제 데이터에 따라 설정
-      }));
-
-      console.log(processedGallery)
-      setGalleryImages(processedGallery);
+        console.log(processedGallery)
+        setGalleryImages(processedGallery);
 
       }
     } catch (error) {

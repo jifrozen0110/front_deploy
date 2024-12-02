@@ -14,7 +14,8 @@ const GalleryWall = ({ count = 0, data }) => { // data prop 추가
       {/* 갤러리 그리드 */}
       <GalleryGrid>
         {limitedImages.map((image) => (
-          <ImageWrapper key={image.id} onClick={() => setSelectedImage(image)}>
+          <ImageWrapper key={image.id} onClick={() => {
+            setSelectedImage(image)}}>
             <ImageContainer>
               <Image src={image.url} alt={image.roomTitle} />
               <ImageOverlay />
@@ -41,7 +42,7 @@ const GalleryWall = ({ count = 0, data }) => { // data prop 추가
               <Details>
                 <InfoRow>
                   <span>
-                    {selectedImage.piece}피스 {selectedImage.clearTime}
+                    {selectedImage.pieceCount}피스 {selectedImage.clearTime}
                   </span>
                   <span>{selectedImage.date}</span>
                 </InfoRow>
@@ -49,24 +50,45 @@ const GalleryWall = ({ count = 0, data }) => { // data prop 추가
                   <h2>{selectedImage.roomTitle}</h2>
                   <span>{selectedImage.description}</span>
                 </Title>
-                <DescriptionBox>
-                  <DescriptionHeader>
-                    <Users size={20} color="#22C55E" />
-                    <span>함께한 사람들</span>
-                  </DescriptionHeader>
-                  <UserList>
-                    {selectedImage.whos && selectedImage.whos.length > 0 ? (
-                      selectedImage.whos.map((user) => (
-                        <UserCard key={user.id}>
-                          <UserAvatar src={user.avatar} alt={user.name} />
-                          <UserName>{user.name}</UserName>
-                        </UserCard>
-                      ))
-                    ) : (
-                      <NoUsersMessage>함께한 사람이 없습니다.</NoUsersMessage>
-                    )}
-                  </UserList>
-                </DescriptionBox>
+
+                {/* 함께한 사람들 */}
+<DescriptionBox>
+  <DescriptionHeader>
+    <Users size={20} color="#22C55E" />
+    <span>함께한 사람들</span>
+  </DescriptionHeader>
+  <UserList>
+    {selectedImage.teamMates && selectedImage.teamMates.length > 0 ? (
+      selectedImage.teamMates.map((member, index) => (
+        <MemberBadge key={index}>
+          {member}
+        </MemberBadge>
+      ))
+    ) : (
+      <NoUsersMessage>함께한 사람이 없습니다.</NoUsersMessage>
+    )}
+  </UserList>
+</DescriptionBox>
+
+{/* 상대한 사람들 */}
+<DescriptionBox>
+  <DescriptionHeader>
+    <Users size={20} color="#EF4444" />
+    <span>상대한 사람들</span>
+  </DescriptionHeader>
+  <UserList>
+    {selectedImage.opponents && selectedImage.opponents.length > 0 ? (
+      selectedImage.opponents.map((member, index) => (
+        <MemberBadge key={index}>
+          {member}
+        </MemberBadge>
+      ))
+    ) : (
+      <NoUsersMessage>상대한 사람이 없습니다.</NoUsersMessage>
+    )}
+  </UserList>
+</DescriptionBox>
+
               </Details>
             </ModalContent>
           </ModalCard>
@@ -119,7 +141,10 @@ const ImageContainerModal = styled.div`
   line-height: 0;
   border-radius: 12px;
 `;
-
+const MemberName = styled.div`
+  font-size: 14px;
+  color: #333333;
+`;
 const Image = styled.img`
   width: 100%;
   height: 100%;
@@ -322,10 +347,21 @@ const DescriptionHeader = styled.div`
   }
 `;
 
+const MemberBadge = styled.div`
+  display: inline-block;
+  background-color: #e5e7eb;
+  color: #111827;
+  padding: 8px 12px;
+  margin: 4px;
+  border-radius: 9999px; /* 둥근 모서리 */
+  font-size: 14px;
+  font-weight: 500;
+`;
+
 const UserList = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 8px;
 `;
 
