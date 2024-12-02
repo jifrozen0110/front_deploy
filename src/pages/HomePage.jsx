@@ -23,7 +23,7 @@ export default function HomePage() {
 
 const Wrapper = styled.div`
   position: relative;
-  height: 100vh;
+  min-height: 100vh;
   background-image: url(${backgroundPath});
   background-size: cover;
   background-attachment: fixed;

@@ -12,17 +12,6 @@ export const findNearTileGroup = ({ config }) => {
   config.groupTiles.forEach((tile, tileIndex) => {
     tile[0].onMouseUp = (event) => {
       // 위치 보정 후
-      // const group = tile[1];
-      // if (group !== undefined) {
-      //   config.groupTiles.forEach((gtile) => {
-      //     if (gtile[1] === group && gtile[2] !== tile[2]) {
-      //       findNearTile({ config, tile: gtile });
-      //     }
-      //   });
-      // }
-      // findNearTile({ config, tile });
-
-      // [group, groupIdx, idIdx]
       const nearGtiles = []
       for (const gtile of config.groupTiles) {
         if (gtile[1] == tile[1]) {
@@ -233,7 +222,6 @@ const checkUndefined = ({ config, nowIndex, nextIndex, direction }) => {
 };
 
 const sendFitTilePosition = (tile, tileIdx) => {
-  console.log("fittile 에서 위치 보냄!", tile.position.x, tile.position.y);
   // // socket 전송
   send(
     "/pub/game/puzzle",
@@ -291,7 +279,6 @@ export const fitTiles = ({
           preTile.position._y,
         );
         uniteFlag = true;
-        console.log("보정값 적용된거 ", nowTile.position);
 
         sendFitTilePosition(nowTile, nowIndex);
       }
@@ -309,7 +296,6 @@ export const fitTiles = ({
           preTile.position._y,
         );
         uniteFlag = true;
-        console.log("보정값 적용된거 ", nowTile.position);
 
         sendFitTilePosition(nowTile, nowIndex);
       }
@@ -324,7 +310,6 @@ export const fitTiles = ({
         // console.log("상", nowTile.position, range, xUp, yUp);
         nowTile.position = new Point(preTile.position._x, preTile.position._y + range);
         uniteFlag = true;
-        console.log("보정값 적용된거 ", nowTile.position);
 
         sendFitTilePosition(nowTile, nowIndex);
       }
@@ -342,7 +327,6 @@ export const fitTiles = ({
           preTile.position._y - (range),
         );
         uniteFlag = true;
-        console.log("보정값 적용된거 ", nowTile.position);
 
         sendFitTilePosition(nowTile, nowIndex);
       }
@@ -350,7 +334,6 @@ export const fitTiles = ({
   }
 
   if (isCombo) {
-    console.log(`${nowTile.position._x}, ${nowTile.position._y}에 img 생성!`);
     const canvasContainer = document.getElementById("canvasContainer");
     if (canvasContainer) {
       const comboEffect = document.createElement("img");
