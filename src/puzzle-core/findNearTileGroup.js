@@ -25,29 +25,47 @@ export const findNearTileGroup = ({ config }) => {
 
       if (nearGtiles.length) {
         const bundleNumSet = new Set(nearGtiles.map(gtile => gtile[1]))
-        let sandData = []
+        // let sandData = []
         const moveTiles = bundleNumSet.size == 1 ? config.groupTiles.filter(gtile => gtile[1] == tile[1]) : nearGtiles
         const stdGtile = bundleNumSet.size == 1 ? config.groupTiles.find(gtile => bundleNumSet.has(gtile[1])) : tile
-        sandData = moveTiles.map(gtile => {
+        // sandData = moveTiles.map(gtile => {
+        //   gtile[0].position = getNewPoint({ config, stdGtile, targetGtile: gtile })
+        //   gtile[1] = stdGtile[1]
+        //   return {
+        //     x: gtile[0].position.x,
+        //     y: gtile[0].position.y,
+        //     index: gtile[2],
+        //   }
+        // })
+        moveTiles.forEach(gtile => {
           gtile[0].position = getNewPoint({ config, stdGtile, targetGtile: gtile })
           gtile[1] = stdGtile[1]
-          return {
-            x: gtile[0].position.x,
-            y: gtile[0].position.y,
-            index: gtile[2],
-          }
         })
-        send(
-          "/pub/game/puzzle", {},
-          JSON.stringify({
-            type: "GAME",
-            roomId: getRoomId(),
-            sender: getSender(),
-            message: "MOUSE_DRAG",
-            targets: sandData,
-          }),
-        );
+        // send(
+        //   "/pub/game/puzzle", {},
+        //   JSON.stringify({
+        //     type: "GAME",
+        //     roomId: getRoomId(),
+        //     sender: getSender(),
+        //     message: "MOUSE_DRAG",
+        //     targets: JSON.stringify(sandData),
+        //   }),
+        // );
 
+        // const addGroupNums = new Set(moveTiles.map(gtile => gtile[1]));
+        // [...addGroupNums].forEach(groupNum => {
+        //   send(
+        //     "/pub/game/puzzle",
+        //     {},
+        //     JSON.stringify({
+        //       type: "GAME",
+        //       roomId: getRoomId(),
+        //       sender: getSender(),
+        //       message: "ADD_PIECE",
+        //       targets: `${groupNum},${stdGtile[2]}`,
+        //     }),
+        //   );
+        // })
         moveTiles.forEach(gtile => {
           send(
             "/pub/game/puzzle",
@@ -61,6 +79,7 @@ export const findNearTileGroup = ({ config }) => {
             }),
           );
         })
+
       }
 
       const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
