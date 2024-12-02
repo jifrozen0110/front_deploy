@@ -82,7 +82,7 @@ export default function BattleGameIngamePage() {
   const [gameDataDto, setGameDataDto] = useState(null);
   const [isOpenedDialog, setIsOpenedDialog] = useState(false);
 
-  const [time, setTime] = useState(0);
+  const [time, setTime] = useState(60);
   const [ourPercent, setOurPercent] = useState(0);
   const [enemyPercent, setEnemyPercent] = useState(0);
   const [chatHistory, setChatHistory] = useState([]);
