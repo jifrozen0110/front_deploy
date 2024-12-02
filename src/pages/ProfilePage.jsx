@@ -132,7 +132,7 @@ export default function ProfilePage({goGallery}) {
   };
 
   return (
-    <>
+    <div style={{ paddingBottom: "50px" }}>
         <InfoWraper style={{ marginTop: "50px", padding: "35px" }}>
           <Profile>
             <div style={{
@@ -269,7 +269,7 @@ export default function ProfilePage({goGallery}) {
             </button>
         </Navigation>
         </InfoWraper>
-    </>
+    </div>
   );
 }
 
