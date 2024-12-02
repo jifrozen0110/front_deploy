@@ -26,7 +26,7 @@ export default function GameCard({ room, category }) {
   };
 
   return (
-    <StyledCard onClick={handleCardClick}>
+    <StyledCard onClick={handleCardClick} disabled={room.roomStatus === "PLAYING"}>
       <CardMedia
         component="img"
         image={room.puzzleImage} // 이미지 경로 수정
@@ -81,7 +81,32 @@ const StyledCard = styled(Button)`
   background-color: rgba(0, 0, 0, 0.7);
   border-radius: 8px;
   overflow: hidden;
-  backdrop-filter: blur(5px); /* 블러 효과 추가 */
+  backdrop-filter: blur(5px);
+  position: relative;
+  transition: all 0.3s ease; /* 부드러운 상태 전환 */
+
+  ${(props) =>
+    props.disabled &&
+    `
+      filter: grayscale(100%); /* 흑백 필터 */
+      opacity: 0.6; /* 불투명도 조정 */
+      pointer-events: none; /* 클릭 불가능 */
+      &:after {
+        content: "게임 중";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-align: center;
+      }
+    `}
+  
   &:hover {
     background-color: rgba(73, 73, 73, 0.7);
   }
