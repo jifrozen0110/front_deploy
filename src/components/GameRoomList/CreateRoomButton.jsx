@@ -47,7 +47,7 @@ export default function CreateRoomButton({ category }) {
   const [puzzleImage, setPuzzleImage] = useState(DEFAULT_IMAGE_URL);
   const [customImageUrl, setCustomImageUrl] = useState(""); // 사용자 정의 이미지 URL
   const [validatedImageUrl, setValidatedImageUrl] = useState(DEFAULT_IMAGE_URL); // 유효성 검사된 이미지 URL
-  const [puzzlePiece, setPuzzlePiece] = useState();
+  const [puzzlePiece, setPuzzlePiece] = useState(72);
   const [maxPlayers, setMaxPlayers] = useState(4);
   const [isOpenedModal, setIsOpenedModal] = useState(false);
 
