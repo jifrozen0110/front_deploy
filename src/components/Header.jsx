@@ -77,4 +77,5 @@ export default function Header({ parentUpdate, goProfile, goHome }) {
 
 const HeaderBar = styled(AppBar)`
   background-color: /* #c4b6fb */ white;
+  position: relative
 `;

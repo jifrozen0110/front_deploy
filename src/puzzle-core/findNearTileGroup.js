@@ -4,7 +4,6 @@ import { socket } from "../socket-utils/socket2";
 import { getRoomId, getSender } from "../socket-utils/storage";
 import { getPuzzleGroup } from "./getPuzzleGroup";
 import { uniteTiles } from "./uniteTiles";
-import { findXChange, findXUp, findYChange, findYUp } from "./findChange";
 
 const { send } = socket;
 
@@ -271,9 +270,6 @@ export const fitTiles = ({
   isCombo = false,
 }) => {
   // const xChange = findXChange(nowShape, preShape, width);
-  const yChange = findYChange(nowShape, preShape, width);
-  const xUp = findXUp(nowShape, preShape, width);
-  const yUp = findYUp(nowShape, preShape, width);
 
   if (flag === false) {
     // console.log("fitTiles: ", nowIndex, preIndex);
