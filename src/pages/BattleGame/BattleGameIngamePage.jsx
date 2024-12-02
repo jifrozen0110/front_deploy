@@ -662,7 +662,7 @@ export default function BattleGameIngamePage() {
             <Timer num={time} color={getTeam()} />
           </div>
           <div style={{position: "absolute", top: "10px", right: "10px"}}>
-            <OutButton onClick={() => navigate("/game/battle")}>
+            <OutButton onClick={() => navigate("/home")}>
               <DoorOpen size="40" style={{margin: "auto"}} />
             </OutButton>
           </div>
