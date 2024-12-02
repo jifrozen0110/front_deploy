@@ -13,6 +13,7 @@ import { setMoveEvent } from "./setMoveEvent";
 import { uniteTiles } from "./uniteTiles";
 import { cleanBorderStyle, switchDirection, updateGroupByBundles } from "./utils";
 import { colors } from "./color";
+import { getNewPoint } from "./findNearTileGroup";
 export const groupPuzzlePieces = ({ config, bundles }) => {
   updateGroupByBundles({ config, bundles });
   return config;
@@ -75,13 +76,23 @@ const createPuzzleConfig = () => {
   };
 
   const addPiece = ({ fromIndex, toIndex }, bundles = []) => {
-    const afterUnitedConfig = uniteTiles({
-      config,
-      preIndex: fromIndex,
-      nowIndex: toIndex,
-    });
+    const fromGroup = config.groupTiles[fromIndex][1];
+    const toGroup = config.groupTiles[toIndex][1];
+    const moveTiles = config.groupTiles.filter(gtile => gtile[1] == fromGroup)
+    const stdGtile = config.groupTiles[toIndex]
+    moveTiles.forEach(gtile => {
+      gtile[0].position = getNewPoint({ config, stdGtile, targetGtile: gtile })
+    })
+    if (fromGroup != toGroup) {
+      config.groupTiles.forEach(gtile => {
+        if (gtile[1] == fromGroup) {
+          gtile[1] = toGroup
+        }
+      })
+    }
+
     const afterCheckItemConfig = removeItemStyleToPiece({
-      config: afterUnitedConfig,
+      config,
       fromIndex,
       toIndex,
     });

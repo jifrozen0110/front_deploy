@@ -1,38 +1,71 @@
 import Header from "../components/Header";
 import { useEffect, useState } from "react";
-import { authRequest, SERVER_END_POINT } from "../apis/requestBuilder";
-import { BackGround, LoginButtonBox, MainBox, PaddingDiv } from "../components/styled/styled";
+import { authRequest } from "../apis/requestBuilder";
+import { BackGround } from "../components/styled/styled";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import GalleryWall from "@/components/MyPage/GalleryWall";
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from "lucide-react";
 
-export default function Gallery() {
+export default function Gallery({goProfile}) {
+  const [galleryImages, setGalleryImages] = useState([]);
   const [forUpdate, setForUpdate] = useState(0);
   const forceUpdate = () => setForUpdate(forUpdate + 1);
   const navigate = useNavigate();
 
-  const moveMyPage = async () => {
-    navigate(`/user`);
+  const fetchGalleryData = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      const response = await authRequest().get(`/games/${userId}/records/gallery`);
+      const data = response.data;
+
+      const processedGallery = data.map((record) => ({
+        id: record.recordId,
+        url: record.puzzleImage,
+        roomTitle: record.gameName || "게임 이름 없음",
+        description: "추가적인 설명란 필요?", // 필요 시 수정 가능
+        piece: record.totalPieceCount.toString(),
+        clearTime: `${record.durationInMinutes}초`,
+        date: new Date(record.playedAt).toLocaleString(),
+        whos: record.teamMates ? JSON.parse(record.teamMates) : [],
+        opponents: record.opponents ? JSON.parse(record.opponents) : [],
+      }));
+      setGalleryImages(processedGallery);
+    } catch (error) {
+      console.error("갤러리 데이터를 가져오는 중 오류 발생:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchGalleryData();
+  }, [forUpdate]);
+
+  // const moveMyPage = () => {
+  //   navigate(`/user`);
+  // };
 
   return (
     <>
-      <BackGround style={{ paddingBottom: "50px" }}>
-        <Header parentUpdate={forceUpdate} />
-        <InfoWraper style={{marginTop: "40px"}}>
-          <SubSection style={{marginBottom: "30px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+        <InfoWraper style={{ marginTop: "40px" }}>
+          <SubSection style={{ marginBottom: "30px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <InfoTitle>
-              <div onClick={moveMyPage} style={{display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer"}}>
+              <div
+                onClick={() => goProfile()}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  cursor: "pointer",
+                }}
+              >
                 <ChevronLeft size={20} />
                 갤러리
               </div>
-              <SubDetail style={{marginLeft: "10px"}}>17</SubDetail>
+              <SubDetail style={{ marginLeft: "10px" }}>{galleryImages.length}</SubDetail>
             </InfoTitle>
           </SubSection>
-          <GalleryWall />
+          <GalleryWall data={galleryImages} />
         </InfoWraper>
-      </BackGround>
     </>
   );
 }
@@ -44,10 +77,7 @@ const InfoWraper = styled.div`
   box-sizing: border-box;
   max-width: 1000px;
   margin: 25px auto 0;
-  box-shadow:
-    0px 2px 4px -1px rgba(0, 0, 0, 0.2),
-    0px 4px 5px 0px rgba(0, 0, 0, 0.14),
-    0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
 `;
 
 const SubSection = styled.div`

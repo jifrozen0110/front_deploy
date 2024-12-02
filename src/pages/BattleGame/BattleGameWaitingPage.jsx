@@ -225,7 +225,8 @@ export default function BattleGameWaitingPage() {
     } catch (e) {
       if (isAxiosError(e) && e.response?.status >= 400) {
         console.error("방 정보를 불러오지 못했습니다.", e.message);
-        navigate("/game/battle", { replace: true });
+        // navigate("/game/battle", { replace: true });
+        navigate("/home", { replace: true });
       }
     }
   };
@@ -246,7 +247,8 @@ export default function BattleGameWaitingPage() {
     );
   } else if (roomData.maxPlayers <= roomData.nowPlayers && isNotInRoom()) {
     alert("방이 꽉 찼습니다.");
-    setTimeout(() => navigate("/game/battle"), 100);
+    // setTimeout(() => navigate("/game/battle"), 100);
+    setTimeout(() => navigate("/home"), 100);
   }
 
   return (
@@ -264,7 +266,8 @@ export default function BattleGameWaitingPage() {
       <Content>
         <Top>
           <ButtonGroup>
-            <TopButton onClick={() => navigate("/game/battle")}>
+            {/* <TopButton onClick={() => navigate("/game/battle")}> */}
+            <TopButton onClick={() => navigate("/home")}>
               <div style={{ textAlign: "center" }}>
                 <ArrowLeft style={{ display: "block", margin: "0 auto" }} />
                 나가기

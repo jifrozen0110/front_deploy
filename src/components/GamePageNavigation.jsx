@@ -11,9 +11,6 @@ import "./sound.css";
 
 
 export default function GamePageNavigation() {
-  const url = useLocation().pathname.split("/")[2] || "battle";
-  const isGame = useLocation().pathname.split("/")[1] === "game" ? true : false;
-  const [value, setValue] = useState(url);
   const audioRef = useRef(null);
   const [isMute, setIsMute] = useState(true);
   const [volume, setVolume] = useState(0.5);

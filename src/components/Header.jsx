@@ -10,7 +10,7 @@ import GamePageNavigation from "@/components/GamePageNavigation";
 import { authRequest } from "../apis/requestBuilder";
 import { getCookie, removeCookie } from "../hooks/cookieUtil";
 
-export default function Header({ parentUpdate }) {
+export default function Header({ parentUpdate, goProfile, goHome }) {
   const navigate = useNavigate();
 
   const theme = createTheme({
@@ -31,11 +31,14 @@ export default function Header({ parentUpdate }) {
 
   useEffect(() => {
     const token = getCookie("jwt");
-    if (!token)
+    if (!token){
       authRequest()
         .get("/api/user/refresh")
         .then((res) => {
           const { userId, userName, image, email, provider } = res.data;
+          if (!userId) {
+            navigate("/")
+          }
           localStorage.setItem("userId", userId);
           localStorage.setItem("userName", userName);
           localStorage.setItem("image", image);
@@ -43,6 +46,7 @@ export default function Header({ parentUpdate }) {
           localStorage.setItem("provider", provider);
         })
         .catch((err) => navigate("/"));
+      }
   }, []);
 
   const logout = async () => {
@@ -56,19 +60,19 @@ export default function Header({ parentUpdate }) {
     navigate("/");
   };
 
-  const moveProfile = async () => {
-    navigate(`/user`);
-  };
+  // const moveProfile = async () => {
+  //   navigate(`/user`);
+  // };
 
   return (
     <HeaderBar>
       <Toolbar sx={{ flexWrap: "wrap" }}>
-        <ImageIcon imageSource={Logo} size="lg" onClick={() => navigate("/home")} />
+        <ImageIcon imageSource={Logo} size="lg" onClick={() => goHome()} />
         <GamePageNavigation />
 
         <nav style={{ display: "flex", gap: "20px" }}>
           <ThemeProvider theme={theme}>
-            <Button variant="text" size="large" onClick={moveProfile}>
+            <Button variant="text" size="large" onClick={() => goProfile()}>
               mypage
             </Button>
             <Button variant="text" size="large" onClick={logout}>

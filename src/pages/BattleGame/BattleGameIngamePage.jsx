@@ -131,8 +131,8 @@ export default function BattleGameIngamePage() {
       redTeam: formatTeam(data.game.redTeam),
       blueTeam: formatTeam(data.game.blueTeam),
       players: formatTeam(data.game.players),
-      redProgressPercent: data.redProgressPercent !== undefined ? Math.round(data.redProgressPercent) : null,
-      blueProgressPercent: data.blueProgressPercent !== undefined ? Math.round(data.blueProgressPercent) : null,
+      redProgressPercent: data.redProgressPercent !== undefined ? parseFloat(data.redProgressPercent.toFixed(1)) : null,
+      blueProgressPercent: data.blueProgressPercent !== undefined ? parseFloat(data.blueProgressPercent.toFixed(1)) : null,
       puzzleImage: puzzleImage,
       totalPieceCount: totalPieceCount,
       startTime: data.game.startTime ? new Date(data.game.startTime).toISOString() : null,
@@ -361,7 +361,10 @@ export default function BattleGameIngamePage() {
 
   const handleCloseGame = () => {
     setIsOpenedDialog(false);
-    navigate(`/game/battle`, {
+    // navigate(`/game/battle`, {
+    //   replace: true,
+    // });
+    navigate(`/home`, {
       replace: true,
     });
   };
@@ -478,8 +481,6 @@ export default function BattleGameIngamePage() {
 
           // 우리팀 event
           if (data.message && data.team === getTeam().toUpperCase()) {
-            console.log("화긴11!!!!!!!!!!",data.senderId)
-            console.log("화긴22!!!!!!!!!!",getSender())
             if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
               const { targets } = data;
               const targetList = JSON.parse(targets);
@@ -504,7 +505,7 @@ export default function BattleGameIngamePage() {
             if (data.message && data.message === "ADD_PIECE") {
               const { targets, combo, comboCnt, team } = data;
               const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-              if (team == getTeam()) {
+              if (team.toUpperCase() == getTeam().toUpperCase()) {
                 addPiece({ fromIndex, toIndex });
               }
 
@@ -661,7 +662,7 @@ export default function BattleGameIngamePage() {
             <Timer num={time} color={getTeam()} />
           </div>
           <div style={{position: "absolute", top: "10px", right: "10px"}}>
-            <OutButton onClick={() => navigate("/game/battle")}>
+            <OutButton onClick={() => navigate("/home")}>
               <DoorOpen size="40" style={{margin: "auto"}} />
             </OutButton>
           </div>

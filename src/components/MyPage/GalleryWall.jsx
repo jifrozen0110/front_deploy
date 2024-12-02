@@ -1,293 +1,13 @@
+// src/components/MyPage/GalleryWall.jsx
 import React, { useState } from "react";
-import { styled } from "styled-components";
+import styled from "styled-components";
 import { X, Users } from "lucide-react";
 
-const GalleryWall = ({ count = 0 }) => {
+const GalleryWall = ({ count = 0, data }) => { // data prop 추가
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const images = [
-    {
-      id: 1,
-      url: "https://i.namu.wiki/i/nOXgZWBRaZguCSSys7FwQEdEae7OIo3gU6kMwqQ-52ITBgrmTNxqaOVF68Arm5pxLGUAy08DWHLhZdn_6hyzdg.webp",
-      roomTitle: "퍼즐 한 판",
-      description: "추가적인 설명란 필요?",
-      piece: "300",
-      clearTime: "10:10",
-      date: "2024/11/25 10:00",
-      whos: [
-        {
-          id: 1,
-          name: "이누야샤",
-          avatar: "https://via.placeholder.com/50", // 유저 아바타 이미지
-        },
-        {
-          id: 2,
-          name: "카구라",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 3,
-          name: "셋쇼마루",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 4,
-          name: "미로쿠",
-          avatar: "https://via.placeholder.com/50",
-        },
-      ],
-    },
-    {
-      id: 2,
-      url: "https://i.pinimg.com/originals/b5/9d/8f/b59d8f8cbb54368862109db8324dc6b8.jpg",
-      roomTitle: "너만 오면 고",
-      description: "추가적인 설명란 필요?",
-      piece: "500",
-      clearTime: "10:10",
-      date: "2024/11/25 10:00",
-      whos: [
-        {
-          id: 1,
-          name: "이누야샤",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 2,
-          name: "카구라",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 3,
-          name: "셋쇼마루",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 4,
-          name: "미로쿠",
-          avatar: "https://via.placeholder.com/50",
-        },
-      ],
-    },
-    {
-      id: 3,
-      url: "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
-      roomTitle: "짱구가 좋아",
-      description: "추가적인 설명란 필요?",
-      piece: "100",
-      clearTime: "10:10",
-      date: "2024/11/25 10:00",
-      whos: [
-        {
-          id: 1,
-          name: "이누야샤",
-          avatar: "https://via.placeholder.com/50", // 유저 아바타 이미지
-        },
-        {
-          id: 2,
-          name: "카구라",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 3,
-          name: "셋쇼마루",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 4,
-          name: "미로쿠",
-          avatar: "https://via.placeholder.com/50",
-        },
-      ],
-    },
-    {
-      id: 4,
-      url: "https://i.namu.wiki/i/nOXgZWBRaZguCSSys7FwQEdEae7OIo3gU6kMwqQ-52ITBgrmTNxqaOVF68Arm5pxLGUAy08DWHLhZdn_6hyzdg.webp",
-      roomTitle: "퍼즐 한 판",
-      description: "추가적인 설명란 필요?",
-      piece: "300",
-      clearTime: "10:10",
-      date: "2024/11/25 10:00",
-      whos: [
-        {
-          id: 1,
-          name: "이누야샤",
-          avatar: "https://via.placeholder.com/50", // 유저 아바타 이미지
-        },
-        {
-          id: 2,
-          name: "카구라",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 3,
-          name: "셋쇼마루",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 4,
-          name: "미로쿠",
-          avatar: "https://via.placeholder.com/50",
-        },
-      ],
-    },
-    {
-      id: 5,
-      url: "https://i.pinimg.com/originals/b5/9d/8f/b59d8f8cbb54368862109db8324dc6b8.jpg",
-      roomTitle: "너만 오면 고",
-      description: "추가적인 설명란 필요?",
-      piece: "500",
-      clearTime: "10:10",
-      date: "2024/11/25 10:00",
-      whos: [
-        {
-          id: 1,
-          name: "이누야샤",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 2,
-          name: "카구라",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 3,
-          name: "셋쇼마루",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 4,
-          name: "미로쿠",
-          avatar: "https://via.placeholder.com/50",
-        },
-      ],
-    },
-    {
-      id: 6,
-      url: "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
-      roomTitle: "짱구가 좋아",
-      description: "추가적인 설명란 필요?",
-      piece: "100",
-      clearTime: "10:10",
-      date: "2024/11/25 10:00",
-      whos: [
-        {
-          id: 1,
-          name: "이누야샤",
-          avatar: "https://via.placeholder.com/50", // 유저 아바타 이미지
-        },
-        {
-          id: 2,
-          name: "카구라",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 3,
-          name: "셋쇼마루",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 4,
-          name: "미로쿠",
-          avatar: "https://via.placeholder.com/50",
-        },
-      ],
-    },
-    {
-      id: 7,
-      url: "https://i.namu.wiki/i/nOXgZWBRaZguCSSys7FwQEdEae7OIo3gU6kMwqQ-52ITBgrmTNxqaOVF68Arm5pxLGUAy08DWHLhZdn_6hyzdg.webp",
-      roomTitle: "퍼즐 한 판",
-      description: "추가적인 설명란 필요?",
-      piece: "300",
-      clearTime: "10:10",
-      date: "2024/11/25 10:00",
-      whos: [
-        {
-          id: 1,
-          name: "이누야샤",
-          avatar: "https://via.placeholder.com/50", // 유저 아바타 이미지
-        },
-        {
-          id: 2,
-          name: "카구라",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 3,
-          name: "셋쇼마루",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 4,
-          name: "미로쿠",
-          avatar: "https://via.placeholder.com/50",
-        },
-      ],
-    },
-    {
-      id: 8,
-      url: "https://i.pinimg.com/originals/b5/9d/8f/b59d8f8cbb54368862109db8324dc6b8.jpg",
-      roomTitle: "너만 오면 고",
-      description: "추가적인 설명란 필요?",
-      piece: "500",
-      clearTime: "10:10",
-      date: "2024/11/25 10:00",
-      whos: [
-        {
-          id: 1,
-          name: "이누야샤",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 2,
-          name: "카구라",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 3,
-          name: "셋쇼마루",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 4,
-          name: "미로쿠",
-          avatar: "https://via.placeholder.com/50",
-        },
-      ],
-    },
-    {
-      id: 9,
-      url: "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
-      roomTitle: "짱구가 좋아",
-      description: "추가적인 설명란 필요?",
-      piece: "100",
-      clearTime: "10:10",
-      date: "2024/11/25 10:00",
-      whos: [
-        {
-          id: 1,
-          name: "이누야샤",
-          avatar: "https://via.placeholder.com/50", // 유저 아바타 이미지
-        },
-        {
-          id: 2,
-          name: "카구라",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 3,
-          name: "셋쇼마루",
-          avatar: "https://via.placeholder.com/50",
-        },
-        {
-          id: 4,
-          name: "미로쿠",
-          avatar: "https://via.placeholder.com/50",
-        },
-      ],
-    },
-  ];
-
-  const limitedImages = count ? images.slice(0, count) : images;
+  // count가 0보다 크면 data를 count만큼 슬라이스, 아니면 전체 데이터를 사용
+  const limitedImages = count > 0 ? data.slice(0, count) : data;
 
   return (
     <Container>
@@ -300,6 +20,7 @@ const GalleryWall = ({ count = 0 }) => {
               <ImageOverlay />
               <ImageTitle>
                 <h3>{image.roomTitle}</h3>
+                <p>{image.pieceCount} 조각</p> {/* pieceCount 추가 */}
               </ImageTitle>
             </ImageContainer>
           </ImageWrapper>
@@ -310,7 +31,7 @@ const GalleryWall = ({ count = 0 }) => {
       {selectedImage && (
         <ModalOverlay>
           <ModalCard>
-            <CloseButton onClick={() => setSelectedImage(null)} style={{ zIndex: "1" }}>
+            <CloseButton onClick={() => setSelectedImage(null)}>
               <X color="rgba(0,0,0,0.6)" />
             </CloseButton>
             <ModalContent>
@@ -318,12 +39,12 @@ const GalleryWall = ({ count = 0 }) => {
                 <ImageModal src={selectedImage.url} alt={selectedImage.roomTitle} />
               </ImageContainerModal>
               <Details>
-                <div style={{ display: "flex", justifyContent: "space-between", color: "#606060" }}>
+                <InfoRow>
                   <span>
                     {selectedImage.piece}피스 {selectedImage.clearTime}
                   </span>
                   <span>{selectedImage.date}</span>
-                </div>
+                </InfoRow>
                 <Title>
                   <h2>{selectedImage.roomTitle}</h2>
                   <span>{selectedImage.description}</span>
@@ -334,12 +55,16 @@ const GalleryWall = ({ count = 0 }) => {
                     <span>함께한 사람들</span>
                   </DescriptionHeader>
                   <UserList>
-                    {selectedImage.whos.map((user) => (
-                      <UserCard key={user.id}>
-                        <UserAvatar src={user.avatar} alt={user.name} />
-                        <UserName>{user.name}</UserName>
-                      </UserCard>
-                    ))}
+                    {selectedImage.whos && selectedImage.whos.length > 0 ? (
+                      selectedImage.whos.map((user) => (
+                        <UserCard key={user.id}>
+                          <UserAvatar src={user.avatar} alt={user.name} />
+                          <UserName>{user.name}</UserName>
+                        </UserCard>
+                      ))
+                    ) : (
+                      <NoUsersMessage>함께한 사람이 없습니다.</NoUsersMessage>
+                    )}
                   </UserList>
                 </DescriptionBox>
               </Details>
@@ -360,8 +85,16 @@ const GalleryGrid = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* 반응형 그리드 */
   gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const ImageWrapper = styled.div`
@@ -374,6 +107,7 @@ const ImageContainer = styled.div`
   border: 4px solid white;
   box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.25);
   aspect-ratio: 1 / 1;
+  border-radius: 12px; /* 모서리 둥글게 */
 `;
 
 const ImageContainerModal = styled.div`
@@ -383,6 +117,7 @@ const ImageContainerModal = styled.div`
   border: 4px solid white;
   box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.25);
   line-height: 0;
+  border-radius: 12px;
 `;
 
 const Image = styled.img`
@@ -390,6 +125,8 @@ const Image = styled.img`
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s;
+  border-radius: 12px;
+
   &:hover {
     transform: scale(1.05);
   }
@@ -400,8 +137,13 @@ const ImageModal = styled.img`
   max-width: 60vw;
   object-fit: contain;
   transition: transform 0.3s;
+
   &:hover {
     transform: scale(1.05);
+  }
+
+  @media (max-width: 768px) {
+    max-width: 90vw;
   }
 `;
 
@@ -411,6 +153,7 @@ const ImageOverlay = styled.div`
   background: linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
   opacity: 0;
   transition: opacity 0.3s;
+
   ${ImageWrapper}:hover & {
     opacity: 1;
   }
@@ -423,14 +166,21 @@ const ImageTitle = styled.div`
   right: 16px;
   opacity: 0;
   transform: translateY(16px);
-  transition:
-    opacity 0.3s,
-    transform 0.3s;
+  transition: opacity 0.3s, transform 0.3s;
+
   h3 {
     color: white;
     font-size: 1.2rem;
     font-weight: bold;
+    margin: 0;
   }
+
+  p {
+    color: white;
+    font-size: 1rem;
+    margin: 4px 0 0;
+  }
+
   ${ImageWrapper}:hover & {
     opacity: 1;
     transform: translateY(0);
@@ -448,60 +198,78 @@ const ModalOverlay = styled.div`
   padding: 16px;
 `;
 
+const CloseButton = styled.button`
+  position: absolute; /* 모달 내부의 상대적 위치 */
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.8); /* 반투명 배경 */
+  border: none;
+  border-radius: 50%; /* 둥근 버튼 */
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  z-index: 10; /* 모달 콘텐츠보다 위에 배치 */
+
+  &:hover {
+    background: rgba(255, 255, 255, 1); /* hover 시 완전 불투명 */
+    transform: scale(1.1); /* 버튼 크기 확대 */
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    color: rgba(0, 0, 0, 0.6); /* X 아이콘 색상 */
+    transition: color 0.3s;
+
+    &:hover {
+      color: rgba(0, 0, 0, 1); /* hover 시 색상 진하게 */
+    }
+  }
+`;
+
 const ModalCard = styled.div`
-  position: fixed;
+  position: relative; /* 자식 요소의 위치 기준 */
   background: white;
   max-width: 60vw;
   max-height: 90vh;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transform: translate(-50%, -50%);
-  top: 50%;
-  left: 50%;
-  z-index: 60;
-
   overflow-y: auto;
-  
+
   /* 스크롤바 스타일 */
   &::-webkit-scrollbar {
-    width: 6px; /* 스크롤바 너비 */
+    width: 6px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.3); /* 스크롤바 색상 */
-    border-radius: 10px; /* 스크롤바 둥글게 */
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.5); /* 스크롤바 hover 효과 */
+    background-color: rgba(0, 0, 0, 0.5);
   }
 
   &::-webkit-scrollbar-track {
-    background: transparent; /* 스크롤 트랙 배경 투명화 */
+    background: transparent;
+  }
+
+  @media (max-width: 768px) {
+    max-width: 90vw;
   }
 `;
 
-const CloseButton = styled.button`
-  position: sticky;
-  display: flex;
-  justify-content: end;
-  top: 5px;
-  width: 100%;
-  background: none;
-  border: none;
-  cursor: pointer;
-  .icon {
-    width: 24px;
-    height: 24px;
-  }
-`;
 
 const ModalContent = styled.div`
-  padding: 0 24px 24px 24px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  flex: 1; /* 남은 공간을 채우도록 설정 */
+  gap: 20px;
 `;
 
 const Details = styled.div`
@@ -510,11 +278,23 @@ const Details = styled.div`
   gap: 16px;
 `;
 
+const InfoRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  color: #606060;
+`;
+
 const Title = styled.div`
   h2 {
     font-size: 1.8rem;
     font-weight: bold;
     color: #333;
+    margin: 0;
+  }
+
+  span {
+    font-size: 1rem;
+    color: #555;
   }
 `;
 
@@ -529,11 +309,13 @@ const DescriptionHeader = styled.div`
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
+
   .icon {
     width: 20px;
     height: 20px;
     color: #2563eb;
   }
+
   span {
     font-weight: bold;
     color: #333;
@@ -542,7 +324,7 @@ const DescriptionHeader = styled.div`
 
 const UserList = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 10px;
   margin-top: 8px;
 `;
@@ -550,7 +332,6 @@ const UserList = styled.div`
 const UserCard = styled.div`
   display: flex;
   align-items: center;
-  min-width: 100px;
   gap: 8px;
   background: #f9f9f9;
   padding: 10px;
@@ -575,4 +356,11 @@ const UserAvatar = styled.img`
 const UserName = styled.span`
   font-weight: bold;
   color: #333;
+`;
+
+const NoUsersMessage = styled.div`
+  font-size: 14px;
+  color: #707070;
+  text-align: center;
+  margin-top: 10px;
 `;
