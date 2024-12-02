@@ -9,6 +9,7 @@ import { deepPurple } from "@mui/material/colors";
 import GamePageNavigation from "@/components/GamePageNavigation";
 import { authRequest } from "../apis/requestBuilder";
 import { getCookie, removeCookie } from "../hooks/cookieUtil";
+import { logout } from "../hooks/login";
 
 export default function Header({ parentUpdate, goProfile, goHome }) {
   const navigate = useNavigate();
@@ -48,17 +49,6 @@ export default function Header({ parentUpdate, goProfile, goHome }) {
         .catch((err) => navigate("/"));
       }
   }, []);
-
-  const logout = async () => {
-    localStorage.removeItem("email");
-    localStorage.removeItem("image");
-    localStorage.removeItem("provider");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userName");
-    removeCookie("jwt");
-
-    navigate("/");
-  };
 
   // const moveProfile = async () => {
   //   navigate(`/user`);
