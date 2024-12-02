@@ -10,7 +10,7 @@ import { Button } from "@mui/material";
 
 const width = 100;
 
-export default function ProfilePage() {
+export default function ProfilePage({goGallery}) {
   const [forUpdate, setForUpdate] = useState(0);
   const [userData, setUserData] = useState({});
   const [gameRecords, setGameRecords] = useState([]);
@@ -113,9 +113,9 @@ export default function ProfilePage() {
     }
   };
 
-  const moveGalleryWall = async () => {
-    navigate(`/user/gallery`);
-  };
+  // const moveGalleryWall = async () => {
+  //   navigate(`/user/gallery`);
+  // };
 
   // 게임 모드를 한글로 변환하는 함수
   const getGameModeText = (gameType) => {
@@ -133,9 +133,6 @@ export default function ProfilePage() {
 
   return (
     <>
-      <BackGround style={{ paddingBottom: "50px" }}>
-        <Header parentUpdate={forceUpdate} />
-
         <InfoWraper style={{ marginTop: "50px", padding: "35px" }}>
           <Profile>
             <div style={{
@@ -162,7 +159,7 @@ export default function ProfilePage() {
               <SubDetail style={{ marginLeft: "10px" }}>{galleryImages.length}</SubDetail>
             </InfoTitle>
             <div
-              onClick={moveGalleryWall}
+              onClick={() => goGallery()}
               style={{ display: "flex", alignItem: "center", color: "grey", cursor: "pointer" }}
             >
               더보기
@@ -272,7 +269,6 @@ export default function ProfilePage() {
             </button>
         </Navigation>
         </InfoWraper>
-      </BackGround>
     </>
   );
 }

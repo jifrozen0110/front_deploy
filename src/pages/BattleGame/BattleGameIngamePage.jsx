@@ -361,7 +361,10 @@ export default function BattleGameIngamePage() {
 
   const handleCloseGame = () => {
     setIsOpenedDialog(false);
-    navigate(`/game/battle`, {
+    // navigate(`/game/battle`, {
+    //   replace: true,
+    // });
+    navigate(`/home`, {
       replace: true,
     });
   };
