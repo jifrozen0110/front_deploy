@@ -217,7 +217,10 @@ export default function ProfilePage({goGallery}) {
                           <TeamMembers>
                           {record.teamMates && Array.isArray(record.teamMates) && record.teamMates.length > 0 ? (
                             record.teamMates.map((member, index) => (
-                              <MemberName key={index}>{member}</MemberName>
+                              <MemberName key={index}>
+                                  {member}
+                                  {index < record.teamMates.length - 1 && ","} {/* 마지막 멤버가 아니라면 쉼표 추가 */}
+                                </MemberName>
                             ))
                           ) : (
                             <MemberName>팀원 정보 없음</MemberName>

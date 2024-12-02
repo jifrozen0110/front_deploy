@@ -126,6 +126,7 @@ export default function BattleGameIngamePage() {
 
     // 백엔드로 보낼 데이터 포맷팅
     const gameDataDto = {
+      gameId:data.game.gameId,
       gameName: data.game.gameName,
       gameType: data.game.gameType,
       redTeam: formatTeam(data.game.redTeam),
@@ -406,7 +407,7 @@ export default function BattleGameIngamePage() {
           }
 
           // 매번 게임이 끝났는지 체크
-          if (data.isFinished === true) {
+          if (data.isFinished === true&&data.isStarted===true&& data.message && data.message === "SAVE_RECORD") {
 
             const ourTeamKey = `${getTeam()}Team`;
             const enemyTeamKey = getTeam() === "red" ? "blueTeam" : "redTeam";
