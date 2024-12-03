@@ -151,7 +151,7 @@ export default function BattleGameListPage() {
           />
           {/* UserListSidebar 모달 */}
           {isUserListModalOpen && (
-            <ModalOverlay onClick={handleOverlayClick}>
+            <ModalOverlay onClick={handleOverlayClick} style={{position:"fixed"}}>
               <ModalContent>
                 <UserListSidebar />
               </ModalContent>

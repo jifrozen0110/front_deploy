@@ -2,7 +2,7 @@ import { Point } from "paper/dist/paper-core";
 import { socket } from "../socket-utils/socket2";
 import { getRoomId, getSender } from "../socket-utils/storage";
 import { getPuzzleGroup } from "./getPuzzleGroup";
-import { findNearTileGroup } from "./findNearTileGroup";
+import { findNearTileGroup, getNewPoint } from "./findNearTileGroup";
 
 const { send } = socket;
 
@@ -67,26 +67,7 @@ const moveTile = ({ config }) => {
           config.project.view._viewSize._height - Math.floor(config.tileWidth / 2),
         ),
       };
-
-      const originalPosition = {
-        x: gtile[0].position._x,
-        y: gtile[0].position._y,
-      };
-
-      if (gtile[1] === undefined) {
-        gtile[0].position = new Point(newPosition.x, newPosition.y);
-      } else {
-        config.groupTiles.forEach((gtile_now) => {
-          if (gtile[1] === gtile_now[1]) {
-            gtile_now[0].position = new Point(
-              gtile_now[0].position._x + newPosition.x - originalPosition.x,
-              gtile_now[0].position._y + newPosition.y - originalPosition.y,
-            );
-          }
-        });
-      }
-
-      const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
+      gtile[0].position = new Point(newPosition.x, newPosition.y)
 
       const currentTime = Date.now();
       if (currentTime - lastExecutionTime >= interval) {
@@ -101,14 +82,19 @@ const moveTile = ({ config }) => {
             roomId: getRoomId(),
             sender: getSender(),
             message: "MOUSE_DRAG",
-            targets: JSON.stringify(puzzleGroup),
-            position_x: gtile[0].position.x,
-            position_y: gtile[0].position.y,
+            targets: JSON.stringify([{ ...newPosition, index: gtile[2] }]),
           }),
         );
 
         lastExecutionTime = currentTime;
       }
+
+      config.groupTiles
+        .forEach(targetGtile => {
+          if (targetGtile[1] == gtile[1]) {
+            targetGtile[0].position = getNewPoint({ config, stdGtile: gtile, targetGtile })
+          }
+        })
     };
 
     gtile[0].onMouseEnter = (event) => {

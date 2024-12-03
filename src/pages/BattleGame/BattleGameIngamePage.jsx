@@ -67,7 +67,7 @@ const { connect, send, subscribe, disconnect } = socket;
 const {
   getConfig,
   lockPuzzle,
-  movePuzzle,
+  movePuzzles,
   unLockPuzzle,
   addPiece,
   usingItemFire,
@@ -489,7 +489,7 @@ export default function BattleGameIngamePage() {
             if (data.message && data.message === "MOVE" && data.senderId !== getSender()) {
               const { targets } = data;
               const targetList = JSON.parse(targets);
-              targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
+              targetList.forEach(({ x, y, index }) => movePuzzles(x, y, index));
               return;
             }
 
@@ -503,25 +503,29 @@ export default function BattleGameIngamePage() {
             if (data.message && data.message === "ADD_PIECE") {
               const { targets, combo, comboCnt, team } = data;
               const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-              if (team.toUpperCase() == getTeam().toUpperCase()) {
-                addPiece({ fromIndex, toIndex });
-              }
-
+              addPiece({ fromIndex, toIndex });
+              
               if (team === "RED") {
                 redCleanHint({ fromIndex, toIndex });
               }
-
+              
               if (team === "BLUE") {
                 blueCleanHint({ fromIndex, toIndex });
               }
-
+              
               return;
             }
           }else{
             if (data.message && data.message === "MOVE"){
               const { targets } = data;
               const targetList = JSON.parse(targets);
-              targetList.forEach(({ x, y, index }) => enemyConfig.movePuzzle(x*enemyCanvasScale, y*enemyCanvasScale, index));
+              targetList.forEach(({ x, y, index }) => enemyConfig.movePuzzles(x*enemyCanvasScale, y*enemyCanvasScale, index));
+              return;
+            }
+            if (data.message && data.message === "ADD_PIECE") {
+              const { targets, combo, comboCnt, team } = data;
+              const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
+              enemyConfig.addPiece({ fromIndex, toIndex });
               return;
             }
           }
