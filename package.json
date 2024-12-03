@@ -23,7 +23,6 @@
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
     "lucide-react": "^0.460.0",
-    "openvidu-browser": "^2.29.0",
     "paper": "^0.12.17",
     "react": "^18.2.0",
     "react-cookie": "^7.2.2",

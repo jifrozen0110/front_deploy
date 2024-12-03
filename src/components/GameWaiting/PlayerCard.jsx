@@ -4,11 +4,11 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-import LocalPoliceTwoToneIcon from '@mui/icons-material/LocalPoliceTwoTone';
+import LocalPoliceTwoToneIcon from "@mui/icons-material/LocalPoliceTwoTone";
 
 function PlayerCard(props) {
   const { player, master, color } = props;
-  
+
   return (
     <WrapperCard className={color}>
       <CardMedia
@@ -18,14 +18,13 @@ function PlayerCard(props) {
         image={player.playerImage}
       />
       <Content>
-      <NicknameWrapper>
+        <NicknameWrapper>
           <Nickname component="div" variant="subtitle1">
             {player.playerName}
           </Nickname>
           {master === player.playerId && <StyledCrownIcon />} {/* 왕관 아이콘 표시 */}
         </NicknameWrapper>
       </Content>
-      {/* <GameOpenVidu gameId={gameId} playerName={player.playerName} /> */}
     </WrapperCard>
   );
 }
@@ -89,7 +88,6 @@ const NicknameWrapper = styled.div`
   display: flex;
   align-items: center; /* 세로 정렬 */
 `;
-
 
 const Content = styled.div`
   width: 100%;

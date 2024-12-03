@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { styled } from "styled-components";
 import { getSender, getRoomId, getTeam } from "@/socket-utils/storage";
-import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
 import { socket } from "@/socket-utils/socket2";
 import { TextField, Button, Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -106,46 +105,38 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
             {/* 채팅 기록을 화면에 출력 */}
             {chatHistory.map((chat, index) => {
               return (
-              <>
-                {chat.userId == getSender() ? (
-                  <MyChatDiv
-                    key={index}
-                    $color={currentChatTheme}
-                    style={{
-                      opacity: isChatVisible  ? 1 : 0, // 투명화 상태에 따라 설정
-                      transition: "opacity 0.5s ease-in-out",
-                    }}
-                  >
-                    <strong>{chat.userName}: </strong>
-                    {chat.message}
-                  </MyChatDiv>
-                ) : (
-                  <ChatDiv
-                    key={index}
-                    $color={currentChatTheme}
-                    style={{
-                      opacity: isChatVisible  ? 1 : 0, // 투명화 상태에 따라 설정
-                      transition: "opacity 0.5s ease-in-out",
-                    }}
-                  >
-                    {chat.userName}: {chat.message}
-                  </ChatDiv>
-                )}
-              </>
-            )})}
+                <>
+                  {chat.userId == getSender() ? (
+                    <MyChatDiv
+                      key={index}
+                      $color={currentChatTheme}
+                      style={{
+                        opacity: isChatVisible ? 1 : 0, // 투명화 상태에 따라 설정
+                        transition: "opacity 0.5s ease-in-out",
+                      }}
+                    >
+                      <strong>{chat.userName}: </strong>
+                      {chat.message}
+                    </MyChatDiv>
+                  ) : (
+                    <ChatDiv
+                      key={index}
+                      $color={currentChatTheme}
+                      style={{
+                        opacity: isChatVisible ? 1 : 0, // 투명화 상태에 따라 설정
+                        transition: "opacity 0.5s ease-in-out",
+                      }}
+                    >
+                      {chat.userName}: {chat.message}
+                    </ChatDiv>
+                  )}
+                </>
+              );
+            })}
           </ChatContainer>
         )}
 
         <Form onSubmit={handleMessageSend}>
-          {isIngame ? (
-            <GameOpenVidu
-              gameId={`${getRoomId()}_${getTeam()}`}
-              playerName={getSender()}
-              color={currentTheme}
-            />
-          ) : (
-            <GameOpenVidu gameId={getRoomId()} playerName={getSender()} />
-          )}
           <ChatInput
             type="text"
             placeholder="메시지를 입력하세요"
@@ -202,13 +193,12 @@ const ChatContainer = styled.div`
   }
 `;
 
-
 const Form = styled.form`
   padding: 5px 5px 0 0;
   display: flex;
   background-color: ${getTeam() === "red" ? red[400] : blue[400]};
   border-radius: 0 5px 0 0;
-  WebkitTextStroke: "2px white", // 글자 테두리
+  webkittextstroke: "2px white"; // 글자 테두리
 `;
 
 const ChatInput = styled(TextField)`
