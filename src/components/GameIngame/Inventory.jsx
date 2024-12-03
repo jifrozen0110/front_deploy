@@ -52,9 +52,9 @@ const InventoryContainer = styled.div`
   align-items: center;
   gap: 10px; /* 슬롯 간의 간격 */
   padding: 10px 30px;
-  border-left: 4px solid ${getTeam() === "red" ? red[400] : blue[400]};
-  border-top: 4px solid ${getTeam() === "red" ? red[400] : blue[400]};
-  border-radius: 10px 0 0 0;
+  // border-left: 4px solid ${getTeam() === "red" ? red[400] : blue[400]};
+  // border-top: 4px solid ${getTeam() === "red" ? red[400] : blue[400]};
+  // border-radius: 10px 0 0 0;
 `;
 
 const Slot = styled.div`

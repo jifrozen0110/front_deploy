@@ -67,7 +67,7 @@ const { connect, send, subscribe, disconnect } = socket;
 const {
   getConfig,
   lockPuzzle,
-  movePuzzle,
+  movePuzzles,
   unLockPuzzle,
   addPiece,
   usingItemFire,
@@ -82,7 +82,7 @@ export default function BattleGameIngamePage() {
   const [gameDataDto, setGameDataDto] = useState(null);
   const [isOpenedDialog, setIsOpenedDialog] = useState(false);
 
-  const [time, setTime] = useState(0);
+  const [time, setTime] = useState(60);
   const [ourPercent, setOurPercent] = useState(0);
   const [enemyPercent, setEnemyPercent] = useState(0);
   const [chatHistory, setChatHistory] = useState([]);
@@ -126,6 +126,7 @@ export default function BattleGameIngamePage() {
 
     // 백엔드로 보낼 데이터 포맷팅
     const gameDataDto = {
+      gameId:data.game.gameId,
       gameName: data.game.gameName,
       gameType: data.game.gameType,
       redTeam: formatTeam(data.game.redTeam),
@@ -135,6 +136,7 @@ export default function BattleGameIngamePage() {
       blueProgressPercent: data.blueProgressPercent !== undefined ? parseFloat(data.blueProgressPercent.toFixed(1)) : null,
       puzzleImage: puzzleImage,
       totalPieceCount: totalPieceCount,
+      battleTimer: data.game.battleTimer,
       startTime: data.game.startTime ? new Date(data.game.startTime).toISOString() : null,
       finishTime: data.game.finishTime ? new Date(data.game.finishTime).toISOString() : null,
     };
@@ -406,7 +408,8 @@ export default function BattleGameIngamePage() {
           }
 
           // 매번 게임이 끝났는지 체크
-          if (data.isFinished === true) {
+          if (data.isFinished === true&&data.isStarted===true&& data.message && data.message === "SAVE_RECORD") {
+            setTime(0);
 
             const ourTeamKey = `${getTeam()}Team`;
             const enemyTeamKey = getTeam() === "red" ? "blueTeam" : "redTeam";
@@ -486,7 +489,7 @@ export default function BattleGameIngamePage() {
             if (data.message && data.message === "MOVE" && data.senderId !== getSender()) {
               const { targets } = data;
               const targetList = JSON.parse(targets);
-              targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
+              targetList.forEach(({ x, y, index }) => movePuzzles(x, y, index));
               return;
             }
 
@@ -500,25 +503,29 @@ export default function BattleGameIngamePage() {
             if (data.message && data.message === "ADD_PIECE") {
               const { targets, combo, comboCnt, team } = data;
               const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-              if (team.toUpperCase() == getTeam().toUpperCase()) {
-                addPiece({ fromIndex, toIndex });
-              }
-
+              addPiece({ fromIndex, toIndex });
+              
               if (team === "RED") {
                 redCleanHint({ fromIndex, toIndex });
               }
-
+              
               if (team === "BLUE") {
                 blueCleanHint({ fromIndex, toIndex });
               }
-
+              
               return;
             }
           }else{
             if (data.message && data.message === "MOVE"){
               const { targets } = data;
               const targetList = JSON.parse(targets);
-              targetList.forEach(({ x, y, index }) => enemyConfig.movePuzzle(x*enemyCanvasScale, y*enemyCanvasScale, index));
+              targetList.forEach(({ x, y, index }) => enemyConfig.movePuzzles(x*enemyCanvasScale, y*enemyCanvasScale, index));
+              return;
+            }
+            if (data.message && data.message === "ADD_PIECE") {
+              const { targets, combo, comboCnt, team } = data;
+              const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
+              enemyConfig.addPiece({ fromIndex, toIndex });
               return;
             }
           }

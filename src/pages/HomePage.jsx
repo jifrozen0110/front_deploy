@@ -41,7 +41,7 @@ const Wrapper = styled.div`
   }
 
   > * {
-    position: relative; /* 자식 요소를 블러 바깥으로 제외 */
+    position: relative;
     z-index: 1;
-  }
+  }  
 `;
