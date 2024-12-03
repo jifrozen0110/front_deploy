@@ -605,8 +605,9 @@ export default function BattleGameIngamePage() {
   const roomId = localStorage.getItem('roomId');
 
   const exitRoom = () => {
-    console.log("방 나가기~");
+    
     send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
+    navigate("/home");
   };
 
   useExitRoom(exitRoom, isGameEndingRef);
@@ -642,6 +643,13 @@ export default function BattleGameIngamePage() {
     },
   });
 
+
+  const handleExit = () => {
+    if (window.confirm("진심으로 게임 방에서 나가시겠습니까?")){
+      exitRoom();
+    }
+  }
+
   if (!isLoaded) {
     return (
       <Wrapper>
@@ -658,7 +666,7 @@ export default function BattleGameIngamePage() {
             <Timer num={time} color={getTeam()} />
           </div>
           <div style={{position: "absolute", top: "10px", right: "10px"}}>
-            <OutButton onClick={() => navigate("/home")}>
+            <OutButton onClick={() => handleExit()}>
               <DoorOpen size="40" style={{margin: "auto"}} />
             </OutButton>
           </div>

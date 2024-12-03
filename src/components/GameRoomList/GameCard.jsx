@@ -16,7 +16,7 @@ import { isAxiosError } from "axios";
 
 export default function GameCard({ room, category }) {
   const navigate = useNavigate();
-
+  console.log(room)
   const handleCardClick = async () => {
     if (room.maxPlayers <= room.nowPlayers) {
       alert("방이 꽉 찼습니다.");
