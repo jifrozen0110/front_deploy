@@ -40,5 +40,8 @@ const Wrapper = styled.div`
     background-color: rgba(0,0,0,0.2);
   }
 
-  
+  > * {
+    position: relative;
+    z-index: 1;
+  }  
 `;
