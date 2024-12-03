@@ -2,7 +2,23 @@ import { Point } from "paper/dist/paper-core";
 import { socket } from "../socket-utils/socket2";
 import { getRoomId, getSender } from "../socket-utils/storage";
 import { getPuzzleGroup } from "./getPuzzleGroup";
+import { setPuzzleSize } from "./setPuzzleSize";
 import { findNearTileGroup, getNewPoint } from "./findNearTileGroup";
+
+import puzzleDownSound from "@/assets/audio/puzzle_up.wav";
+
+const addAudio = (audioPath) => {
+  const audio = new Audio(audioPath);
+  audio.loop = false;
+  audio.volume = 0.4;
+  audio.crossOrigin = "anonymous";
+  audio.load();
+  try {
+    audio.play();
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 const { send } = socket;
 
@@ -25,17 +41,27 @@ const moveTile = ({ config }) => {
   // 모든 타일을 돌면서 마우스 이벤트 등록
   config.groupTiles.forEach((gtile, gtileIdx) => {
     gtile[0].onMouseDown = (event) => {
+      console.log("퍼즐을 잡았다");
+      addAudio(puzzleDownSound);
+
+      let isGroup = false;
       const group = gtile[1];
       if (group !== undefined) {
         // 그룹이면 해당 그룹의 타일들 모두 앞으로 이동
         config.groupTiles.forEach((tile) => {
           if (tile[1] === group) {
+            if (tile[0] !== gtile[0]) {
+              isGroup = true;
+            }
             tile[0].bringToFront();
           }
         });
       } else {
         // 그룹이 아닐땐 클릭된 타일만 앞으로 이동
         event.target.bringToFront();
+      }
+      if (!isGroup) {
+        setPuzzleSize(gtile[0], 84);
       }
 
       const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
