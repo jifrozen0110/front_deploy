@@ -63,8 +63,15 @@ const createPuzzleConfig = () => {
 
   };
 
-  const movePuzzle = (x, y, index) => {
+  const movePuzzles = (x, y, index) => {
     config.tiles[index].position = new Point(x, y);
+    const myGtile = config.groupTiles[index]
+    config.groupTiles
+      .forEach(gtile => {
+        if (myGtile[1] == gtile[1] && gtile[2] != myGtile[2]) {
+          gtile[0].position = getNewPoint({ config, stdGtile: myGtile, targetGtile: gtile })
+        }
+      })
   };
 
   const unLockPuzzle = (index) => {
@@ -199,7 +206,7 @@ const createPuzzleConfig = () => {
     initializePuzzle2,
     getConfig,
     lockPuzzle,
-    movePuzzle,
+    movePuzzles,
     unLockPuzzle,
     addPiece,
     addCombo,

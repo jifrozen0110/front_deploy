@@ -20,7 +20,7 @@ export default function Timer({ num, isCooperation = false, color }) {
   }, [num]);
 
   const urgencyLevel = useMemo(() => {
-    if (isCooperation) return 0;
+    if (isCooperation || num == 0) return 0;
     if (num <= 10) return 3; // 매우 긴박
     if (num <= 20) return 2; // 긴박
     if (num <= 30) return 1; // 약간 긴박
