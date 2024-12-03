@@ -3,13 +3,31 @@ import comboEffectPath from "@/assets/effects/comboEffect.gif";
 import { socket } from "../socket-utils/socket2";
 import { getRoomId, getSender } from "../socket-utils/storage";
 import { getPuzzleGroup } from "./getPuzzleGroup";
+import { setPuzzleSize } from "./setPuzzleSize";
 import { uniteTiles } from "./uniteTiles";
+
+import puzzleDownSound from "@/assets/audio/puzzle_down.wav";
+import puzzleFitSound from "@/assets/audio/puzzle_fit.wav";
+
+const addAudio = (audioPath) => {
+  const audio = new Audio(audioPath);
+  audio.loop = false;
+  audio.volume = 0.4;
+  audio.crossOrigin = "anonymous";
+  audio.load();
+  try {
+    audio.play();
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 const { send } = socket;
 
 export const findNearTileGroup = ({ config }) => {
   config.groupTiles.forEach((tile, tileIndex) => {
     tile[0].onMouseUp = (event) => {
+      
       // 위치 보정 후
       const nearGroupStdIdxs = []
       const nearGroupSet = new Set()
@@ -42,6 +60,8 @@ export const findNearTileGroup = ({ config }) => {
         }
 
         nearGroupStdIdxs.forEach(nearStdIdx => {
+          console.log("퍼즐을 맞췄다");
+          addAudio(puzzleFitSound);
           send(
             "/pub/game/puzzle",
             {},
@@ -54,6 +74,9 @@ export const findNearTileGroup = ({ config }) => {
             }),
           );
         })
+      } else {
+        console.log("퍼즐을 못맞췄다");
+        addAudio(puzzleDownSound);
       }
 
       const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
