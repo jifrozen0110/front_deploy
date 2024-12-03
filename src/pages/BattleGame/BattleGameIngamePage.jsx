@@ -409,6 +409,7 @@ export default function BattleGameIngamePage() {
 
           // 매번 게임이 끝났는지 체크
           if (data.isFinished === true&&data.isStarted===true&& data.message && data.message === "SAVE_RECORD") {
+            setTime(0);
 
             const ourTeamKey = `${getTeam()}Team`;
             const enemyTeamKey = getTeam() === "red" ? "blueTeam" : "redTeam";
