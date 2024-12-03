@@ -611,8 +611,7 @@ export default function BattleGameIngamePage() {
   const roomId = localStorage.getItem('roomId');
 
   const exitRoom = () => {
-    
-    send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
+    send(`/pub/game/${gameId}/exit`, {}, JSON.stringify(createPlayerRequest()));
     navigate("/home");
   };
 
