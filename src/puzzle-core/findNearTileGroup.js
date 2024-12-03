@@ -27,6 +27,7 @@ const { send } = socket;
 export const findNearTileGroup = ({ config }) => {
   config.groupTiles.forEach((tile, tileIndex) => {
     tile[0].onMouseUp = (event) => {
+      setPuzzleSize(tile[0], 80);
       
       // 위치 보정 후
       const nearGroupStdIdxs = []

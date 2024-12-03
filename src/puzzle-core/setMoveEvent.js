@@ -44,17 +44,24 @@ const moveTile = ({ config }) => {
       console.log("퍼즐을 잡았다");
       addAudio(puzzleDownSound);
 
+      let isGroup = false;
       const group = gtile[1];
       if (group !== undefined) {
         // 그룹이면 해당 그룹의 타일들 모두 앞으로 이동
         config.groupTiles.forEach((tile) => {
           if (tile[1] === group) {
+            if (tile[0] !== gtile[0]) {
+              isGroup = true;
+            }
             tile[0].bringToFront();
           }
         });
       } else {
         // 그룹이 아닐땐 클릭된 타일만 앞으로 이동
         event.target.bringToFront();
+      }
+      if (!isGroup) {
+        setPuzzleSize(gtile[0], 84);
       }
 
       const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
