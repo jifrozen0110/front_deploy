@@ -50,13 +50,14 @@ import blackholePath from "@/assets/effects/blackhole.png";
 import twinklePath from "@/assets/effects/twinkle.gif";
 import framePath from "@/assets/effects/frame.png";
 
-import { attackAudio } from "@/puzzle-core/addAudio";
+import { attackAudio, puzzleAudio, backgroundAudio } from "@/puzzle-core/addAudio";
 import fireAudioPath from "@/assets/audio/fire.mp3";
 import mudAudioPath from "@/assets/audio/mud.wav";
 import tornadoAudioPath from "@/assets/audio/tornado.mp3";
 import bloomAudioPath from "@/assets/audio/blooming.mp3";
 import blackholeAudioPath from "@/assets/audio/blackhole.mp3";
 import frameAudioPath from "@/assets/audio/frame2.mp3";
+import beep from "@/assets/audio/beep.mp3";
 
 import './ani.css';
 import { authRequest } from "../../apis/requestBuilder";
@@ -641,6 +642,12 @@ export default function BattleGameIngamePage() {
       setPictureSrc(tempSrc);
     }
   }, [gameData]);
+
+  useEffect(() => {
+    if (time <= 10) {
+      puzzleAudio(beep);
+    }
+  }, [time]);
 
   const theme = createTheme({
     typography: {
