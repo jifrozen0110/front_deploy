@@ -6,21 +6,9 @@ import { getPuzzleGroup } from "./getPuzzleGroup";
 import { setPuzzleSize } from "./setPuzzleSize";
 import { uniteTiles } from "./uniteTiles";
 
+import { puzzleAudio } from "@/puzzle-core/addAudio";
 import puzzleDownSound from "@/assets/audio/puzzle_down.wav";
 import puzzleFitSound from "@/assets/audio/puzzle_fit.wav";
-
-const addAudio = (audioPath) => {
-  const audio = new Audio(audioPath);
-  audio.loop = false;
-  audio.volume = 0.4;
-  audio.crossOrigin = "anonymous";
-  audio.load();
-  try {
-    audio.play();
-  } catch (err) {
-    console.log(err);
-  }
-};
 
 const { send } = socket;
 
@@ -62,7 +50,7 @@ export const findNearTileGroup = ({ config }) => {
 
         nearGroupStdIdxs.forEach(nearStdIdx => {
           console.log("퍼즐을 맞췄다");
-          addAudio(puzzleFitSound);
+          puzzleAudio(puzzleFitSound);
           send(
             "/pub/game/puzzle",
             {},
@@ -77,7 +65,7 @@ export const findNearTileGroup = ({ config }) => {
         })
       } else {
         console.log("퍼즐을 못맞췄다");
-        addAudio(puzzleDownSound);
+        puzzleAudio(puzzleDownSound);
       }
 
       const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
