@@ -30,6 +30,7 @@ export default function BattleGameWaitingPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [roomData, setRoomData] = useState(null);
+  const [battleTimer, setBattleTimer] = useState(null);
   const [playerCount, setPlayerCount] = useState(1);
   const [emptyPlayerCount, setEmptyPlayerCount] = useState([0, 0]);
   const [xPlayerCount, setXPlayerCount] = useState([0, 0]);
@@ -228,10 +229,10 @@ export default function BattleGameWaitingPage() {
   const initialize = async () => {
     try {
       const response = await authRequest().get(`/api/rooms/${roomId}`);
-
       const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
       setIsMaster(response.data.master===playerId)
       setRoomData(response.data);
+      setBattleTimer(response.data.battleTimer);
       setPlayerCount(response.data.nowPlayers);
       setEmptyPlayerCount([
         Math.max(0, halfPlayers - response.data.redPlayers.length),
@@ -346,7 +347,7 @@ export default function BattleGameWaitingPage() {
               <Title>{roomData.roomName}</Title>
               <Divider />
               <Typography variant="subtitle1">
-                {roomData.gameMode == "battle" ? "대전 모드" : ""}
+                {battleTimer/60} 분
               </Typography>
               <Typography variant="subtitle1">{roomData.puzzlePiece} 피스</Typography>
               <StartButton isMaster={isMaster} onClick={() => isMaster && startGame()}>시작</StartButton>
