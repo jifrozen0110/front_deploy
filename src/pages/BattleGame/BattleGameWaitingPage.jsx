@@ -299,12 +299,12 @@ export default function BattleGameWaitingPage() {
                 이동
               </div>
             </TopButton>
-            <TopButton>
+            {/* <TopButton>
               <div style={{ textAlign: "center" }}>
                 <Settings style={{ display: "block", margin: "0 auto" }} />
                 설정
               </div>
-            </TopButton>
+            </TopButton> */}
             <TopButton onClick={handleInviteClick}>
               <div style={{ textAlign: "center" }}>
                 <UserPlus style={{ display: "block", margin: "0 auto" }} />
