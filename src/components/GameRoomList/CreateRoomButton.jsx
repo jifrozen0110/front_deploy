@@ -26,15 +26,15 @@ import { authRequest } from "../../apis/requestBuilder";
 const predefinedImages = [
   {
     name: "짱구",
-    url: "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+    url: "https://res.heraldm.com/content/image/2015/03/06/20150306001045_0.jpg",
   },
   {
     name: "치이카와",
     url: "https://ynoblesse.com/wp-content/uploads/2023/07/358520758_1425769678257003_8801872512201663407_n.jpg",
   },
   {
-    name: "배틀그라운드",
-    url: "https://i.namu.wiki/i/zLs_c5RLdQZF3lf3QN-rrVFa-8C0QcMRsEk0UhoAwOEEW56lvrUh51E04eQu0Uuvmsgx-Wu-6F_eAIzAxk0hXw.webp",
+    name: "문지캠퍼스",
+    url: "https://i.postimg.cc/L8FR60pP/Kakao-Talk-20241202-141212588.jpg",
   },
 ];
 
