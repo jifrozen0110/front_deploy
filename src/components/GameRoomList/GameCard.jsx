@@ -51,7 +51,7 @@ export default function GameCard({ room, category }) {
             <UserCard userImage={room.masterImage} userName={room.masterName} imageSize="40" nameSize="20" />
           </div>
           <Typography sx={{ color: "white" }}>
-            {room.gameMode}
+            {room.battleTimer/60}분
           </Typography>
           <Typography sx={{ color: "white" }}>
             {room.puzzlePiece} 피스
