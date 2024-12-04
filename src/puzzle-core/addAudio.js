@@ -27,7 +27,7 @@ export const puzzleAudio = (audioPath) => {
 export const backgroundAudio = (audioPath) => {
     const audio = new Audio(audioPath);
     audio.loop = true;
-    audio.volume = 0.1;
+    audio.volume = 0.03;
     audio.crossOrigin = "anonymous";
     return audio;
 }

@@ -15,9 +15,14 @@ export default function GamePageNavigation() {
   const audioRef = useRef(null);
   const [isMute, setIsMute] = useState(true);
   const [volume, setVolume] = useState(0.5);
+  let isPlaying = false;
 
 
   const toggleMusic = () => {
+    if (!isPlaying) {
+      isPlaying = true;
+      audioRef.current.play()
+    }
     if (!audioRef.current) return;
     audioRef.current.muted = !isMute;
     setIsMute(!isMute);
@@ -61,10 +66,6 @@ export default function GamePageNavigation() {
       },
     },
   });
-
-  useEffect(() => {
-    audioRef.current.play()
-  },[])
 
   return (
     <Container>
