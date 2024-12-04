@@ -27,7 +27,7 @@ export default function ResultModal({
   const redPercentRounded = parseFloat(redPercent.toFixed(1));
 
   const resultState = useMemo(() => {
-    if (ourPercent > enemyPercent) {
+    if (ourPercent > enemyPercent || enemyTeam.length==0) {
       return "win";
     } else if (ourPercent === enemyPercent) {
       return "draw";

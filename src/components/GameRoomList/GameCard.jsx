@@ -16,7 +16,7 @@ import { isAxiosError } from "axios";
 
 export default function GameCard({ room, category }) {
   const navigate = useNavigate();
-
+  console.log(room)
   const handleCardClick = async () => {
     if (room.maxPlayers <= room.nowPlayers) {
       alert("방이 꽉 찼습니다.");
@@ -51,7 +51,7 @@ export default function GameCard({ room, category }) {
             <UserCard userImage={room.masterImage} userName={room.masterName} imageSize="40" nameSize="20" />
           </div>
           <Typography sx={{ color: "white" }}>
-            {room.gameMode}
+            {room.battleTimer/60}분
           </Typography>
           <Typography sx={{ color: "white" }}>
             {room.puzzlePiece} 피스
