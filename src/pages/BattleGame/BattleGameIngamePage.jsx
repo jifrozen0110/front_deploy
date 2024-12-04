@@ -619,7 +619,7 @@ export default function BattleGameIngamePage() {
 
   const backgroundSound = backgroundAudio(puzzleBackground);
 
-  useExitRoom(exitRoom, isGameEndingRef);
+  // useExitRoom(exitRoom, isGameEndingRef);
 
   useEffect(() => {
     // if (roomId !== getRoomId() || !getSender()) {
