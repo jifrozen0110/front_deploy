@@ -117,39 +117,27 @@ export default function CreateRoomButton({ category }) {
       return;
     }
 
-    try {
-      setLoading(true);
+    // 수정된 API 호출
+    const response = await authRequest().post("/api/rooms/image/dimensions", null, {
+      params: { imageUrl },
+    });
 
-      // 수정된 API 호출
-      const response = await authRequest().post("/api/rooms/image/dimensions", null, {
-        params: { imageUrl },
-      });
+    const data = response.data;
 
-      const data = response.data;
-
-      if (data && data.puzzlePiece > 0) {
-        setValidatedImageUrl(imageUrl);
-        setPuzzlePiece(data.puzzlePiece);
-        setImageWidth(data.width);
-        setImageLength(data.length);
-        setShowPreview(true);
-        setAlertMessage("이미지 URL이 유효합니다.");
-        setAlertSeverity("success");
-        setIsPuzzleGenerated(true);
-      } else {
-        setAlertMessage("이미지 처리 중 오류가 발생했습니다.");
-        setAlertSeverity("error");
-        setShowPreview(false);
-        setIsPuzzleGenerated(false);
-      }
-    } catch (error) {
-      console.error("이미지 유효성 검사 실패:", error);
+    if (data && data.puzzlePiece > 0) {
+      setValidatedImageUrl(imageUrl);
+      setPuzzlePiece(data.puzzlePiece);
+      setImageWidth(data.width);
+      setImageLength(data.length);
+      setShowPreview(true);
+      setAlertMessage("이미지 URL이 유효합니다.");
+      setAlertSeverity("success");
+      setIsPuzzleGenerated(true);
+    } else {
       setAlertMessage("이미지 처리 중 오류가 발생했습니다.");
       setAlertSeverity("error");
       setShowPreview(false);
       setIsPuzzleGenerated(false);
-    } finally {
-      setLoading(false);
     }
   };
 
