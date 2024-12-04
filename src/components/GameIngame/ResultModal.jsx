@@ -5,6 +5,11 @@ import { getTeam, getRoomId } from "@/socket-utils/storage";
 import { useGameInfo } from "@/hooks/useGameInfo";
 import { socket } from "@/socket-utils/socket2";
 
+import { resultAudio } from "@/puzzle-core/addAudio";
+import win from "@/assets/audio/win.mp3";
+import lose from "@/assets/audio/lose.mp3";
+import draw from "@/assets/audio/rocket.wav";
+
 export default function ResultModal({
   isOpenedDialog,
   handleCloseGame,
@@ -40,7 +45,7 @@ export default function ResultModal({
   const resultTextColor =
     resultState === "win" ? "#ffc107" : resultState === "lose" ? "#373737" : "#a985ff";
   // const winColor = getTeam() === "blue" && resultState === "win" ? "blue" : getTeam() === "red" && resultState === "win"? "red" : "draw";
-  const winColor = resultState === "draw"? "draw" : getTeam() === "blue" && resultState === "win"? "blue" : "red";
+  const winColor = resultState === "draw"? "draw" : (getTeam() === "blue" && resultState === "win") || (getTeam() === "red" && resultState === "lose")? "blue" : "red";
   const resultBlueTeamColor = winColor === "blue" || winColor === "draw" ? "#3b82f6" : "#373737"
   const resultRedTeamColor = winColor === "red" || winColor === "draw" ? "#ef4444" : "#373737"
 
@@ -50,6 +55,18 @@ export default function ResultModal({
     isGameEndingRef.current = true;
     window.location.replace(`/game/battle/waiting/${roomId}`);
   };
+
+  useEffect(() => {
+    if (isOpenedDialog == true) {
+      if (ourPercent > enemyPercent || enemyTeam.length==0) {
+        resultAudio(win);
+      } else if (ourPercent === enemyPercent) {
+        resultAudio(draw);
+      } else {
+        resultAudio(lose);
+      }
+    }
+  }, [isOpenedDialog]);
 
   return (
     <Dialog open={isOpenedDialog}>

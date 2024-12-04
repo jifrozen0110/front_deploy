@@ -652,7 +652,7 @@ export default function BattleGameIngamePage() {
   }, [gameData]);
 
   useEffect(() => {
-    if (time <= 10) {
+    if (time <= 10 && time > 0) {
       puzzleAudio(beep);
     }
   }, [time]);
