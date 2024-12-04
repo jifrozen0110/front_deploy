@@ -93,6 +93,25 @@ export default function BattleGameWaitingPage() {
     send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
   };
   const startGame = () => {
+     // 방장인지 확인
+    if (!isMaster) return;
+
+    // 파란팀과 빨간팀에 플레이어가 있는지 확인
+    if (roomData.bluePlayers.length === 0 && roomData.redPlayers.length === 0) {
+      alert("양쪽 팀에 플레이어가 없습니다.");
+      return;
+    }
+
+    if (roomData.bluePlayers.length === 0) {
+      alert("파란팀에 플레이어가 없습니다.");
+      return;
+    }
+
+    if (roomData.redPlayers.length === 0) {
+      alert("빨간팀에 플레이어가 없습니다.");
+      return;
+    }
+    
     console.log("게임 시작~");
     send(`/pub/room/${roomId}/start`, {}, JSON.stringify(createPlayerRequest()));
   };
