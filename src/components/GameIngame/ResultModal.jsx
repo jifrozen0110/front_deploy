@@ -39,6 +39,11 @@ export default function ResultModal({
   const resultText = resultState === "win" ? "WIN!!" : resultState === "lose" ? "LOSE" : "DRAW";
   const resultTextColor =
     resultState === "win" ? "#ffc107" : resultState === "lose" ? "#373737" : "#a985ff";
+  // const winColor = getTeam() === "blue" && resultState === "win" ? "blue" : getTeam() === "red" && resultState === "win"? "red" : "draw";
+  const winColor = resultState === "draw"? "draw" : getTeam() === "blue" && resultState === "win"? "blue" : "red";
+  const resultBlueTeamColor = winColor === "blue" || winColor === "draw" ? "#3b82f6" : "#373737"
+  const resultRedTeamColor = winColor === "red" || winColor === "draw" ? "#ef4444" : "#373737"
+
   const roomId = localStorage.getItem("roomId");
 
   const navigateToWaitingPage = () => {
@@ -61,8 +66,8 @@ export default function ResultModal({
         {/* 팀 정보 */}
         <ResultContainer>
           <TeamWrapper>
-            <TeamName color="#3b82f6">Blue</TeamName>
-            <TeamPercent color="#3b82f6">{bluePercentRounded}%</TeamPercent>
+            <TeamName color={resultBlueTeamColor}>Blue</TeamName>
+            <TeamPercent color={resultBlueTeamColor}>{bluePercentRounded}%</TeamPercent>
             <TeamPlayers>
               {blueTeam.length > 0 ? (
                 blueTeam.map((player) => (
@@ -88,8 +93,8 @@ export default function ResultModal({
           </CenterContainer>
 
           <TeamWrapper>
-            <TeamName color="#ef4444">Red</TeamName>
-            <TeamPercent color="#ef4444">{redPercentRounded}%</TeamPercent>
+            <TeamName color={resultRedTeamColor}>Red</TeamName>
+            <TeamPercent color={resultRedTeamColor}>{redPercentRounded}%</TeamPercent>
             <TeamPlayers>
               {redTeam.length > 0 ? (
                 redTeam.map((player) => (
