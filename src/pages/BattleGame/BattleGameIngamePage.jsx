@@ -58,6 +58,7 @@ import bloomAudioPath from "@/assets/audio/blooming.mp3";
 import blackholeAudioPath from "@/assets/audio/blackhole.mp3";
 import frameAudioPath from "@/assets/audio/frame2.mp3";
 import beep from "@/assets/audio/beep.mp3";
+import puzzleBackground from "@/assets/audio/puzzleBackground.wav";
 
 import './ani.css';
 import { authRequest } from "../../apis/requestBuilder";
@@ -159,7 +160,6 @@ export default function BattleGameIngamePage() {
 
   const [players, setPlayers] = useState([])
   const isGameEndingRef = useRef(false);
-
 
   const itemFunc = useMemo(() => {    
     return {
@@ -411,6 +411,7 @@ export default function BattleGameIngamePage() {
           // 매번 게임이 끝났는지 체크
           if (data.isFinished === true&&data.isStarted===true&& data.message && data.message === "SAVE_RECORD") {
             setTime(0);
+            backgroundSound.muted = true;
 
             const ourTeamKey = `${getTeam()}Team`;
             const enemyTeamKey = getTeam() === "red" ? "blueTeam" : "redTeam";
@@ -616,6 +617,8 @@ export default function BattleGameIngamePage() {
     send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
   };
 
+  const backgroundSound = backgroundAudio(puzzleBackground);
+
   useExitRoom(exitRoom, isGameEndingRef);
 
   useEffect(() => {
@@ -625,8 +628,13 @@ export default function BattleGameIngamePage() {
     //   });
     //   return;
     // }
-    setEnemyCanvasScale(0.6) // 상대편 화면 scale 설정
+    
+    backgroundSound.play();
+    setEnemyCanvasScale(0.6); // 상대편 화면 scale 설정
     connectSocket();
+    return () => {
+      backgroundSound.muted = true;
+    }
 
     // eslint-disable-next-line
   }, []);

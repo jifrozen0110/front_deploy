@@ -27,13 +27,7 @@ export const puzzleAudio = (audioPath) => {
 export const backgroundAudio = (audioPath) => {
     const audio = new Audio(audioPath);
     audio.loop = true;
-    audio.volume = 0.4;
+    audio.volume = 0.2;
     audio.crossOrigin = "anonymous";
-    audio.load();
-    try {
-      audio.play();
-    } catch (err) {
-      console.log(err);
-    }
     return audio;
 }
