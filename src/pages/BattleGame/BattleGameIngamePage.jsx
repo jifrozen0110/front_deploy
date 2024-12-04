@@ -50,7 +50,7 @@ import blackholePath from "@/assets/effects/blackhole.png";
 import twinklePath from "@/assets/effects/twinkle.gif";
 import framePath from "@/assets/effects/frame.png";
 
-import { addAudio } from "../../puzzle-core/attackItem";
+import { attackAudio } from "@/puzzle-core/addAudio";
 import fireAudioPath from "@/assets/audio/fire.mp3";
 import mudAudioPath from "@/assets/audio/mud.wav";
 import tornadoAudioPath from "@/assets/audio/tornado.mp3";
@@ -182,7 +182,7 @@ export default function BattleGameIngamePage() {
           return;
         }
 
-        addAudio(fireAudioPath);
+        attackAudio(fireAudioPath);
         for (let i = 0; i < targetList.length; i++) {
           const currentTargetIdx = targetList[i];
           const [x, y] = getPuzzlePositionByIndex({
@@ -219,7 +219,7 @@ export default function BattleGameIngamePage() {
           : document.getElementById("enemyCanvasContainer");
         
 
-        addAudio(mudAudioPath);
+        attackAudio(mudAudioPath);
         gameBoard.appendChild(mudImg);
 
         setTimeout(() => {
@@ -247,7 +247,7 @@ export default function BattleGameIngamePage() {
           return;
         }
 
-        addAudio(tornadoAudioPath);
+        attackAudio(tornadoAudioPath);
         gameBoard.appendChild(tornadoImg);
         setTimeout(() => usingItemTyphoon(targetList, bundles, isPlayerTeam, enemyCanvasScale), 500);
         setTimeout(() => {
@@ -275,7 +275,7 @@ export default function BattleGameIngamePage() {
         bloomImg.src = blackholePath;
         bloomImg.className = "black-hole"
 
-        addAudio(blackholeAudioPath);
+        attackAudio(blackholeAudioPath);
         gameBoard.appendChild(bloomImg);
 
         setTimeout(() => usingItemTyphoon(targetList, bundles, isPlayerTeam, enemyCanvasScale), 1000);
@@ -303,7 +303,7 @@ export default function BattleGameIngamePage() {
         frame.className = "frame"
         frame.appendChild(twinkleImg)
 
-        addAudio(frameAudioPath);
+        attackAudio(frameAudioPath);
         gameBoard.appendChild(frame);
 
         setTimeout(() => usingItemFrame(targetList, bundles, isPlayerTeam, enemyCanvasScale), 1000);
