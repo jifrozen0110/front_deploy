@@ -30,6 +30,7 @@ export default function BattleGameWaitingPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [roomData, setRoomData] = useState(null);
+  const [battleTimer, setBattleTimer] = useState(null);
   const [playerCount, setPlayerCount] = useState(1);
   const [emptyPlayerCount, setEmptyPlayerCount] = useState([0, 0]);
   const [xPlayerCount, setXPlayerCount] = useState([0, 0]);
@@ -93,6 +94,25 @@ export default function BattleGameWaitingPage() {
     send(`/pub/room/${roomId}/switch`, {}, JSON.stringify(createPlayerRequest()));
   };
   const startGame = () => {
+     // 방장인지 확인
+    if (!isMaster) return;
+
+    // 파란팀과 빨간팀에 플레이어가 있는지 확인
+    if (roomData.bluePlayers.length === 0 && roomData.redPlayers.length === 0) {
+      alert("양쪽 팀에 플레이어가 없습니다.");
+      return;
+    }
+
+    if (roomData.bluePlayers.length === 0) {
+      alert("파란팀에 플레이어가 없습니다.");
+      return;
+    }
+
+    if (roomData.redPlayers.length === 0) {
+      alert("빨간팀에 플레이어가 없습니다.");
+      return;
+    }
+    
     console.log("게임 시작~");
     send(`/pub/room/${roomId}/start`, {}, JSON.stringify(createPlayerRequest()));
   };
@@ -209,10 +229,10 @@ export default function BattleGameWaitingPage() {
   const initialize = async () => {
     try {
       const response = await authRequest().get(`/api/rooms/${roomId}`);
-
       const halfPlayers = Math.ceil(response.data.maxPlayers / 2);
       setIsMaster(response.data.master===playerId)
       setRoomData(response.data);
+      setBattleTimer(response.data.battleTimer);
       setPlayerCount(response.data.nowPlayers);
       setEmptyPlayerCount([
         Math.max(0, halfPlayers - response.data.redPlayers.length),
@@ -327,7 +347,7 @@ export default function BattleGameWaitingPage() {
               <Title>{roomData.roomName}</Title>
               <Divider />
               <Typography variant="subtitle1">
-                {roomData.gameMode == "battle" ? "대전 모드" : ""}
+                {battleTimer/60} 분
               </Typography>
               <Typography variant="subtitle1">{roomData.puzzlePiece} 피스</Typography>
               <StartButton isMaster={isMaster} onClick={() => isMaster && startGame()}>시작</StartButton>
