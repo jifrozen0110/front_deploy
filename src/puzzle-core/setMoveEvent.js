@@ -10,7 +10,7 @@ import puzzleDownSound from "@/assets/audio/puzzle_up.wav";
 const addAudio = (audioPath) => {
   const audio = new Audio(audioPath);
   audio.loop = false;
-  audio.volume = 0.4;
+  audio.volume = 0.5;
   audio.crossOrigin = "anonymous";
   audio.load();
   try {
