@@ -13,6 +13,7 @@ import { socket } from "@/socket-utils/socket2";
 import UserListSidebar from "@/components/GameRoomList/UserListSidebar";
 import InviteAlertModal from "@/components/GameWaiting/InviteAlertModal";
 import { logout } from "../../hooks/login";
+import { Height } from "@mui/icons-material";
 const { connect, send, subscribe, disconnect } = socket;
 
 export default function BattleGameListPage() {
@@ -125,9 +126,9 @@ export default function BattleGameListPage() {
             </LeftSidebar>
             <CenterContaier>
               <CenterTop>
-                <CenterContext>
+                {/* <CenterContext>
                   게임 찾기
-                </CenterContext>
+                </CenterContext> */}
                 <CenterButtonContainer>
                   <CenterButton onClick={() => {refetchAllRoom(); handleRefreshClick();}} disabled={isButtonDisabled}>
                     <RotatingIcon size="28" isRotating={isRotating} />새로고침
@@ -168,6 +169,8 @@ const ContentContainer = styled.div`
   display: flex;
   justify-content: space-between;
   height: calc(100vh - 66px);
+  width: 70vw;
+  margin: 0 auto;
 `;
 
 const LeftSidebar = styled.div`
@@ -175,6 +178,10 @@ const LeftSidebar = styled.div`
   flex-direction: column;
   height: 100%;
   width: 20%;
+  align-items: center;
+  padding: 90px 0 60px 0;
+  box-sizing: border-box;
+  min-width:300px;
 `;
 
 const CenterContaier = styled.div`
@@ -183,7 +190,9 @@ const CenterContaier = styled.div`
   flex-direction: column;
   flex-grow: 1;
   height: 100%;
-  padding: 0 20px;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  min-width: 900px;
 `
 
 const CenterTop = styled.div`
