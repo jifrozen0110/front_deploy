@@ -274,6 +274,13 @@ export default function BattleGameWaitingPage() {
   return (
     <Wrapper>
       {/* 왼쪽 채팅 */}
+      <LeftSidebar>
+        <Chatting
+          chatList={chatList}
+          path={"/pub/chat/room"}
+          defualtData={{ roomId, roomName: roomData.roomName }}
+        />
+      </LeftSidebar>
 
       {/* 나머지 콘텐츠 */}
       <Content>
@@ -347,13 +354,6 @@ export default function BattleGameWaitingPage() {
             </Details>
           </PuzzleDetails>
         </Body>
-        <LeftSidebar>
-          <Chatting
-            chatList={chatList}
-            path={"/pub/chat/room"}
-            defualtData={{ roomId, roomName: roomData.roomName }}
-          />
-        </LeftSidebar>
       </Content>
       <InviteModal
         isOpen={isInviteModalOpen}
@@ -386,7 +386,7 @@ const LeftSidebar = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-height: 300px;
+  width: 20%;
 `;
 
 const Content = styled.div`
@@ -395,10 +395,9 @@ const Content = styled.div`
   flex-direction: column;
   justify-content: center;
   align-item: center;
-  padding: 10vh 15vw 2vh 15vw;
+  padding: 0 30px;
   boxsizing: border-box;
   max-height: 100%;
-  min-width: 1000px;
   gap: 10px;
 `;
 
