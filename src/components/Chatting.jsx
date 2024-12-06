@@ -38,7 +38,7 @@ function ChatComponent({ chatList, path, defualtData = {} }) {
       {/* 채팅 메시지 목록 */}
       <ChatMessages ref={chatMessagesRef}>
         {chatList.map((chat, index) => (
-          <Message key={index} isMyMessage={chat.userId == localStorage.getItem("userId")}>
+          <Message key={index} ismymessage={chat.userId == localStorage.getItem("userId")? 1 : 0}>
             {chat.userId != localStorage.getItem("userId") && <div>{chat.userName}:</div>}
             {chat.message}
           </Message>
@@ -105,12 +105,12 @@ const ChatMessages = styled.div`
 const Message = styled.div`
   text-align: "left";
   padding: 10px;
-  color: ${(props) => (props.isMyMessage ? "#FFFFFF" : "#bbf11c")};
+  color: ${(props) => (props.ismymessage ? "#FFFFFF" : "#bbf11c")};
   border-radius: 8px;
   margin-bottom: 8px;
   max-width: 90%;
-  margin-right: ${(props) => (props.isMyMessage ? "0" : "auto")};
-  border: 1px solid ${(props) => (props.isMyMessage ? "#FFFFFF" : "#DCF8C6")};
+  margin-right: ${(props) => (props.ismymessage ? "0" : "auto")};
+  border: 1px solid ${(props) => (props.ismymessage ? "#FFFFFF" : "#DCF8C6")};
 `;
 
 const ChatInputContainer = styled.div`
