@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import { Plus } from "lucide-react";
@@ -26,15 +26,15 @@ import { authRequest } from "../../apis/requestBuilder";
 const predefinedImages = [
   {
     name: "짱구",
-    url: "https://res.heraldm.com/content/image/2015/03/06/20150306001045_0.jpg",
+    url: "d83e4746-fcde-4079-8023-5e498446aa6a-20150306001045_0.jpg",
   },
   {
     name: "치이카와",
-    url: "https://ynoblesse.com/wp-content/uploads/2023/07/358520758_1425769678257003_8801872512201663407_n.jpg",
+    url: "8cbe296e-ff5e-4ab5-881b-bca536ee599f-358520758_1425769678257003_8801872512201663407_n.jpg",
   },
   {
     name: "문지캠퍼스",
-    url: "https://i.postimg.cc/L8FR60pP/Kakao-Talk-20241202-141212588.jpg",
+    url: "e5e81451-8396-4cc1-b08f-67d3c650bd54-Kakao-Talk-20241202-141212588.jpg",
   },
 ];
 
@@ -67,6 +67,10 @@ export default function CreateRoomButton({ category }) {
   const [loading, setLoading] = useState(false);
   const [isPuzzleGenerated, setIsPuzzleGenerated] = useState(false);
 
+  // const [inputMode, setInputMode] = useState("url"); // 입력 모드 (URL 또는 파일)
+  const inputMode = useRef("url");
+  const [selectedFile, setSelectedFile] = useState(null); // 선택한 파일
+
   const handleRoomSize = (e) => {
     const count = Number(e.target.value);
     if (2 <= count && count <= 8) {
@@ -83,6 +87,7 @@ export default function CreateRoomButton({ category }) {
 
   const handlePredefinedImageSelect = async (event, newImageUrl) => {
     if (newImageUrl) {
+      inputMode.current = "url";
       setCustomImageUrl("");
       setPuzzleImage(newImageUrl);
       setValidatedImageUrl("");
@@ -98,8 +103,36 @@ export default function CreateRoomButton({ category }) {
   };
 
   // 이미지 URL 유효성 검사 함수
-  const validateImageUrl = async (imageUrlParam) => {
-    let imageUrl = imageUrlParam || customImageUrl || puzzleImage;
+  const validateImageUrl = async (imageParam) => {
+    const uploadImage = async (endpoint, formData) => {
+      return authRequest().post(endpoint, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    };
+
+    let response;
+    try {
+      const formData = new FormData();
+      if (inputMode.current === "url") {
+        formData.append("imageUrl", imageParam || customImageUrl || puzzleImage);
+        response = await uploadImage("/api/rooms/image-url/dimensions", formData);
+      } else {
+        formData.append("imageFile", selectedFile);
+        response = await uploadImage("/api/rooms/image-file/dimensions", formData);
+      }
+      // 응답 데이터 처리
+      console.log("이미지 업로드 성공:", response.data);
+    } catch (error) {
+      console.error("이미지 업로드 실패:", error);
+      setAlertMessage("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
+      setAlertSeverity("error"); 
+      setShowPreview(false);
+      setIsPuzzleGenerated(false);
+    }
+    const imageUrl = response.data.imageUrl;
+    console.log("이미지 url:", imageUrl);
 
     if (!imageUrl) {
       setAlertMessage("이미지 URL을 입력하거나 이미지를 선택하세요.");
@@ -116,11 +149,6 @@ export default function CreateRoomButton({ category }) {
       setIsPuzzleGenerated(false);
       return;
     }
-
-    // 수정된 API 호출
-    const response = await authRequest().post("/api/rooms/image/dimensions", null, {
-      params: { imageUrl },
-    });
 
     const data = response.data;
 
@@ -154,7 +182,7 @@ export default function CreateRoomButton({ category }) {
     setIsOpenedModal(false);
     setShowPreview(false);
     setIsPuzzleGenerated(false);
-    setAlertMessage("이미지 URL을 입력하고 퍼즐 생성 버튼을 눌러주세요.");
+    setAlertMessage("이미지를 선택하고 퍼즐 생성 버튼을 눌러주세요.");
     setAlertSeverity("info");
   };
 
@@ -353,7 +381,7 @@ export default function CreateRoomButton({ category }) {
                 {predefinedImages.map((image) => (
                   <ToggleButton key={image.name} value={image.url} sx={{ padding: 1 }}>
                     <img
-                      src={image.url}
+                      src={"https://puzzleshare-gallery.s3.ap-northeast-2.amazonaws.com/"+image.url}
                       alt={image.name}
                       style={{
                         width: "100px",
@@ -366,20 +394,69 @@ export default function CreateRoomButton({ category }) {
                 ))}
               </ToggleButtonGroup>
 
-              {/* 원하는 이미지로 퍼즐 만들기 */}
-              <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                원하는 이미지로 퍼즐 만들기:
-              </Typography>
               <Grid container alignItems="center">
-                <Grid item xs={8}>
-                  <TextField
-                    label="이미지 URL"
-                    value={customImageUrl}
-                    onChange={handleCustomImageUrlChange}
-                    fullWidth
-                    placeholder="이미지 URL을 입력하세요"
-                  />
+                {/* 원하는 이미지로 퍼즐 만들기 */}
+                <Typography variant="subtitle1" xs={6}>
+                  원하는 이미지로 퍼즐 만들기:
+                </Typography>
+                <Grid item xs={6}>
+                  {/* URL과 FILE 전환 버튼 */}
+                  <ToggleButtonGroup
+                    value={inputMode.current}
+                    exclusive
+                    onChange={(event, newMode) => {
+                      setPuzzleImage(DEFAULT_IMAGE_URL);
+                      setValidatedImageUrl("");
+                      setPuzzlePiece(0);
+                      setImageWidth(0);
+                      setImageLength(0);
+                      setShowPreview(false);
+                      setIsPuzzleGenerated(false);
+                      inputMode.current = newMode;
+                    }}
+                    aria-label="Input mode selection"
+                    sx={{ display: "flex", justifyContent: "flex-end" }}
+                  >
+                    <ToggleButton value="url" aria-label="URL input">
+                      URL
+                    </ToggleButton>
+                    <ToggleButton value="file" aria-label="File input">
+                      File
+                    </ToggleButton>
+                  </ToggleButtonGroup>
                 </Grid>
+
+                {/* URL 입력 */}
+                {inputMode.current === "url" && (
+                  <>
+                    <Grid item xs={8}>
+                      <TextField
+                        label="이미지 URL"
+                        value={customImageUrl}
+                        onChange={handleCustomImageUrlChange}
+                        fullWidth
+                        placeholder="이미지 URL을 입력하세요"
+                      />
+                    </Grid>
+                  </>
+                )}
+
+                {/* 파일 업로드 */}
+                {inputMode.current === "file" && (
+                  <>
+                    <Grid item xs={8}>
+                      <TextField
+                        type="file"
+                        onChange={(e) => setSelectedFile(e.target.files[0])}
+                        inputProps={{
+                          accept: "image/jpeg, image/png, image/webp", // 지원하는 파일 형식
+                        }}
+                        fullWidth
+                      />
+                    </Grid>
+                  </>
+                )}
+                
                 <Grid item xs={4} sx={{ pl: 2 }}>
                   <Button
                     variant="outlined"
@@ -471,10 +548,8 @@ export default function CreateRoomButton({ category }) {
                           marginTop: "10px",
                         }}
                         onError={(e) => {
-                          e.target.src = DEFAULT_IMAGE_URL;
-                          setAlertMessage("이미지 로딩에 실패하여 기본 이미지로 대체됩니다.");
-                          setAlertSeverity("warning");
-                          setPuzzleImage(DEFAULT_IMAGE_URL);
+                          e.target.src = "";
+                          setPuzzleImage("");
                           setValidatedImageUrl("");
                           setPuzzlePiece(0);
                           setImageWidth(0);
