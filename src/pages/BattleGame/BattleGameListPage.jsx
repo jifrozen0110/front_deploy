@@ -1,19 +1,16 @@
 import { useEffect, useState, useMemo, useRef } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { styled, keyframes, css } from "styled-components";
 import { Button } from "@mui/material";
 import { RotateCw, User } from "lucide-react";
-import Header from "@/components/Header";
 import Chatting from "@/components/Chatting";
 import CreateRoomButton from "@/components/GameRoomList/CreateRoomButton";
 import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
 import { authRequest } from "@/apis/requestBuilder";
-import backgroundPath from "@/assets/backgrounds/background.png";
 import { socket } from "@/socket-utils/socket2";
 import UserListSidebar from "@/components/GameRoomList/UserListSidebar";
 import InviteAlertModal from "@/components/GameWaiting/InviteAlertModal";
 import { logout } from "../../hooks/login";
-import { Height } from "@mui/icons-material";
 const { connect, send, subscribe, disconnect } = socket;
 
 export default function BattleGameListPage() {
@@ -121,24 +118,21 @@ export default function BattleGameListPage() {
       ) : (
         <>
           <ContentContainer>
-            <LeftSidebar>
-              <Chatting chatList={chatList} path={"/pub/chat/main"} />
-            </LeftSidebar>
+            <Top>
+              <TopButtonContainer>
+                <TopButton onClick={() => {refetchAllRoom(); handleRefreshClick();}} disabled={isButtonDisabled}>
+                  <RotatingIcon size="20" isRotating={isRotating} />새로고침
+                </TopButton>
+                <TopButton onClick={openUserListModal}>
+                  <ShakingUserIcon size="20" />친구
+                </TopButton>
+                <CreateRoomButton category="battle" />
+              </TopButtonContainer>
+            </Top>
             <CenterContaier>
-              <CenterTop>
-                {/* <CenterContext>
-                  게임 찾기
-                </CenterContext> */}
-                <CenterButtonContainer>
-                  <CenterButton onClick={() => {refetchAllRoom(); handleRefreshClick();}} disabled={isButtonDisabled}>
-                    <RotatingIcon size="28" isRotating={isRotating} />새로고침
-                  </CenterButton>
-                  <CenterButton onClick={openUserListModal}>
-                    <ShakingUserIcon size="28" />친구
-                  </CenterButton>
-                  <CreateRoomButton category="battle" />
-                </CenterButtonContainer>
-              </CenterTop>
+              <LeftSidebar>
+                <Chatting chatList={chatList} path={"/pub/chat/main"} />
+              </LeftSidebar>
               <GameRoomListBoard category="battle" roomList={roomList} />
             </CenterContaier>
             {/* <UserListSidebar /> */}
@@ -158,7 +152,6 @@ export default function BattleGameListPage() {
               </ModalContent>
             </ModalOverlay>
           )}
-      
         </>
       )}
     </>
@@ -167,10 +160,13 @@ export default function BattleGameListPage() {
 
 const ContentContainer = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   height: calc(100vh - 66px);
   width: 70vw;
   margin: 0 auto;
+  padding: 20px 0;
+  box-sizing: border-box;
 `;
 
 const LeftSidebar = styled.div`
@@ -179,7 +175,6 @@ const LeftSidebar = styled.div`
   height: 100%;
   width: 20%;
   align-items: center;
-  padding: 90px 0 60px 0;
   box-sizing: border-box;
   min-width:300px;
 `;
@@ -187,24 +182,16 @@ const LeftSidebar = styled.div`
 const CenterContaier = styled.div`
   display: flex;
   flex: 1;
-  flex-direction: column;
-  flex-grow: 1;
   height: 100%;
-  padding: 10px 20px;
+  margin-top: 10px;
+  gap: 20px;
   box-sizing: border-box;
   min-width: 900px;
 `
 
-const CenterTop = styled.div`
+const Top = styled.div`
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-`
-
-const CenterContext = styled.div`
-  color: white;
-  font-size: 100px;
-  font-weight: bold;
+  justify-content: flex-end;
 `
 
 const rotate = keyframes`
@@ -227,21 +214,20 @@ const RotatingIcon = styled(RotateCw).withConfig({
   margin-right: 5px;
 `;
 
-const CenterButtonContainer = styled.div`
+const TopButtonContainer = styled.div`
   display: flex;
-  margin: auto 12px 0 0;
   gap: 10px;
-  height: 62px;
+  height: 45px;
 `
 
-const CenterButton = styled(Button)`
+const TopButton = styled(Button)`
   background-color: orange;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   box-sizing: border-box;
   color: white;
-  padding: 10px 20px;
   cursor: pointer;
-  font-size: 25px;
+  font-size: 20px;
+  padding: 10px;
   &:hover {
     background-color: darkorange;
   }
@@ -268,8 +254,8 @@ const ShakingUserIcon = styled(User)`
   margin-right: 5px;
   animation: none; /* 기본값 */
 
-  /* CenterButton에 hover 시 아이콘 애니메이션 적용 */
-  ${CenterButton}:hover & {
+  /* TopButton에 hover 시 아이콘 애니메이션 적용 */
+  ${TopButton}:hover & {
     animation: ${shake} 0.5s linear;
   }
 `;
