@@ -16,7 +16,8 @@ export const findNearTileGroup = ({ config }) => {
   config.groupTiles.forEach((tile, tileIndex) => {
     tile[0].onMouseUp = (event) => {
       setPuzzleSize(tile[0], 80);
-      
+      console.log("mouse up", tile[0].position.x, tile[0].position.y);
+
       // 위치 보정 후
       const nearGroupStdIdxs = []
       const nearGroupSet = new Set()
@@ -40,7 +41,8 @@ export const findNearTileGroup = ({ config }) => {
         const stdGtile = nearGroupStdIdxs.length == 1 ? config.groupTiles[nearGroupStdIdxs[0]] : tile
 
         moveTiles.forEach(gtile => {
-          gtile[0].position = getNewPoint({ config, stdGtile, targetGtile: gtile })
+          gtile[0].position.x = getNewX({ config, stdGtile, targetGtile: gtile })
+          gtile[0].position.y = getNewY({ config, stdGtile, targetGtile: gtile })
           gtile[1] = stdGtile[1]
         })
 
@@ -48,9 +50,8 @@ export const findNearTileGroup = ({ config }) => {
           nearGroupStdIdxs[0] = tile[2]
         }
 
+        puzzleAudio(puzzleFitSound);
         nearGroupStdIdxs.forEach(nearStdIdx => {
-          console.log("퍼즐을 맞췄다");
-          puzzleAudio(puzzleFitSound);
           send(
             "/pub/game/puzzle",
             {},
@@ -64,7 +65,6 @@ export const findNearTileGroup = ({ config }) => {
           );
         })
       } else {
-        console.log("퍼즐을 못맞췄다");
         puzzleAudio(puzzleDownSound);
       }
 
@@ -99,6 +99,24 @@ export const getNewPoint = ({ config, stdGtile, targetGtile }) => {
     position.x + (targetX - stdX) * tileWidth,
     position.y + (targetY - stdY) * tileWidth,
   )
+}
+
+export const getNewX = ({ config, stdGtile, targetGtile }) => {
+  const { tilesPerRow, tileWidth } = config
+  const stdX = stdGtile[2] % tilesPerRow
+  const targetX = targetGtile[2] % tilesPerRow
+  const { position } = stdGtile[0]
+
+  return position.x + (targetX - stdX) * tileWidth
+}
+
+export const getNewY = ({ config, stdGtile, targetGtile }) => {
+  const { tilesPerRow, tileWidth } = config
+  const stdY = parseInt(stdGtile[2] / tilesPerRow)
+  const targetY = parseInt(targetGtile[2] / tilesPerRow)
+  const { position } = stdGtile[0]
+
+  return position.y + (targetY - stdY) * tileWidth
 }
 
 const findNearTile2 = ({ config, tile }) => {

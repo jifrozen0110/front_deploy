@@ -34,8 +34,12 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
       canvas.width = 1000;
       canvas.height = 750;
       initializePuzzle({ puzzleImg, level, shapes, board, picture });
+      canvas.style.width = `${canvas.parentElement.clientWidth}px`;
+      canvas.style.height = `${canvas.parentElement.clientWidth / 4 * 3}px`;
       const config = getConfig()
       groupPuzzlePieces({ config, bundles })
+      canvas.style.aspectRatio = '1000 / 750'
+
       if (itemPieces) {
         Object.entries(itemPieces).forEach(([idx, bool]) => {
           if (!bool) {
@@ -82,17 +86,55 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
     }
   }, [canvasRef]);
 
+  const eventBlock = e => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  const eventDispatch = (e, type) => {
+    eventBlock(e)
+
+    const scaleX = 1000 / e.currentTarget.clientWidth
+    const scaleY = 750 / e.currentTarget.clientHeight
+    const mouseEvent = new MouseEvent(type, {
+      bubbles: false,
+      cancelable: true,
+      view: e.view,
+      // layerX: e.nativeEvent.layerX,
+      // layerY: e.nativeEvent.layerY,
+      layerX: e.nativeEvent.layerX * scaleX,
+      layerY: e.nativeEvent.layerY * scaleY,
+    });
+
+    canvasRef.current.dispatchEvent(mouseEvent)
+  }
+
   return (
     <>
       <div
         id="canvasContainer"
-        style={{ position: "relative", display: "flex", justifyContent: "center" }}
+        style={{ position: "relative", display: "flex", justifyContent: "center", width: '76%', height:'auto', alignItems:"center", margin: '0 auto' }}
+        onMouseDown={e => {
+          console.log("mousedown");
+          
+          eventDispatch(e, "onmousedown")
+        }}
+        onMouseUp={e => {
+          console.log("mouseup");
+          
+          eventDispatch(e, "onmouseup")
+        }}
+        onDrag={e => {
+          console.log("drag");
+          
+          eventDispatch(e, "ondrag")
+        }}
+        draggable
       >
         {players?.filter(p => p.playerId != userId)
         .map(p => 
             <Pointer path={pointerPath} id={`user${p.playerId}`} color={p.color} key={`user${p.playerId}`} name={p.playerName}></Pointer>
         )}
-        <Canvas ref={canvasRef} id="canvas" onMouseMove={mouseMove}/>
+        <Canvas ref={canvasRef} id="canvas" onMouseMove={mouseMove} />
       </div>
     </>
   );

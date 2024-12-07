@@ -3,7 +3,7 @@ import { socket } from "../socket-utils/socket2";
 import { getRoomId, getSender } from "../socket-utils/storage";
 import { getPuzzleGroup } from "./getPuzzleGroup";
 import { setPuzzleSize } from "./setPuzzleSize";
-import { findNearTileGroup, getNewPoint } from "./findNearTileGroup";
+import { findNearTileGroup, getNewPoint, getNewX, getNewY } from "./findNearTileGroup";
 
 import puzzleDownSound from "@/assets/audio/puzzle_up.wav";
 
@@ -41,7 +41,8 @@ const moveTile = ({ config }) => {
   // 모든 타일을 돌면서 마우스 이벤트 등록
   config.groupTiles.forEach((gtile, gtileIdx) => {
     gtile[0].onMouseDown = (event) => {
-      console.log("퍼즐을 잡았다");
+      console.log("mousedown", gtile[0].position.x, gtile[0].position.y);
+
       addAudio(puzzleDownSound);
 
       let isGroup = false;
@@ -82,22 +83,18 @@ const moveTile = ({ config }) => {
     };
 
     gtile[0].onMouseDrag = (event) => {
-      // 캔버스 사이즈를 벗어나지 않는 범위내로 이동
-      const newPosition = {
-        x: Math.min(
-          Math.max(gtile[0].position._x + event.delta.x, Math.floor(config.tileWidth / 2)),
-          config.project.view._viewSize._width - Math.floor(config.tileWidth / 2),
-        ),
-        y: Math.min(
-          Math.max(gtile[0].position._y + event.delta.y, Math.floor(config.tileWidth / 2)),
-          config.project.view._viewSize._height - Math.floor(config.tileWidth / 2),
-        ),
-      };
-      gtile[0].position = new Point(newPosition.x, newPosition.y)
+      console.log("mousedrag", event.point);
 
       const currentTime = Date.now();
+      // 지정된 간격(interval)으로 함수 실행
       if (currentTime - lastExecutionTime >= interval) {
-        // 지정된 간격(interval)으로 함수 실행
+        // 캔버스 사이즈를 벗어나지 않는 범위내로 이동
+        gtile[0].position.x = Math.min(Math.max(event.point.x, 20), config.project.view._viewSize._width - Math.floor(config.tileWidth / 2))
+        const { canvas } = config.project.project._view._context
+        // const x = getMouseX(event, canvas)
+        // const y = getMouseX(event, canvas)
+        gtile[0].position.y = Math.min(Math.max(event.point.y, 20), config.project.view._viewSize._height - Math.floor(config.tileWidth / 2))
+
 
         // socket 전송
         send(
@@ -108,19 +105,19 @@ const moveTile = ({ config }) => {
             roomId: getRoomId(),
             sender: getSender(),
             message: "MOUSE_DRAG",
-            targets: JSON.stringify([{ ...newPosition, index: gtile[2] }]),
+            targets: JSON.stringify([{ x: gtile[0].position.x, y: gtile[0].position.y, index: gtile[2] }]),
           }),
         );
 
         lastExecutionTime = currentTime;
+        config.groupTiles
+          .forEach(targetGtile => {
+            if (targetGtile[1] == gtile[1]) {
+              targetGtile[0].position.x = getNewX({ config, stdGtile: gtile, targetGtile })
+              targetGtile[0].position.y = getNewY({ config, stdGtile: gtile, targetGtile })
+            }
+          })
       }
-
-      config.groupTiles
-        .forEach(targetGtile => {
-          if (targetGtile[1] == gtile[1]) {
-            targetGtile[0].position = getNewPoint({ config, stdGtile: gtile, targetGtile })
-          }
-        })
     };
 
     gtile[0].onMouseEnter = (event) => {
@@ -132,3 +129,14 @@ const moveTile = ({ config }) => {
     };
   });
 };
+
+function getMouseX(event, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  return (event.clientX - rect.left) * scaleX
+}
+function getMouseY(event, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleY = canvas.height / rect.height;
+  return (event.clientY - rect.top) * scaleY
+}

@@ -442,9 +442,8 @@ export default function BattleGameIngamePage() {
             sendGameDataToBackend(data, data.game.finishTime);
             // ----------------------------------------------------------------------
 
-            setTimeout(() => {
-              setIsOpenedDialog(true);
-            }, 1000);
+            setTimeout(() => setIsOpenedDialog(true), 1000);
+            setTimeout(() => window.location.replace(`/game/battle/waiting/${roomId}`), 6000);
             // return;
           }
 
@@ -853,6 +852,7 @@ const GameInfo = styled(Box)`
   box-sizing: border-box;
   gap: 10px;
   align-items: center;
+  width: 30%;
 `;
 
 const OtherTeam = styled.div`
