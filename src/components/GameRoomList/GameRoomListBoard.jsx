@@ -4,11 +4,18 @@ import GameCard from "@/components/GameRoomList/GameCard";
 export default function GameRoomListBoard({ category, roomList }) {
   return (
     <Wrapper>
+      {roomList.length > 0 ? (
       <GridContainer>
         {roomList.map((room) => (
           <GameCard key={room.roomId} room={room} category={category} />
         ))}
       </GridContainer>
+      ):(
+        <EmptyCard>
+          생성된 방이 없습니다.
+        </EmptyCard>
+      )
+    }
     </Wrapper>
   );
 }
@@ -52,3 +59,16 @@ const GridContainer = styled.div`
     background: transparent; /* 스크롤 트랙 배경 투명화 */
   }
 `;
+
+const EmptyCard = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  color: white;
+  font-size: 20px;
+`
