@@ -182,7 +182,7 @@ const LeftSidebar = styled.div`
 const CenterContaier = styled.div`
   display: flex;
   flex: 1;
-  height: 100%;
+  height: calc(100% - 66px); /* 전체 화면 높이에서 Header(66px) 제외 */
   margin-top: 10px;
   gap: 20px;
   box-sizing: border-box;
