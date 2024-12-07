@@ -22,6 +22,11 @@ import {
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import { authRequest } from "../../apis/requestBuilder";
+import { ChevronRight, ChevronLeft } from "lucide-react";
+
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
+import Slider from "react-slick";
 
 const predefinedImages = [
   {
@@ -36,8 +41,13 @@ const predefinedImages = [
     name: "문지캠퍼스",
     url: "e5e81451-8396-4cc1-b08f-67d3c650bd54-Kakao-Talk-20241202-141212588.jpg",
   },
+  {
+    name: "몬스터 주식회사",
+    url: "20241208_011319_f10e1d8b-aadc-4efb-881b-30090087f30e.jpg",
+  },
 ];
 
+const IMAGES_PER_SLIDE = 3;
 const DEFAULT_IMAGE_URL = predefinedImages[0].url;
 
 export default function CreateRoomButton({ category }) {
@@ -51,7 +61,7 @@ export default function CreateRoomButton({ category }) {
   const [isOpenedModal, setIsOpenedModal] = useState(false);
 
   const [alertMessage, setAlertMessage] = useState(
-    "이미지 URL을 입력하고 퍼즐 생성 버튼을 눌러주세요.",
+    "이미지를 선택하고 퍼즐 생성 버튼을 눌러주세요.",
   );
   const [alertSeverity, setAlertSeverity] = useState("info");
 
@@ -67,9 +77,18 @@ export default function CreateRoomButton({ category }) {
   const [loading, setLoading] = useState(false);
   const [isPuzzleGenerated, setIsPuzzleGenerated] = useState(false);
 
-  // const [inputMode, setInputMode] = useState("url"); // 입력 모드 (URL 또는 파일)
-  const inputMode = useRef("url");
+  const [inputMode, setInputMode] = useState("default"); // 입력 모드 (URL 또는 파일)
   const [selectedFile, setSelectedFile] = useState(null); // 선택한 파일
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const currentImages = predefinedImages.slice(
+    currentIndex,
+    currentIndex + IMAGES_PER_SLIDE
+  );
+  const canMoveLeft = currentIndex > 0;
+  const canMoveRight = currentIndex + IMAGES_PER_SLIDE < predefinedImages.length;
+
 
   const handleRoomSize = (e) => {
     const count = Number(e.target.value);
@@ -87,7 +106,7 @@ export default function CreateRoomButton({ category }) {
 
   const handlePredefinedImageSelect = async (event, newImageUrl) => {
     if (newImageUrl) {
-      inputMode.current = "url";
+      setInputMode("default");
       setCustomImageUrl("");
       setPuzzleImage(newImageUrl);
       setValidatedImageUrl("");
@@ -115,7 +134,7 @@ export default function CreateRoomButton({ category }) {
     let response;
     try {
       const formData = new FormData();
-      if (inputMode.current === "url") {
+      if (inputMode === "url" || inputMode === "default" ) {
         formData.append("imageUrl", imageParam || customImageUrl || puzzleImage);
         response = await uploadImage("/api/rooms/image-url/dimensions", formData);
       } else {
@@ -322,7 +341,7 @@ export default function CreateRoomButton({ category }) {
   return (
     <ThemeProvider theme={theme}>
       <CreateButton onClick={() => setIsOpenedModal(true)}>
-        <RotatingIcon size="28" />방 만들기
+        <RotatingIcon size="20" />방 만들기
       </CreateButton>
       <Modal
         open={isOpenedModal}
@@ -344,11 +363,6 @@ export default function CreateRoomButton({ category }) {
             p: 4,
           }}
         >
-          {/* 알림 메시지를 표시 */}
-          <Alert severity={alertSeverity} sx={{ mb: 2 }}>
-            {alertMessage}
-          </Alert>
-
           <Typography id="modal-modal-title" variant="h5" sx={{ mb: 2 }}>
             {category === "cooperation" ? "협동" : "배틀"}방 만들기
           </Typography>
@@ -364,87 +378,172 @@ export default function CreateRoomButton({ category }) {
                 sx={{ mb: 2 }}
               />
 
-              <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                이미지 선택:
-              </Typography>
-              <ToggleButtonGroup
-                value={puzzleImage}
-                exclusive
-                onChange={handlePredefinedImageSelect}
-                fullWidth
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-around",
-                  mb: 2,
-                }}
-              >
-                {predefinedImages.map((image) => (
-                  <ToggleButton key={image.name} value={image.url} sx={{ padding: 1 }}>
-                    <img
-                      src={"https://puzzleshare-gallery.s3.ap-northeast-2.amazonaws.com/"+image.url}
-                      alt={image.name}
-                      style={{
-                        width: "100px",
-                        height: "100px",
-                        objectFit: "cover",
-                        borderRadius: "5px",
-                      }}
-                    />
-                  </ToggleButton>
-                ))}
-              </ToggleButtonGroup>
-
-              <Grid container alignItems="center">
+              <Grid container alignItems="center" sx={{ marginTop: 2 }}>
                 {/* 원하는 이미지로 퍼즐 만들기 */}
-                <Typography variant="subtitle1" xs={6}>
-                  원하는 이미지로 퍼즐 만들기:
-                </Typography>
-                <Grid item xs={6}>
+                <Grid item xs={12}>
                   {/* URL과 FILE 전환 버튼 */}
                   <ToggleButtonGroup
-                    value={inputMode.current}
+                    value={inputMode}
                     exclusive
                     onChange={(event, newMode) => {
-                      setPuzzleImage(DEFAULT_IMAGE_URL);
-                      setValidatedImageUrl("");
-                      setPuzzlePiece(0);
-                      setImageWidth(0);
-                      setImageLength(0);
-                      setShowPreview(false);
-                      setIsPuzzleGenerated(false);
-                      inputMode.current = newMode;
+                      if (newMode !== null) {
+                        setInputMode(newMode);
+                        setPuzzleImage("DEFAULT_IMAGE_URL");
+                        setValidatedImageUrl("");
+                        setPuzzlePiece(0);
+                        setImageWidth(0);
+                        setImageLength(0);
+                        setShowPreview(false);
+                        setIsPuzzleGenerated(false);
+                      }
                     }}
                     aria-label="Input mode selection"
-                    sx={{ display: "flex", justifyContent: "flex-end" }}
                   >
-                    <ToggleButton value="url" aria-label="URL input">
+                    <ToggleButton value="default" aria-label="Default input" style={{borderBottom: "none", borderBottomLeftRadius: "0"}}>
+                      DEFAULT
+                    </ToggleButton>
+                    <ToggleButton value="url" aria-label="URL input" style={{borderBottom: "none"}}>
                       URL
                     </ToggleButton>
-                    <ToggleButton value="file" aria-label="File input">
+                    <ToggleButton value="file" aria-label="File input" style={{borderBottom: "none", borderBottomRightRadius: "0"}}>
                       File
                     </ToggleButton>
                   </ToggleButtonGroup>
                 </Grid>
 
-                {/* URL 입력 */}
-                {inputMode.current === "url" && (
+                {/* Default 선택 */}
+                {inputMode === "default" && (
                   <>
-                    <Grid item xs={8}>
+                    <div style={{ position: "relative", width: "100%", maxWidth: "800px", margin: "0 auto" }}>
+                      {/* 왼쪽 슬라이드 버튼 */}
+                      {canMoveLeft && (
+                        <button
+                          style={{
+                            position: "absolute",
+                            left: "-20px",
+                            top: "45%",
+                            transform: "translateY(-50%)",
+                            background: "rgba(0, 0, 0, 0.5)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "50%",
+                            width: "40px",
+                            height: "40px",
+                            cursor: "pointer",
+                            zIndex: 10,
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                          onClick={() => setCurrentIndex(currentIndex - IMAGES_PER_SLIDE)}
+                        >
+                          <ChevronLeft/>
+                        </button>
+                      )}
+
+                      {/* 이미지 그룹 */}
+                      <ToggleButtonGroup
+                        value={puzzleImage}
+                        exclusive
+                        fullWidth
+                        onChange={handlePredefinedImageSelect}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-around",
+                          mb: 2,
+                        }}
+                      >
+                        {Array.from({ length: IMAGES_PER_SLIDE }, (_, index) => {
+                          const image = currentImages[index];
+                          return image ? (
+                            <ToggleButton
+                              key={image.name}
+                              value={image.url}
+                              selected={puzzleImage === image.url}
+                              sx={{
+                                padding: 1,
+                                borderRadius: "5px",
+                                border: puzzleImage === image.url ? "1px solid orange" : "1px solid #ccc",
+                              }}
+                              style={{borderTopLeftRadius: "0"}}
+                            >
+                              <img
+                                src={`https://puzzleshare-gallery.s3.ap-northeast-2.amazonaws.com/${image.url}`}
+                                alt={image.name}
+                                style={{
+                                  width: "100px",
+                                  height: "100px",
+                                  objectFit: "cover",
+                                  borderRadius: "5px",
+                                }}
+                              />
+                            </ToggleButton>
+                          ) : (
+                            <ToggleButton
+                              sx={{
+                                padding: 1,
+                                borderRadius: "5px",
+                                border: "1px solid #ccc",
+                              }}
+                            />
+                          );
+                        })}
+                      </ToggleButtonGroup>
+
+                      {/* 오른쪽 슬라이드 버튼 */}
+                      {canMoveRight && (
+                        <button
+                          style={{
+                            position: "absolute",
+                            right: "-20px",
+                            top: "45%",
+                            transform: "translateY(-50%)",
+                            background: "rgba(0, 0, 0, 0.5)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "50%",
+                            width: "40px",
+                            height: "40px",
+                            cursor: "pointer",
+                            zIndex: 10,
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                          onClick={() => setCurrentIndex(currentIndex + IMAGES_PER_SLIDE)}
+                        >
+                          <ChevronRight/>
+                        </button>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {/* URL 입력 */}
+                {inputMode === "url" && (
+                  <>
+                    <Grid item xs={8.5}>
                       <TextField
                         label="이미지 URL"
                         value={customImageUrl}
                         onChange={handleCustomImageUrlChange}
                         fullWidth
                         placeholder="이미지 URL을 입력하세요"
+                        style={{margin: "0"}}
+                        InputProps={{
+                          style: {
+                            borderTopLeftRadius: "0px", // 입력 필드 자체 반지름 제거
+                          },
+                        }}
                       />
                     </Grid>
                   </>
                 )}
 
                 {/* 파일 업로드 */}
-                {inputMode.current === "file" && (
+                {inputMode === "file" && (
                   <>
-                    <Grid item xs={8}>
+                    <Grid item xs={8.5}>
                       <TextField
                         type="file"
                         onChange={(e) => setSelectedFile(e.target.files[0])}
@@ -452,21 +551,31 @@ export default function CreateRoomButton({ category }) {
                           accept: "image/jpeg, image/png, image/webp", // 지원하는 파일 형식
                         }}
                         fullWidth
+                        style={{margin: "0"}}
+                        InputProps={{
+                          style: {
+                            borderTopLeftRadius: "0px", // 입력 필드 자체 반지름 제거
+                          },
+                        }}
                       />
                     </Grid>
                   </>
                 )}
                 
-                <Grid item xs={4} sx={{ pl: 2 }}>
-                  <Button
-                    variant="outlined"
-                    onClick={() => validateImageUrl()}
-                    sx={{ height: "56px" }}
-                    fullWidth
-                  >
-                    퍼즐 생성
-                  </Button>
-                </Grid>
+                {(inputMode === "url" || inputMode === "file") && (
+                  <>
+                    <Grid item xs={3.5} sx={{ pl: 1 }}>
+                      <Button
+                        variant="outlined"
+                        onClick={() => validateImageUrl()}
+                        sx={{ height: "56px" }}
+                        fullWidth
+                      >
+                        퍼즐 생성
+                      </Button>
+                    </Grid>
+                  </>
+                )}
               </Grid>
 
               <FormControl component="fieldset" fullWidth sx={{ mt: 2 }}>
@@ -518,8 +627,13 @@ export default function CreateRoomButton({ category }) {
                 방 만들기
               </Button>
             </Grid>
-            {/* 오른쪽: 이미지 미리보기 */}
+            
             <Grid item xs={12} md={6}>
+              {/* 알림 메시지를 표시 */}
+              <Alert severity={alertSeverity} sx={{ mt: 1.5 }}>
+                {alertMessage}
+              </Alert>
+
               {/* 미리보기를 조건부로 렌더링 */}
               {showPreview && (
                 <>
@@ -541,7 +655,7 @@ export default function CreateRoomButton({ category }) {
                         alt="퍼즐 이미지 미리보기"
                         style={{
                           width: "100%",
-                          maxHeight: "500px",
+                          maxHeight: "400px",
                           objectFit: "contain",
                           borderRadius: "10px",
                           border: "1px solid #ccc",
@@ -560,13 +674,13 @@ export default function CreateRoomButton({ category }) {
                       />
                       {/* 퍼즐 조각 수 및 이미지 크기 표시 */}
                       {puzzlePiece && (
-                        <Typography variant="subtitle1" sx={{ mb: 2, color: deepPurple[500] }}>
+                        <Typography variant="subtitle1" sx={{ color: deepPurple[500] }}>
                           선택된 퍼즐 조각 수: {puzzlePiece}
                         </Typography>
                       )}
                       {imageWidth > 0 && imageLength > 0 && (
                         <Typography variant="subtitle1" sx={{ mb: 2, color: deepPurple[500] }}>
-                          이미지 크기: {imageWidth}px x {imageLength}px
+                          이미지 크기: {imageWidth} x {imageLength} (px)
                         </Typography>
                       )}
                     </>
@@ -582,12 +696,12 @@ export default function CreateRoomButton({ category }) {
 }
 
 const CreateButton = styled(Button)`
-  height: 60px;
+  height: 100%;
   background-color: orange;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
   color: white;
-  font-size: 25px;
-  padding: 10px 20px;
+  font-size: 20px;
+  padding: 10px;
   border: none;
   display: flex;
   align-items: center;

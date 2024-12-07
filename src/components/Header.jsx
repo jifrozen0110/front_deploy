@@ -57,9 +57,16 @@ export default function Header({ parentUpdate, goProfile, goHome }) {
   return (
     <HeaderBar>
       <Toolbar sx={{ flexWrap: "wrap" }}>
-        <ImageIcon imageSource={Logo} size="lg" onClick={() => goHome()} />
-        <GamePageNavigation />
+        <div onClick={() => goHome()} style={{ display: "flex", alignItems: "center", cursor: "pointer"}}>
+          <div>
+            <ImageIcon imageSource={Logo} size="lg" />
+          </div>
+          <div style={{color: "black", fontWeight: "bold", fontSize: "30px", marginLeft: "5px"}}>
+            <span style={{ color: "red "}}>P</span>uzzle <span style={{ color: "blue"}}>S</span>hare
+          </div>
+        </div>
 
+        <GamePageNavigation />
         <nav style={{ display: "flex", gap: "20px" }}>
           <ThemeProvider theme={theme}>
             <Button variant="text" size="large" onClick={() => goProfile()}>
