@@ -379,6 +379,8 @@ const Wrapper = styled.div`
   background-size: cover;
   background-attachment: fixed;
   margin: 0 auto;
+  padding: 30px;
+  box-sizing: border-box;
   user-select: none; /* 텍스트 선택 금지 */
 `;
 
@@ -395,7 +397,7 @@ const Content = styled.div`
   flex-direction: column;
   justify-content: center;
   align-item: center;
-  padding: 0 30px;
+  padding-left: 30px;
   boxsizing: border-box;
   max-height: 100%;
   gap: 10px;

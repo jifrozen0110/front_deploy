@@ -38,7 +38,6 @@ const GridContainer = styled.div`
   height: 100%;
   
   overflow-y: auto;
-  padding-right: 10px;
   box-sizing: border-box;
 
   /* 스크롤바 스타일 */

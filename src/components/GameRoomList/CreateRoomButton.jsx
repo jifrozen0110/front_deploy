@@ -22,6 +22,11 @@ import {
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import { authRequest } from "../../apis/requestBuilder";
+import { ChevronRight, ChevronLeft } from "lucide-react";
+
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
+import Slider from "react-slick";
 
 const predefinedImages = [
   {
@@ -36,8 +41,13 @@ const predefinedImages = [
     name: "문지캠퍼스",
     url: "e5e81451-8396-4cc1-b08f-67d3c650bd54-Kakao-Talk-20241202-141212588.jpg",
   },
+  {
+    name: "몬스터 주식회사",
+    url: "20241208_011319_f10e1d8b-aadc-4efb-881b-30090087f30e.jpg",
+  },
 ];
 
+const IMAGES_PER_SLIDE = 3;
 const DEFAULT_IMAGE_URL = predefinedImages[0].url;
 
 export default function CreateRoomButton({ category }) {
@@ -69,6 +79,16 @@ export default function CreateRoomButton({ category }) {
 
   const [inputMode, setInputMode] = useState("default"); // 입력 모드 (URL 또는 파일)
   const [selectedFile, setSelectedFile] = useState(null); // 선택한 파일
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const currentImages = predefinedImages.slice(
+    currentIndex,
+    currentIndex + IMAGES_PER_SLIDE
+  );
+  const canMoveLeft = currentIndex > 0;
+  const canMoveRight = currentIndex + IMAGES_PER_SLIDE < predefinedImages.length;
+
 
   const handleRoomSize = (e) => {
     const count = Number(e.target.value);
@@ -391,42 +411,118 @@ export default function CreateRoomButton({ category }) {
                   </ToggleButtonGroup>
                 </Grid>
 
-                {/* URL 입력 */}
+                {/* Default 선택 */}
                 {inputMode === "default" && (
                   <>
-                    <ToggleButtonGroup
-                      value={puzzleImage}
-                      exclusive
-                      onChange={handlePredefinedImageSelect}
-                      fullWidth
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-around",
-                        mb: 2,
-                      }}
-                    >
-                      {predefinedImages.map((image) => (
-                        <ToggleButton key={image.name} value={image.url} sx={{ padding: 1 }} style={{borderTopLeftRadius: "0"}}>
-                          <img
-                            src={"https://puzzleshare-gallery.s3.ap-northeast-2.amazonaws.com/"+image.url}
-                            alt={image.name}
-                            style={{
-                              width: "100px",
-                              height: "100px",
-                              objectFit: "cover",
-                              borderRadius: "5px",
-                            }}
-                          />
-                        </ToggleButton>
-                      ))}
-                    </ToggleButtonGroup>
+                    <div style={{ position: "relative", width: "100%", maxWidth: "800px", margin: "0 auto" }}>
+                      {/* 왼쪽 슬라이드 버튼 */}
+                      {canMoveLeft && (
+                        <button
+                          style={{
+                            position: "absolute",
+                            left: "-20px",
+                            top: "45%",
+                            transform: "translateY(-50%)",
+                            background: "rgba(0, 0, 0, 0.5)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "50%",
+                            width: "40px",
+                            height: "40px",
+                            cursor: "pointer",
+                            zIndex: 10,
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                          onClick={() => setCurrentIndex(currentIndex - IMAGES_PER_SLIDE)}
+                        >
+                          <ChevronLeft/>
+                        </button>
+                      )}
+
+                      {/* 이미지 그룹 */}
+                      <ToggleButtonGroup
+                        value={puzzleImage}
+                        exclusive
+                        fullWidth
+                        onChange={handlePredefinedImageSelect}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-around",
+                          mb: 2,
+                        }}
+                      >
+                        {Array.from({ length: IMAGES_PER_SLIDE }, (_, index) => {
+                          const image = currentImages[index];
+                          return image ? (
+                            <ToggleButton
+                              key={image.name}
+                              value={image.url}
+                              selected={puzzleImage === image.url}
+                              sx={{
+                                padding: 1,
+                                borderRadius: "5px",
+                                border: puzzleImage === image.url ? "1px solid orange" : "1px solid #ccc",
+                              }}
+                              style={{borderTopLeftRadius: "0"}}
+                            >
+                              <img
+                                src={`https://puzzleshare-gallery.s3.ap-northeast-2.amazonaws.com/${image.url}`}
+                                alt={image.name}
+                                style={{
+                                  width: "100px",
+                                  height: "100px",
+                                  objectFit: "cover",
+                                  borderRadius: "5px",
+                                }}
+                              />
+                            </ToggleButton>
+                          ) : (
+                            <ToggleButton
+                              sx={{
+                                padding: 1,
+                                borderRadius: "5px",
+                                border: "1px solid #ccc",
+                              }}
+                            />
+                          );
+                        })}
+                      </ToggleButtonGroup>
+
+                      {/* 오른쪽 슬라이드 버튼 */}
+                      {canMoveRight && (
+                        <button
+                          style={{
+                            position: "absolute",
+                            right: "-20px",
+                            top: "45%",
+                            transform: "translateY(-50%)",
+                            background: "rgba(0, 0, 0, 0.5)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "50%",
+                            width: "40px",
+                            height: "40px",
+                            cursor: "pointer",
+                            zIndex: 10,
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                          onClick={() => setCurrentIndex(currentIndex + IMAGES_PER_SLIDE)}
+                        >
+                          <ChevronRight/>
+                        </button>
+                      )}
+                    </div>
                   </>
                 )}
 
                 {/* URL 입력 */}
                 {inputMode === "url" && (
                   <>
-                    <Grid item xs={8}>
+                    <Grid item xs={8.5}>
                       <TextField
                         label="이미지 URL"
                         value={customImageUrl}
@@ -447,7 +543,7 @@ export default function CreateRoomButton({ category }) {
                 {/* 파일 업로드 */}
                 {inputMode === "file" && (
                   <>
-                    <Grid item xs={8}>
+                    <Grid item xs={8.5}>
                       <TextField
                         type="file"
                         onChange={(e) => setSelectedFile(e.target.files[0])}
@@ -468,7 +564,7 @@ export default function CreateRoomButton({ category }) {
                 
                 {(inputMode === "url" || inputMode === "file") && (
                   <>
-                    <Grid item xs={4} sx={{ pl: 2 }}>
+                    <Grid item xs={3.5} sx={{ pl: 1 }}>
                       <Button
                         variant="outlined"
                         onClick={() => validateImageUrl()}
