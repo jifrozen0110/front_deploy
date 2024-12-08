@@ -4,7 +4,7 @@ import BattleGameListPage from "./BattleGame/BattleGameListPage";
 import Gallery from "./Gallery";
 import ProfilePage from "./ProfilePage";
 import styled from "styled-components";
-import backgroundPath from "@/assets/backgrounds/background.png";
+import backgroundPath2 from "@/assets/backgrounds/background_winter2.jpg";
 
 export default function HomePage() {
   const [page, setPage] = useState(0)
@@ -24,7 +24,7 @@ export default function HomePage() {
 const Wrapper = styled.div`
   position: relative;
   min-height: 100vh;
-  background-image: url(${backgroundPath});
+  background-image: url(${backgroundPath2});
   background-size: cover;
   background-attachment: fixed;
   user-select: none; /* 텍스트 선택 금지 */
@@ -37,11 +37,10 @@ const Wrapper = styled.div`
     right: 0;
     bottom: 0;
     z-index: 0; /* 배경 위에 위치 */
-    background-color: rgba(0,0,0,0.2);
   }
 
   > * {
     position: relative;
     z-index: 1;
-  }  
+  }
 `;
