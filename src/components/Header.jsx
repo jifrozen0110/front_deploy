@@ -62,7 +62,7 @@ export default function Header({ parentUpdate, goProfile, goHome }) {
             <ImageIcon imageSource={Logo} size="lg" />
           </div>
           <div style={{color: "black", fontWeight: "bold", fontSize: "30px", marginLeft: "5px"}}>
-            <span style={{ color: "red "}}>P</span>uzzle <span style={{ color: "blue"}}>S</span>hare
+            <span style={{ color: "#FE5B5E"}}>P</span>uzzle <span style={{ color: "#5BAFFE"}}>S</span>hare
           </div>
         </div>
 
