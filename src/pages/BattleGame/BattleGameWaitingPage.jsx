@@ -13,7 +13,7 @@ import Button from "@mui/material/Button";
 
 import { socket } from "@/socket-utils/socket2"; // 소켓 유틸리티
 
-import backgroundPath from "@/assets/backgrounds/background2.png";
+import backgroundPath1 from "@/assets/backgrounds/background_winter1.jpg";
 import { authRequest } from "../../apis/requestBuilder";
 import { useGameInfo } from "../../hooks/useGameInfo";
 import Typography from "@mui/material/Typography";
@@ -23,7 +23,6 @@ import { ArrowLeft, ArrowLeftRight, Settings, UserPlus } from "lucide-react";
 import { setTeam } from "../../socket-utils/storage";
 import InviteModal from "@/components/GameWaiting/InviteModal";
 import InviteAlertModal from "@/components/GameWaiting/InviteAlertModal";
-import { parse } from "dotenv";
 const { connect, send, subscribe } = socket;
 
 export default function BattleGameWaitingPage() {
@@ -279,6 +278,7 @@ export default function BattleGameWaitingPage() {
           chatList={chatList}
           path={"/pub/chat/room"}
           defualtData={{ roomId, roomName: roomData.roomName }}
+          style={{ height: "1100px" }}
         />
       </LeftSidebar>
 
@@ -326,9 +326,7 @@ export default function BattleGameWaitingPage() {
                 {makeXPlayer(xPlayerCount[1])}
               </TeamGrid>
             </TeamSection>
-
-            <Versus>VS</Versus>
-
+            
             <TeamSection>
               <Team style={{ backgroundColor: "rgba(254, 91, 94, 0.6)" }}>빨간팀</Team>
               <TeamGrid>
@@ -373,31 +371,33 @@ export default function BattleGameWaitingPage() {
 }
 
 const Wrapper = styled.div`
-  display: flex; /* Flex 컨테이너 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 100vh;
-  background-image: url(${backgroundPath});
+  background-image: url(${backgroundPath1});
   background-size: cover;
   background-attachment: fixed;
-  margin: 0 auto;
+  // width: 100%;
+  padding: 30px;
+  box-sizing: border-box;
   user-select: none; /* 텍스트 선택 금지 */
 `;
 
 const LeftSidebar = styled.div`
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   height: 100%;
-  width: 20%;
+  max-height: 800px;
+  width: 380px;
 `;
 
 const Content = styled.div`
   display: flex;
-  flex: 1;
   flex-direction: column;
   justify-content: center;
-  align-item: center;
-  padding: 0 30px;
-  boxsizing: border-box;
-  max-height: 100%;
+  padding-left: 10px;
+  height: 100%;
+  max-height: 800px;
   gap: 10px;
 `;
 
@@ -440,11 +440,10 @@ const TopButton = styled(Button)`
 `;
 
 const Body = styled.div`
+  flex: 1;
   display: flex;
-  justify-content: space-between;
   // margin-top: 10px;
-  width: 100%;
-  gap: 30px;
+  gap: 10px;
 `;
 
 const ButtonGroup = styled.div`
@@ -460,11 +459,10 @@ const Title = styled.h1`
 
 const MainSection = styled.div`
   display: flex;
-  justify-content: space-between;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(20px);
-  width: 70%;
-  padding: 60px;
+  padding: 60px 20px;
+  gap: 30px;
   border-radius: 5px;
 `;
 
@@ -491,7 +489,7 @@ const PuzzleDetails = styled.div`
   backdrop-filter: blur(20px);
   color: white;
   padding: 5px;
-  width: 30%;
+  width: 610px;
   align-items: center;
   border-radius: 5px;
 `;
