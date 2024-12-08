@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { styled } from "styled-components";
 import { playerConfig } from "../puzzle-core";
-import { Color } from "paper/dist/paper-core";
+import { Color,  MouseEvent,  Point } from "paper/dist/paper-core";
 import { socket } from "@/socket-utils/socket2";
 import pointerPath from "@/assets/icons/gameRoom/pointer2.png";
 import { getTeam } from "../socket-utils/storage";
@@ -12,6 +12,7 @@ const { connect, send, subscribe } = socket;
 
 const myPointer = {x : 0, y : 0}
 const prePointer = {x : 0, y : 0}
+let dragTarget = null
 
 export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture, bundles, itemPieces, players }) {
   const canvasRef = useRef(null);
@@ -34,8 +35,97 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
       canvas.width = 1000;
       canvas.height = 750;
       initializePuzzle({ puzzleImg, level, shapes, board, picture });
+      canvas.style.width = `${canvas.parentElement.clientWidth}px`;
+      canvas.style.height = `${canvas.parentElement.clientWidth / 4 * 3}px`;
       const config = getConfig()
       groupPuzzlePieces({ config, bundles })
+      canvas.style.aspectRatio = '1000 / 750'
+      config.project.view._bounds.width = canvas.parentElement.clientWidth
+      config.project.view._bounds.height = canvas.parentElement.clientWidth / 4 * 3
+      
+      config.project.view.onMouseDown = (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        console.log("view mouse down");
+        
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        const correctedX = (event.event.clientX - rect.left) * scaleX;
+        const correctedY = (event.event.clientY - rect.top) * scaleY;
+        
+        const hitResult = config.project.project.hitTest(new Point(correctedX, correctedY));
+        if (hitResult?.item?._parent?._parent?.onMouseDown) {
+          const customEvent = new MouseEvent(event.type, {
+            clientX: correctedX,
+            clientY: correctedY,
+            bubbles: true,
+            cancelable: true,
+          });
+          customEvent.point = {x: correctedX, y: correctedY};
+          customEvent.delta = event.delta;
+          customEvent.target = hitResult.item._parent._parent;
+          customEvent.currentTarget = hitResult.item._parent._parent;
+          dragTarget = hitResult.item._parent._parent
+          
+          hitResult.item._parent._parent.onMouseDown(customEvent);
+        }
+      };
+      
+      config.project.view.onMouseUp = (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        console.log("view mouse up");
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        const correctedX = (event.event.clientX - rect.left) * scaleX;
+        const correctedY = (event.event.clientY - rect.top) * scaleY;
+        const tempTarget = dragTarget
+        dragTarget = null
+        
+        if (tempTarget) {
+          const customEvent = new MouseEvent(event.type, {
+            clientX: correctedX,
+            clientY: correctedY,
+            bubbles: true,
+            cancelable: true,
+          });
+          customEvent.point = {x: correctedX, y: correctedY};
+          customEvent.delta = {x: 0, y: 0};
+          customEvent.target = tempTarget;
+          customEvent.currentTarget = tempTarget;
+          
+          tempTarget.onMouseUp(customEvent);
+        }
+      };
+      
+      config.project.view.onMouseDrag = (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        console.log("view mouse drag");
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+    
+        const correctedX = (event.event.clientX - rect.left) * scaleX;
+        const correctedY = (event.event.clientY - rect.top) * scaleY;
+    
+        if (dragTarget) {
+          event.point.x = correctedX
+          event.point.y = correctedY
+          event.isCustom = true
+          event.prevented = false
+          event.delta = event.delta;
+          event.target = dragTarget;
+          event.currentTarget = dragTarget;
+          dragTarget.onMouseDrag(event);
+        }
+      };
+      
+
       if (itemPieces) {
         Object.entries(itemPieces).forEach(([idx, bool]) => {
           if (!bool) {
@@ -50,6 +140,7 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
         });
       }
 
+      const scale = 1000 / canvas.parentElement.clientWidth
       subscribe(`/topic/game/${gameId}/mouse`, message => {
         const data = JSON.parse(message.body)
         if (data.team == team) {
@@ -58,8 +149,8 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
           }
           const pointer = document.getElementById(`user${data.playerId}`)
           if(pointer){
-            pointer.style.left = `${data.x}px`
-            pointer.style.top = `${data.y}px`
+            pointer.style.left = `${data.x / scale}px`
+            pointer.style.top = `${data.y / scale}px`
           }
         }
       })
@@ -70,8 +161,8 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
             JSON.stringify({
               playerId : userId,
               playerName : userName,
-              x : myPointer.x,
-              y : myPointer.y,
+              x : myPointer.x * scale,
+              y : myPointer.y * scale,
               color : myColor,
               team : getTeam(),
             }))
@@ -86,13 +177,13 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
     <>
       <div
         id="canvasContainer"
-        style={{ position: "relative", display: "flex", justifyContent: "center" }}
+        style={{ position: "relative", display: "flex", justifyContent: "center", width: '76%', height:'auto', alignItems:"center", margin: '0 auto' }}
       >
         {players?.filter(p => p.playerId != userId)
         .map(p => 
             <Pointer path={pointerPath} id={`user${p.playerId}`} color={p.color} key={`user${p.playerId}`} name={p.playerName}></Pointer>
         )}
-        <Canvas ref={canvasRef} id="canvas" onMouseMove={mouseMove}/>
+        <Canvas ref={canvasRef} id="canvas" onMouseMove={mouseMove} />
       </div>
     </>
   );
@@ -116,19 +207,11 @@ const Pointer = ({color, path, name, id,}) => {
         color:"white",
         background: color,
         fontWeight:600,
+        textWrapMode: "nowrap",
       }}>{name}</div>
     </div>
   )
 }
-// const Pointer = styled.div`
-//   width: 25px;
-//   height: 25px;
-//   position: absolute;
-//   background: ${(props) => props.color};
-//   mask: url(${(props)=> props.path}) no-repeat center / contain;
-//   transition: left 0.1s ease, top 0.1s ease;
-//   pointer-events: none;
-// `
 
 const Canvas = styled.canvas`
   border: 1px solid #ccc;

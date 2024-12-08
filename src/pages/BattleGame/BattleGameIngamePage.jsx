@@ -129,8 +129,6 @@ export default function BattleGameIngamePage() {
       finishTime: data.game.finishTime ? new Date(data.game.finishTime).toISOString() : null,
     };
 
-    console.log('전송할 게임 데이터:', gameDataDto);
-
     // 백엔드 서버로 데이터 전송
     const userId = getSender(); // 또는 다른 방법으로 userId를 얻으세요.
 
@@ -179,8 +177,14 @@ export default function BattleGameIngamePage() {
 
           const fireImgCopy = fireImg.cloneNode();
 
-          fireImgCopy.style.left = `${x}px`;
-          fireImgCopy.style.top = `${y}px`;
+          const scale = canvasContainer.clientWidth / 1000
+          if (isPlayerTeam) {
+            fireImgCopy.style.left = `${x * scale}px`;
+            fireImgCopy.style.top = `${y * scale}px`;
+          }else{
+            fireImgCopy.style.left = `${x * scale / enemyCanvasScale}px`;
+            fireImgCopy.style.top = `${y * scale / enemyCanvasScale}px`;
+          }
 
           canvasContainer.appendChild(fireImgCopy);
           
@@ -361,7 +365,6 @@ export default function BattleGameIngamePage() {
     setGameData(data);
     const targetSlot = isBlue ? data.bluePuzzle.inventory : data.redPuzzle.inventory;
     setSlots(targetSlot);
-    console.log("gamedata is here!", gameData, data);
   };
 
   const changePercent = (data) => {
@@ -384,10 +387,6 @@ export default function BattleGameIngamePage() {
         console.log("@@@@@@@@@@@@@@@@ 인게임 소켓 연결 @@@@@@@@@@@@@@@@@@");
         subscribe(`/topic/game/room/${gameId}`, (message) => {
           const data = JSON.parse(message.body);
-          if(data.message !== 'MOVE'){
-            console.log("##################");
-            console.log(data);
-          }
 
           // 매번 게임이 끝났는지 체크
           if (data.isFinished === true&&data.isStarted===true&& data.message && data.message === "SAVE_RECORD") {
@@ -423,9 +422,8 @@ export default function BattleGameIngamePage() {
             sendGameDataToBackend(data, data.game.finishTime);
             // ----------------------------------------------------------------------
 
-            setTimeout(() => {
-              setIsOpenedDialog(true);
-            }, 1000);
+            setTimeout(() => setIsOpenedDialog(true), 1000);
+            setTimeout(() => window.location.replace(`/game/battle/waiting/${roomId}`), 6000);
             // return;
           }
 
@@ -514,14 +512,11 @@ export default function BattleGameIngamePage() {
         // 채팅
         subscribe(`/topic/chat/game/${gameId}/${getTeam()}`, (message) => {
           const data = JSON.parse(message.body);
-          console.log("채팅왔다", data);
           setChatHistory((prevChat) => [...prevChat, data]); // 채팅 기록에 새로운 채팅 추가
         });
 
         subscribe(`/topic/game/room/${gameId}/init`, (message) => {
           const data = JSON.parse(message.body);
-          console.log("init");
-          console.log(data);
           initializeGame(data.game);
           changePercent(data)
         });
@@ -803,6 +798,7 @@ const GameInfo = styled(Box)`
   box-sizing: border-box;
   gap: 10px;
   align-items: center;
+  width: 30%;
 `;
 
 const OtherTeam = styled.div`
