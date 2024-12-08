@@ -11,50 +11,39 @@ import Chatting from "@/components/GameIngame/Chatting";
 import ResultModal from "@/components/GameIngame/ResultModal";
 import useExitRoom from "@/components/ExitRoom";
 
-import { LogOut, ArrowLeft, Settings, DoorOpen, XCircle } from "lucide-react";
+import { DoorOpen } from "lucide-react";
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { playerConfig, enemyConfig } from "@/puzzle-core";
-import { getPuzzlePositionByIndex, updateGroupByBundles } from "@/puzzle-core/utils";
-import { groupPuzzlePieces } from "@/puzzle-core/index";
-import BackgroundPath from "@/assets/backgrounds/background2.png";
+import { getPuzzlePositionByIndex } from "@/puzzle-core/utils";
+
+import backgroundPath3 from "@/assets/backgrounds/background_winter3.jpg";
 
 import {
   Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
   Snackbar,
-  Button,
-  ButtonBase,
 } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { red, blue, deepPurple } from "@mui/material/colors";
+import { createTheme } from "@mui/material/styles";
+import { red, blue } from "@mui/material/colors";
 import { useHint } from "@/hooks/useHint";
 import Hint from "../../components/Hint";
 import { createPortal } from "react-dom";
 import { useSnackbar } from "../../hooks/useSnackbar";
-import { useInventory } from "../../hooks/useInventory";
 import { useSnackbar2 } from "../../hooks/useSnackbar2";
 import { setRoomId, setTeam } from "../../socket-utils/storage";
 
 import Inventory from "../../components/GameIngame/Inventory";
-import firePath from "@/assets/effects/fire.gif";
 import boomPath from "@/assets/effects/boom.gif";
-import mudPath from "@/assets/effects/mud.png";
 import inkPath from "@/assets/effects/ink.png";
 import tornadoPath from "@/assets/effects/tornado.gif";
-import bloomPath from "@/assets/effects/blooming.gif";
 import blackholePath from "@/assets/effects/blackhole.png";
-import twinklePath from "@/assets/effects/twinkle.gif";
 import framePath from "@/assets/effects/frame.png";
 
 import { attackAudio, puzzleAudio, backgroundAudio } from "@/puzzle-core/addAudio";
 import fireAudioPath from "@/assets/audio/fire.mp3";
 import mudAudioPath from "@/assets/audio/mud.wav";
 import tornadoAudioPath from "@/assets/audio/tornado.mp3";
-import bloomAudioPath from "@/assets/audio/blooming.mp3";
 import blackholeAudioPath from "@/assets/audio/blackhole.mp3";
 import frameAudioPath from "@/assets/audio/frame2.mp3";
 import beep from "@/assets/audio/beep.mp3";
@@ -72,9 +61,6 @@ const {
   movePuzzles,
   unLockPuzzle,
   addPiece,
-  usingItemFire,
-  usingItemTyphoon,
-  usingItemFrame,
 } = playerConfig;
 
 export default function BattleGameIngamePage() {
@@ -359,9 +345,6 @@ export default function BattleGameIngamePage() {
 
   const handleCloseGame = () => {
     setIsOpenedDialog(false);
-    // navigate(`/game/battle`, {
-    //   replace: true,
-    // });
     navigate(`/home`, {
       replace: true,
     });
@@ -394,8 +377,6 @@ export default function BattleGameIngamePage() {
       setEnemyPercent(roundTo(data.redProgressPercent, 2));
     }
   };
-
-  // const temp = true;
 
   const connectSocket = async () => {
     connect(
@@ -462,9 +443,6 @@ export default function BattleGameIngamePage() {
             }
           }
 
-          // 진행도
-          // ATTACK일때 2초 뒤(효과 지속 시간과 동일) 반영
-          // MIRROR일때 3초 뒤(효과 지속 시간과 동일) 반영
           if (data.redProgressPercent >= 0 && data.blueProgressPercent >= 0) {
             if (data.message && data.message === "ATTACK") {
               setTimeout(() => {
@@ -580,10 +558,6 @@ export default function BattleGameIngamePage() {
       },
       () => {
         console.log("@@@@@@@@@@@@@@@@@@@@@socket error 발생@@@@@@@@@@@@@@@@@@@@@");
-        // window.alert("게임이 종료되었거나 입장할 수 없습니다.");
-        // navigate(`/game/battle`, {
-        //   replace: true,
-        // });
       },
     );
   };
@@ -619,24 +593,13 @@ export default function BattleGameIngamePage() {
 
   const backgroundSound = backgroundAudio(puzzleBackground);
 
-  // useExitRoom(exitRoom, isGameEndingRef);
-
   useEffect(() => {
-    // if (roomId !== getRoomId() || !getSender()) {
-    //   navigate("/game/battle", {
-    //     replace: true,
-    //   });
-    //   return;
-    // }
-    
     backgroundSound.play();
     setEnemyCanvasScale(0.6); // 상대편 화면 scale 설정
     connectSocket();
     return () => {
       backgroundSound.muted = true;
     }
-
-    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
@@ -685,6 +648,14 @@ export default function BattleGameIngamePage() {
           <div style={{position: "absolute", top: "0px", left: "0px", width: "250px"}}>
             <Timer num={time} color={getTeam()} />
           </div>
+          <ProgressContainer>
+            <ProgressWrapper>
+              <PrograssBar percent={ourPercent} teamColor={getTeam() === "red"? "red":"blue"} />
+            </ProgressWrapper>
+            <ProgressWrapper>
+              <PrograssBar percent={enemyPercent} teamColor={getTeam() !== "red"? "red":"blue"} />
+            </ProgressWrapper>
+          </ProgressContainer>
           <div style={{position: "absolute", top: "10px", right: "10px"}}>
             <OutButton onClick={() => handleExit()}>
               <DoorOpen size="40" style={{margin: "auto"}} />
@@ -733,24 +704,11 @@ export default function BattleGameIngamePage() {
                   enemyCanvasScale = {enemyCanvasScale}
                 />
           </OtherTeam>
-          <ProgressContainer>
-            <ProgressWrapper>
-              <PrograssBar percent={enemyPercent} teamColor={getTeam() !== "red"? "red":"blue"} />
-            </ProgressWrapper>
-            <ProgressWrapper>
-              <PrograssBar percent={ourPercent} teamColor={getTeam() === "red"? "red":"blue"} />
-            </ProgressWrapper>
-          </ProgressContainer>
         </GameInfo>
       </Row>
 
       {getTeam() === "red" ? (
         <>
-          {/* <ItemInventory
-            prevItemInventory={prevRedItemInventory}
-            itemInventory={redItemInventory}
-            onUseItem={handleUseItem}
-          /> */}
           {document.querySelector("#canvasContainer") &&
             createPortal(
               <Hint hintList={redHintList} setHintList={setRedHintList} />,
@@ -766,11 +724,6 @@ export default function BattleGameIngamePage() {
         </>
       ) : (
         <>
-          {/* <ItemInventory
-            prevItemInventory={prevBlueItemInventory}
-            itemInventory={blueItemInventory}
-            onUseItem={handleUseItem}
-          /> */}
           {document.querySelector("#canvasContainer") &&
             createPortal(
               <Hint hintList={blueHintList} setHintList={setBlueHintList} />,
@@ -793,11 +746,6 @@ export default function BattleGameIngamePage() {
         onClose={handleSnackClose}
         message={snackMessage}
       />
-      {/* <ThemeProvider theme={theme}>
-            <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
-              <DialogTitle>게임 결과</DialogTitle>
-            </Dialog>
-          </ThemeProvider> */}
       <ResultModal
         isOpenedDialog={isOpenedDialog}
         handleCloseGame={handleCloseGame}
@@ -819,7 +767,7 @@ export default function BattleGameIngamePage() {
 const Wrapper = styled.div`
   position: relative;
   height: 100vh;
-  background-image: url(${BackgroundPath});
+  background-image: url(${backgroundPath3});
   background-size: cover;
   background-attachment: fixed;
   box-sizing: border-box;
@@ -831,9 +779,11 @@ const Wrapper = styled.div`
 `;
 
 const ImageContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;  
   width: 100%;
-  max-height: 50%;
-  text-align: center;
   background-color: rgba(0,0,0, 0.4);
   border-radius: 10px;
   overflow: hidden;
@@ -878,19 +828,21 @@ const Board = styled.div`
 `;
 
 const ProgressContainer = styled.div`
-  flex: 1;
   display: flex;
-  flex-direction: column;
   box-sizing: border-box;
-  padding: 5px;
-  gap: 5px;
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
+  position: absolute;
+  top: 10px;
+  left: 280px;
+  width: calc(100% - 380px);
+  height: 60px;
+  // background-color: rgba(255, 255, 255, 0.8);
   border-radius: 10px;
 `;
 
 const ProgressWrapper = styled(Box)`
   height: 100%;
+  width: 80%;
+  margin: 0 auto;
 `;
 
 const OutButton = styled.button`

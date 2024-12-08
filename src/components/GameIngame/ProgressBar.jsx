@@ -2,6 +2,7 @@ import { styled } from "styled-components";
 import LinearProgress from "@mui/material/LinearProgress";
 import { red, blue } from "@mui/material/colors";
 import React, { useState, useEffect } from "react";
+import { getTeam } from "@/socket-utils/storage";
 
 export default function PrograssBar({ percent, teamColor }) {
   const barColor = teamColor === "red" ? red[400] : blue[400];
@@ -38,21 +39,19 @@ export default function PrograssBar({ percent, teamColor }) {
       <BorderLinearProgress
         variant="determinate"
         value={displayedPercent}
+        teamColor={teamColor} // teamColor 전달
+        barColor={barColor} // barColor 전달
         sx={{
           backgroundColor: "white",
           "& span.MuiLinearProgress-bar": {
-            transform: `translateX(-${100 - displayedPercent}%) !important`,
-            backgroundColor: barColor,
-            borderRadius: "5px",
+            transform: `translateX(${getTeam() === teamColor ? 100 - displayedPercent : -(100 - displayedPercent)}%) !important`,
           },
-          border: `2px solid ${barColor}`,
         }}
       />
     </ProgressContainer>
   );
 }
 
-// 중앙 정렬을 위한 ProgressContainer 스타일
 const ProgressContainer = styled.div`
   position: relative;
   width: 100%;
@@ -92,6 +91,16 @@ const PercentText = styled.span`
 const BorderLinearProgress = styled(LinearProgress)`
   width: 100%;
   height: 100%;
-  border-radius: 8px;
+  border-radius: ${({ teamColor }) => (getTeam() === teamColor ? "8px 0 0 8px" : "0 8px 8px 0")};
   box-sizing: border-box;
+
+  /* Progress bar 색상 */
+  & .MuiLinearProgress-bar {
+    background-color: ${({ barColor }) => barColor}; /* barColor를 사용 */
+  }
+
+  /* Border 처리 */
+  border: 2px solid ${({ barColor }) => barColor};
+  border-right: ${({ teamColor, barColor }) =>getTeam() === teamColor ? "none" : `2px solid ${barColor}`};
+  border-left: ${({ teamColor, barColor }) =>getTeam() === teamColor ? `2px solid ${barColor}` : "none"};
 `;

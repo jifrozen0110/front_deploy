@@ -86,7 +86,7 @@ export default function BattleGameWaitingPage() {
   };
   const exitRoom = () => {
     console.log("방 나가기~");
-    // send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
+    send(`/pub/room/${roomId}/exit`, {}, JSON.stringify(createPlayerRequest()));
   };
   const switchTeam = () => {
     console.log("팀 바꾸기~");
