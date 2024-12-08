@@ -91,7 +91,7 @@ const PercentText = styled.span`
 const BorderLinearProgress = styled(LinearProgress)`
   width: 100%;
   height: 100%;
-  border-radius: ${({ teamColor }) => (getTeam() === teamColor ? "8px 0 0 8px" : "0 8px 8px 0")};
+  border-radius: ${({ teamColor }) => (getTeam() === teamColor ? "30px 0 0 30px" : "0 30px 30px 0")};
   box-sizing: border-box;
 
   /* Progress bar 색상 */

@@ -277,7 +277,7 @@ const TeamName = styled.h2`
   font-size: 100px;
   font-weight: bold;
   color: ${(props) => props.color};
-  -webkit-text-stroke: 4px white;
+  -webkit-text-stroke: 4px ${(props) => props.color === "#373737"? "#666666" : "white"};
 `;
 
 const TeamPercent = styled.div`
@@ -285,7 +285,7 @@ const TeamPercent = styled.div`
   font-size: 70px;
   font-weight: bold;
   color: ${(props) => props.color};
-  -webkit-text-stroke: 4px white;
+  -webkit-text-stroke: 4px ${(props) => props.color === "#373737"? "#666666" : "white"};
 `;
 
 const TeamPlayers = styled.div`
