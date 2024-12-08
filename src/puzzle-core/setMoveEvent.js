@@ -41,60 +41,24 @@ const moveTile = ({ config }) => {
   // 모든 타일을 돌면서 마우스 이벤트 등록
   config.groupTiles.forEach((gtile, gtileIdx) => {
     gtile[0].onMouseDown = (event) => {
-      console.log("mousedown", gtile[0].position.x, gtile[0].position.y);
 
-      addAudio(puzzleDownSound);
-
-      let isGroup = false;
-      const group = gtile[1];
-      if (group !== undefined) {
-        // 그룹이면 해당 그룹의 타일들 모두 앞으로 이동
-        config.groupTiles.forEach((tile) => {
-          if (tile[1] === group) {
-            if (tile[0] !== gtile[0]) {
-              isGroup = true;
-            }
-            tile[0].bringToFront();
-          }
-        });
+      if (event.event?.isTrusted) {
+        return false;
       } else {
-        // 그룹이 아닐땐 클릭된 타일만 앞으로 이동
-        event.target.bringToFront();
-      }
-      if (!isGroup) {
-        setPuzzleSize(gtile[0], 84);
-      }
+        addAudio(puzzleDownSound);
 
-      const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
-      // socket 전송
-      send(
-        "/pub/game/puzzle",
-        {},
-        JSON.stringify({
-          type: "GAME",
-          roomId: getRoomId(),
-          sender: getSender(),
-          message: "MOUSE_DOWN",
-          targets: JSON.stringify(puzzleGroup),
-          position_x: gtile[0].position.x,
-          position_y: gtile[0].position.y,
-        }),
-      );
-    };
-
-    gtile[0].onMouseDrag = (event) => {
-      console.log("mousedrag", event.point);
-
-      const currentTime = Date.now();
-      // 지정된 간격(interval)으로 함수 실행
-      if (currentTime - lastExecutionTime >= interval) {
-        // 캔버스 사이즈를 벗어나지 않는 범위내로 이동
-        gtile[0].position.x = Math.min(Math.max(event.point.x, 20), config.project.view._viewSize._width - Math.floor(config.tileWidth / 2))
-        const { canvas } = config.project.project._view._context
-        // const x = getMouseX(event, canvas)
-        // const y = getMouseX(event, canvas)
-        gtile[0].position.y = Math.min(Math.max(event.point.y, 20), config.project.view._viewSize._height - Math.floor(config.tileWidth / 2))
-
+        const group = gtile[1];
+        const targets = config.groupTiles.map(tile => {
+          if (tile[1] === group) {
+            tile[0].bringToFront();
+            return { x: tile[0].position.x, y: tile[0].position.y, index: tile[2] }
+          } else {
+            return null
+          }
+        }).filter(Boolean)
+        if (targets.length === 1) {
+          setPuzzleSize(gtile[0], 84);
+        }
 
         // socket 전송
         send(
@@ -104,19 +68,52 @@ const moveTile = ({ config }) => {
             type: "GAME",
             roomId: getRoomId(),
             sender: getSender(),
-            message: "MOUSE_DRAG",
-            targets: JSON.stringify([{ x: gtile[0].position.x, y: gtile[0].position.y, index: gtile[2] }]),
+            message: "MOUSE_DOWN",
+            targets: JSON.stringify(targets),
+            position_x: gtile[0].position.x,
+            position_y: gtile[0].position.y,
           }),
         );
+        return true;
+      }
 
-        lastExecutionTime = currentTime;
-        config.groupTiles
-          .forEach(targetGtile => {
-            if (targetGtile[1] == gtile[1]) {
-              targetGtile[0].position.x = getNewX({ config, stdGtile: gtile, targetGtile })
-              targetGtile[0].position.y = getNewY({ config, stdGtile: gtile, targetGtile })
-            }
-          })
+    };
+
+    gtile[0].onMouseDrag = (event) => {
+      if (!event.isCustom) {
+        return false;
+      } else {
+        const currentTime = Date.now();
+        const { canvas } = config.project.project._view._context
+        // 캔버스 사이즈를 벗어나지 않는 범위내로 이동
+        // 지정된 간격(interval)으로 함수 실행
+        if (currentTime - lastExecutionTime >= interval) {
+          gtile[0].position.x = Math.min(Math.max(event.point.x, 20), config.project.view._viewSize._width - Math.floor(config.tileWidth / 2))
+          gtile[0].position.y = Math.min(Math.max(event.point.y, 20), config.project.view._viewSize._height - Math.floor(config.tileWidth / 2))
+
+          config.groupTiles
+            .forEach(targetGtile => {
+              if (targetGtile[1] == gtile[1]) {
+                targetGtile[0].position.x = getNewX({ config, stdGtile: gtile, targetGtile })
+                targetGtile[0].position.y = getNewY({ config, stdGtile: gtile, targetGtile })
+              }
+            })
+
+          // socket 전송
+          send(
+            "/pub/game/puzzle",
+            {},
+            JSON.stringify({
+              type: "GAME",
+              roomId: getRoomId(),
+              sender: getSender(),
+              message: "MOUSE_DRAG",
+              targets: JSON.stringify([{ x: gtile[0].position.x, y: gtile[0].position.y, index: gtile[2] }]),
+            }),
+          );
+
+          lastExecutionTime = currentTime;
+        }
       }
     };
 
