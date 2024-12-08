@@ -656,15 +656,15 @@ export default function BattleGameIngamePage() {
               <PrograssBar percent={enemyPercent} teamColor={getTeam() !== "red"? "red":"blue"} />
             </ProgressWrapper>
           </ProgressContainer>
-          <div style={{position: "absolute", top: "10px", right: "10px"}}>
+          <div style={{position: "absolute", top: "10px", right: "10px", zIndex: 1}}>
             <OutButton onClick={() => handleExit()}>
               <DoorOpen size="40" style={{margin: "auto"}} />
             </OutButton>
           </div>
-          <div style={{position: "absolute", bottom: "0px", left: "0px"}}>
+          <div style={{position: "absolute", bottom: "0px", left: "0px", zIndex: 1}}>
             <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} style={{width: "200px"}} />
           </div>
-          <div style={{position: "absolute", bottom: "0px", right: "0px", maxWidth: "50%"}}>
+          <div style={{position: "absolute", bottom: "0px", right: "0px", maxWidth: "50%", zIndex: 1}}>
             <Inventory slots={slots} useItem={useItem} color={getTeam()}></Inventory>
           </div>
           <PlayPuzzle
@@ -825,6 +825,7 @@ const Board = styled.div`
   border: 6px solid ${getTeam() === "red" ? red[400] : blue[400]};
   background-color: rgba(255, 255, 255, 0.8);
   position: relative;
+  z-index: 1;
 `;
 
 const ProgressContainer = styled.div`
