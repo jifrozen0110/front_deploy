@@ -38,7 +38,7 @@ function ChatComponent({ chatList, path, defualtData = {} }) {
       {/* 채팅 메시지 목록 */}
       <ChatMessages ref={chatMessagesRef}>
         {chatList.map((chat, index) => (
-          <Message key={index} isMyMessage={chat.userId == localStorage.getItem("userId")}>
+          <Message key={index} ismymessage={chat.userId == localStorage.getItem("userId")? 1 : 0}>
             {chat.userId != localStorage.getItem("userId") && <div>{chat.userName}:</div>}
             {chat.message}
           </Message>
@@ -51,7 +51,7 @@ function ChatComponent({ chatList, path, defualtData = {} }) {
           ref={inputTag}
           placeholder="메시지를 입력하세요..."
           onKeyDown={(e) => {
-            if (e.key === "Enter") handleSendMessage();
+            if (e.key === "Enter" && !e.nativeEvent.isComposing) handleSendMessage();
           }}
         />
         <ChatButton onClick={handleSendMessage}>
@@ -73,6 +73,8 @@ const ChatContainer = styled.div`
   padding: 15px 10px;
   background-color: rgba(255, 255, 255, 0.6); /* 반투명 배경 */
   backdrop-filter: blur(40px); /* 블러 효과 */
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 5px;
 `;
 
 const ChatMessages = styled.div`
@@ -101,23 +103,23 @@ const ChatMessages = styled.div`
 `;
 
 const Message = styled.div`
-  text-align: ${(props) => (props.isMyMessage ? "right" : "left")};
+  text-align: "left";
   padding: 10px;
-  background-color: ${(props) => (props.isMyMessage ? "#FFFFFF" : "#DCF8C6")};
+  color: ${(props) => (props.ismymessage ? "#FFFFFF" : "#bbf11c")};
   border-radius: 8px;
   margin-bottom: 8px;
-  max-width: 70%;
-  margin-left: ${(props) => (props.isMyMessage ? "auto" : "0")};
-  margin-right: ${(props) => (props.isMyMessage ? "0" : "auto")};
+  max-width: 90%;
+  margin-right: ${(props) => (props.ismymessage ? "0" : "auto")};
+  border: 1px solid ${(props) => (props.ismymessage ? "#FFFFFF" : "#DCF8C6")};
 `;
 
 const ChatInputContainer = styled.div`
   display: flex;
-  border-top: 1px solid #ddd;
+  // border-top: 1px solid #ddd;
   box-sizing: border-box;
   width: 100%;
   padding: 5px;
-  background-color: #c6e7ff;
+  // background-color: #c6e7ff;
   border-radius: 5px;
 `;
 

@@ -5,14 +5,10 @@ import {
   CardMedia,
   Typography,
   Box,
-  Divider,
-  Chip,
-  CardActionArea,
-  Snackbar,
   Button,
 } from "@mui/material";
 import { styled } from "styled-components";
-import { isAxiosError } from "axios";
+import { User, Puzzle, Timer } from "lucide-react";
 
 export default function GameCard({ room, category }) {
   const navigate = useNavigate();
@@ -30,7 +26,7 @@ export default function GameCard({ room, category }) {
       <CardMedia
         component="img"
         image={room.puzzleImage} // 이미지 경로 수정
-        sx={{ width: 280, height: "100%"}}
+        sx={{ width: 230, height: "100%"}}
       />
       <CardContent
         sx={{
@@ -46,24 +42,18 @@ export default function GameCard({ room, category }) {
         <Typography sx={{ fontWeight: "bold", color: "white", fontSize: "30px", width: "40%", textAlign: "left" }}>
           {room.roomName}
         </Typography>
-        <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", width: "60%"}}>
-          <div style={{width: "200px"}}>
-            <UserCard userImage={room.masterImage} userName={room.masterName} imageSize="40" nameSize="20" />
-          </div>
-          <Typography sx={{ color: "white" }}>
-            {room.battleTimer/60}분
+        <div style={{width: "150px"}}>
+          <UserCard userImage={room.masterImage} userName={room.masterName} imageSize="40" nameSize="20" />
+        </div>
+        <div style={{display: "flex", flexDirection: "column", alignItems: "start", width: "20%", gap: "5px"}}>
+          <Typography sx={{display: "flex", alignItems: "center", color: "white", gap: "5px"}}>
+            <Timer size="15"/>{room.battleTimer/60}분
           </Typography>
-          <Typography sx={{ color: "white" }}>
-            {room.puzzlePiece} 피스
+          <Typography sx={{display: "flex", alignItems: "center", color: "white", gap: "5px"}}>
+            <Puzzle size="15"/>{room.puzzlePiece} 피스
           </Typography>
-          <Box
-            sx={{
-              marginRight: "16px",
-              color: "white",
-              fontSize: "20px"
-            }}
-          >
-            {`${room.nowPlayers}/${room.maxPlayers}`}
+          <Box sx={{display: "flex", alignItems: "center", color: "white", gap: "5px"}}>
+            <User size="15"/>{`${room.nowPlayers}/${room.maxPlayers}`}
           </Box>
         </div>
       </CardContent>

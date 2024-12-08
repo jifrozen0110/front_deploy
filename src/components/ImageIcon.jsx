@@ -22,19 +22,6 @@ const Container = styled.div`
 
   img {
     width: 100%;
-    &:hover {
-      animation: bounce 0.4s infinite alternate;
-      transform-origin: bottom;
-
-      @keyframes bounce {
-        0% {
-          transform: translateY(0);
-        }
-        100% {
-          transform: translateY(-10px); /* 튀는 정도 조절 */
-        }
-      }
-    }
   }
 `;
 
