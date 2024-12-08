@@ -46,14 +46,15 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
       config.project.view.onMouseDown = (event) => {
         event.preventDefault()
         event.stopPropagation()
+        console.log("view mouse down");
         
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-    
+        
         const correctedX = (event.event.clientX - rect.left) * scaleX;
         const correctedY = (event.event.clientY - rect.top) * scaleY;
-    
+        
         const hitResult = config.project.project.hitTest(new Point(correctedX, correctedY));
         if (hitResult?.item?._parent?._parent?.onMouseDown) {
           const customEvent = new MouseEvent(event.type, {
@@ -67,23 +68,24 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
           customEvent.target = hitResult.item._parent._parent;
           customEvent.currentTarget = hitResult.item._parent._parent;
           dragTarget = hitResult.item._parent._parent
-  
+          
           hitResult.item._parent._parent.onMouseDown(customEvent);
         }
       };
-
+      
       config.project.view.onMouseUp = (event) => {
         event.preventDefault()
         event.stopPropagation()
+        console.log("view mouse up");
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-    
+        
         const correctedX = (event.event.clientX - rect.left) * scaleX;
         const correctedY = (event.event.clientY - rect.top) * scaleY;
         const tempTarget = dragTarget
         dragTarget = null
-
+        
         if (tempTarget) {
           const customEvent = new MouseEvent(event.type, {
             clientX: correctedX,
@@ -95,14 +97,15 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
           customEvent.delta = {x: 0, y: 0};
           customEvent.target = tempTarget;
           customEvent.currentTarget = tempTarget;
-  
+          
           tempTarget.onMouseUp(customEvent);
         }
       };
-
+      
       config.project.view.onMouseDrag = (event) => {
         event.preventDefault()
         event.stopPropagation()
+        console.log("view mouse drag");
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;

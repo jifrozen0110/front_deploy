@@ -191,8 +191,14 @@ export default function BattleGameIngamePage() {
 
           const fireImgCopy = fireImg.cloneNode();
 
-          fireImgCopy.style.left = `${x}px`;
-          fireImgCopy.style.top = `${y}px`;
+          const scale = canvasContainer.clientWidth / 1000
+          if (isPlayerTeam) {
+            fireImgCopy.style.left = `${x * scale}px`;
+            fireImgCopy.style.top = `${y * scale}px`;
+          }else{
+            fireImgCopy.style.left = `${x * scale / enemyCanvasScale}px`;
+            fireImgCopy.style.top = `${y * scale / enemyCanvasScale}px`;
+          }
 
           canvasContainer.appendChild(fireImgCopy);
           

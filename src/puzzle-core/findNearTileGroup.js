@@ -16,6 +16,8 @@ export const findNearTileGroup = ({ config }) => {
   config.groupTiles.forEach((tile, tileIndex) => {
     tile[0].onMouseUp = (event) => {
       setPuzzleSize(tile[0], 80);
+      console.log("mouse up");
+
       // 위치 보정 후
       const nearGroupStdIdxs = []
       const nearGroupSet = new Set()

@@ -42,9 +42,7 @@ const moveTile = ({ config }) => {
   config.groupTiles.forEach((gtile, gtileIdx) => {
     gtile[0].onMouseDown = (event) => {
 
-      if (event.event?.isTrusted) {
-        return false;
-      } else {
+      if (!event.event?.isTrusted) {
         addAudio(puzzleDownSound);
 
         const group = gtile[1];
@@ -74,17 +72,12 @@ const moveTile = ({ config }) => {
             position_y: gtile[0].position.y,
           }),
         );
-        return true;
       }
-
     };
 
     gtile[0].onMouseDrag = (event) => {
-      if (!event.isCustom) {
-        return false;
-      } else {
+      if (event.isCustom) {
         const currentTime = Date.now();
-        const { canvas } = config.project.project._view._context
         // 캔버스 사이즈를 벗어나지 않는 범위내로 이동
         // 지정된 간격(interval)으로 함수 실행
         if (currentTime - lastExecutionTime >= interval) {
