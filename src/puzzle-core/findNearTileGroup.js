@@ -15,76 +15,75 @@ const { send } = socket;
 export const findNearTileGroup = ({ config }) => {
   config.groupTiles.forEach((tile, tileIndex) => {
     tile[0].onMouseUp = (event) => {
-      setPuzzleSize(tile[0], 80);
-      console.log("mouse up");
+      if (!event.event?.isTrusted) {
+        setPuzzleSize(tile[0], 80);
 
-      // 위치 보정 후
-      const nearGroupStdIdxs = []
-      const nearGroupSet = new Set()
-      for (const gtile of config.groupTiles) {
-        if (gtile[1] == tile[1]) {
-          findNearTile2({ config, tile: gtile })
-            .forEach(idx => {
-              const group = config.groupTiles[idx][1]
-              if (!nearGroupSet.has(group)) {
-                nearGroupStdIdxs.push(idx)
-                nearGroupSet.add(group)
-              }
-            })
-        }
-      }
-
-      if (nearGroupStdIdxs.length) {
-        const moveTiles = nearGroupStdIdxs.length == 1
-          ? config.groupTiles.filter(gtile => gtile[1] == tile[1])
-          : config.groupTiles.filter(gtile => nearGroupSet.has(gtile[1]))
-        const stdGtile = nearGroupStdIdxs.length == 1 ? config.groupTiles[nearGroupStdIdxs[0]] : tile
-
-        moveTiles.forEach(gtile => {
-          gtile[0].position.x = getNewX({ config, stdGtile, targetGtile: gtile })
-          gtile[0].position.y = getNewY({ config, stdGtile, targetGtile: gtile })
-          gtile[1] = stdGtile[1]
-        })
-
-        if (nearGroupStdIdxs.length == 1) {
-          nearGroupStdIdxs[0] = tile[2]
+        // 위치 보정 후
+        const nearGroupStdIdxs = []
+        const nearGroupSet = new Set()
+        for (const gtile of config.groupTiles) {
+          if (gtile[1] == tile[1]) {
+            findNearTile2({ config, tile: gtile })
+              .forEach(idx => {
+                const group = config.groupTiles[idx][1]
+                if (!nearGroupSet.has(group)) {
+                  nearGroupStdIdxs.push(idx)
+                  nearGroupSet.add(group)
+                }
+              })
+          }
         }
 
-        puzzleAudio(puzzleFitSound);
-        nearGroupStdIdxs.forEach(nearStdIdx => {
-          send(
-            "/pub/game/puzzle",
-            {},
-            JSON.stringify({
-              type: "GAME",
-              roomId: getRoomId(),
-              sender: getSender(),
-              message: "ADD_PIECE",
-              targets: `${nearStdIdx},${stdGtile[2]}`,
-            }),
-          );
-        })
-      } else {
-        puzzleAudio(puzzleDownSound);
+        if (nearGroupStdIdxs.length) {
+          const moveTiles = nearGroupStdIdxs.length == 1
+            ? config.groupTiles.filter(gtile => gtile[1] == tile[1])
+            : config.groupTiles.filter(gtile => nearGroupSet.has(gtile[1]))
+          const stdGtile = nearGroupStdIdxs.length == 1 ? config.groupTiles[nearGroupStdIdxs[0]] : tile
+
+          moveTiles.forEach(gtile => {
+            gtile[0].position.x = getNewX({ config, stdGtile, targetGtile: gtile })
+            gtile[0].position.y = getNewY({ config, stdGtile, targetGtile: gtile })
+            gtile[1] = stdGtile[1]
+          })
+
+          if (nearGroupStdIdxs.length == 1) {
+            nearGroupStdIdxs[0] = tile[2]
+          }
+
+          puzzleAudio(puzzleFitSound);
+          nearGroupStdIdxs.forEach(nearStdIdx => {
+            send(
+              "/pub/game/puzzle",
+              {},
+              JSON.stringify({
+                type: "GAME",
+                roomId: getRoomId(),
+                sender: getSender(),
+                message: "ADD_PIECE",
+                targets: `${nearStdIdx},${stdGtile[2]}`,
+              }),
+            );
+          })
+        } else {
+          puzzleAudio(puzzleDownSound);
+        }
+
+        const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
+        // socket 전송
+        send(
+          "/pub/game/puzzle",
+          {},
+          JSON.stringify({
+            type: "GAME",
+            roomId: getRoomId(),
+            sender: getSender(),
+            message: "MOUSE_UP",
+            targets: JSON.stringify(puzzleGroup),
+            position_x: tile[0].position.x,
+            position_y: tile[0].position.y,
+          }),
+        );
       }
-
-      const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
-      // socket 전송
-      send(
-        "/pub/game/puzzle",
-        {},
-        JSON.stringify({
-          type: "GAME",
-          roomId: getRoomId(),
-          sender: getSender(),
-          message: "MOUSE_UP",
-          targets: JSON.stringify(puzzleGroup),
-          position_x: tile[0].position.x,
-          position_y: tile[0].position.y,
-        }),
-      );
-      // }
-
     };
   });
 };
