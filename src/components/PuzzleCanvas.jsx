@@ -32,8 +32,8 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
   useEffect(() => {
     if (canvasRef.current) {
       const canvas = canvasRef.current;
-      canvas.width = 1000;
-      canvas.height = 750;
+      canvas.width = 1002;
+      canvas.height = 752;
       initializePuzzle({ puzzleImg, level, shapes, board, picture });
       canvas.style.width = `${canvas.parentElement.clientWidth}px`;
       canvas.style.height = `${canvas.parentElement.clientWidth / 4 * 3}px`;
@@ -46,14 +46,12 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
       config.project.view.onMouseDown = (event) => {
         event.preventDefault()
         event.stopPropagation()
-        console.log("view mouse down");
         
         const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
+        const scaleX = 1000 / rect.width;
         
         const correctedX = (event.event.clientX - rect.left) * scaleX;
-        const correctedY = (event.event.clientY - rect.top) * scaleY;
+        const correctedY = (event.event.clientY - rect.top) * scaleX;
         
         const hitResult = config.project.project.hitTest(new Point(correctedX, correctedY));
         if (hitResult?.item?._parent?._parent?.onMouseDown) {
@@ -76,13 +74,11 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
       config.project.view.onMouseUp = (event) => {
         event.preventDefault()
         event.stopPropagation()
-        console.log("view mouse up");
         const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
+        const scaleX = 1000 / rect.width;
         
         const correctedX = (event.event.clientX - rect.left) * scaleX;
-        const correctedY = (event.event.clientY - rect.top) * scaleY;
+        const correctedY = (event.event.clientY - rect.top) * scaleX;
         const tempTarget = dragTarget
         dragTarget = null
         
@@ -105,13 +101,11 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
       config.project.view.onMouseDrag = (event) => {
         event.preventDefault()
         event.stopPropagation()
-        console.log("view mouse drag");
         const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
+        const scaleX = 1000 / rect.width;
     
         const correctedX = (event.event.clientX - rect.left) * scaleX;
-        const correctedY = (event.event.clientY - rect.top) * scaleY;
+        const correctedY = (event.event.clientY - rect.top) * scaleX;
     
         if (dragTarget) {
           event.point.x = correctedX
