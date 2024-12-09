@@ -1,0 +1,27 @@
+name: Deploy to Deployment Repo
+
+on:
+  push:
+    branches:
+      - test # 자동 배포를 트리거할 브랜치를 지정합니다.
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false # 추가된 부분
+
+      - name: Configure git
+        run: |
+          git config --global user.email "answldjs1836@gmail.com"
+          git config --global user.name "jifrozen0110"
+          git remote add test https://x-access-token:${{ secrets.DEPLOY_REPO_TOKEN }}@github.com/jifrozen0110/front_test.git
+
+      - name: Push to deployment repository
+        run: |
+          git push test HEAD:main --force
