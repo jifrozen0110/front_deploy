@@ -4,8 +4,8 @@ import { red, blue } from "@mui/material/colors";
 import React, { useState, useEffect } from "react";
 import { getTeam } from "@/socket-utils/storage";
 
-export default function PrograssBar({ percent, teamColor }) {
-  const barColor = teamColor === "red" ? red[400] : blue[400];
+export default function PrograssBar({ percent, teamColor: team_color}) {
+  const bar_color = team_color === "red" ? red[400] : blue[400];
   const [displayedPercent, setDisplayedPercent] = useState(percent);
 
   useEffect(() => {
@@ -35,16 +35,16 @@ export default function PrograssBar({ percent, teamColor }) {
 
   return (
     <ProgressContainer>
-      <PercentText style={{ color: `${barColor}` }}>{displayedPercent}%</PercentText>
+      <PercentText style={{ color: `${bar_color}` }}>{displayedPercent}%</PercentText>
       <BorderLinearProgress
         variant="determinate"
         value={displayedPercent}
-        teamColor={teamColor} // teamColor 전달
-        barColor={barColor} // barColor 전달
+        team_color={team_color} // team_color 전달
+        bar_color={bar_color} // bar_color 전달
         sx={{
           backgroundColor: "white",
           "& span.MuiLinearProgress-bar": {
-            transform: `translateX(${getTeam() === teamColor ? 100 - displayedPercent : -(100 - displayedPercent)}%) !important`,
+            transform: `translateX(${getTeam() === team_color ? 100 - displayedPercent : -(100 - displayedPercent)}%) !important`,
           },
         }}
       />
@@ -91,16 +91,16 @@ const PercentText = styled.span`
 const BorderLinearProgress = styled(LinearProgress)`
   width: 100%;
   height: 100%;
-  border-radius: ${({ teamColor }) => (getTeam() === teamColor ? "30px 0 0 30px" : "0 30px 30px 0")};
+  border-radius: ${({ team_color }) => (getTeam() === team_color ? "30px 0 0 30px" : "0 30px 30px 0")};
   box-sizing: border-box;
 
   /* Progress bar 색상 */
   & .MuiLinearProgress-bar {
-    background-color: ${({ barColor }) => barColor}; /* barColor를 사용 */
+    background-color: ${({ bar_color }) => bar_color}; /* bar_color를 사용 */
   }
 
   /* Border 처리 */
-  border: 2px solid ${({ barColor }) => barColor};
-  border-right: ${({ teamColor, barColor }) =>getTeam() === teamColor ? "none" : `2px solid ${barColor}`};
-  border-left: ${({ teamColor, barColor }) =>getTeam() === teamColor ? `2px solid ${barColor}` : "none"};
+  border: 2px solid ${({ bar_color }) => bar_color};
+  border-right: ${({ team_color, bar_color }) =>getTeam() === team_color ? "none" : `2px solid ${bar_color}`};
+  border-left: ${({ team_color, bar_color }) =>getTeam() === team_color ? `2px solid ${bar_color}` : "none"};
 `;
