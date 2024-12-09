@@ -31,8 +31,9 @@ const EnemyPuzzle = ({ category, shapes, board, picture, bundles, itemPieces,ene
       display: "flex",
       textAlign: "center",
       width: "100%",
+      height:"100%",
     }}>
-      <div style={{margin:"0 auto"}}>
+      <div style={{width:'100%',height:'100%'}}>
         <img
           ref={imgRef}
           id="enemyPuzzleImage"

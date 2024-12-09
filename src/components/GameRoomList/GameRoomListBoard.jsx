@@ -32,12 +32,13 @@ const Wrapper = styled.div`
   overflow: hidden; /* 부모 범위를 초과하지 않도록 설정 */
 `;
 
-
 const GridContainer = styled.div`
   width: 100%;
   height: 100%;
+  padding: 0 15px 0 20px;
   
   overflow-y: auto;
+  overflow-x: hidden;
   box-sizing: border-box;
 
   /* 스크롤바 스타일 */

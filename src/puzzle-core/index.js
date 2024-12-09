@@ -13,7 +13,7 @@ import { setMoveEvent } from "./setMoveEvent";
 import { uniteTiles } from "./uniteTiles";
 import { cleanBorderStyle, switchDirection, updateGroupByBundles } from "./utils";
 import { colors } from "./color";
-import { getNewPoint } from "./findNearTileGroup";
+import { getNewPoint, getNewX, getNewY } from "./findNearTileGroup";
 export const groupPuzzlePieces = ({ config, bundles }) => {
   updateGroupByBundles({ config, bundles });
   return config;
@@ -69,7 +69,8 @@ const createPuzzleConfig = () => {
     config.groupTiles
       .forEach(gtile => {
         if (myGtile[1] == gtile[1] && gtile[2] != myGtile[2]) {
-          gtile[0].position = getNewPoint({ config, stdGtile: myGtile, targetGtile: gtile })
+          gtile[0].position.x = getNewX({ config, stdGtile: myGtile, targetGtile: gtile })
+          gtile[0].position.y = getNewY({ config, stdGtile: myGtile, targetGtile: gtile })
         }
       })
   };
@@ -88,7 +89,8 @@ const createPuzzleConfig = () => {
     const moveTiles = config.groupTiles.filter(gtile => gtile[1] == fromGroup)
     const stdGtile = config.groupTiles[toIndex]
     moveTiles.forEach(gtile => {
-      gtile[0].position = getNewPoint({ config, stdGtile, targetGtile: gtile })
+      gtile[0].position.x = getNewX({ config, stdGtile, targetGtile: gtile })
+      gtile[0].position.y = getNewY({ config, stdGtile, targetGtile: gtile })
     })
     if (fromGroup != toGroup) {
       config.groupTiles.forEach(gtile => {

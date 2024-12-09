@@ -163,9 +163,9 @@ const ContentContainer = styled.div`
   flex-direction: column;
   justify-content: space-between;
   height: calc(100vh - 66px);
-  width: 70vw;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 0;
+  padding: 20px;
   box-sizing: border-box;
 `;
 
@@ -184,7 +184,6 @@ const CenterContaier = styled.div`
   flex: 1;
   height: calc(100% - 66px); /* 전체 화면 높이에서 Header(66px) 제외 */
   margin-top: 10px;
-  gap: 20px;
   box-sizing: border-box;
   min-width: 900px;
 `
@@ -218,6 +217,7 @@ const TopButtonContainer = styled.div`
   display: flex;
   gap: 10px;
   height: 45px;
+  margin-right: 25px;
 `
 
 const TopButton = styled(Button)`

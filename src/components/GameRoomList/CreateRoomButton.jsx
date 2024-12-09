@@ -400,7 +400,7 @@ export default function CreateRoomButton({ category }) {
                     aria-label="Input mode selection"
                   >
                     <ToggleButton value="default" aria-label="Default input" style={{borderBottom: "none", borderBottomLeftRadius: "0"}}>
-                      DEFAULT
+                      기본 이미지
                     </ToggleButton>
                     <ToggleButton value="url" aria-label="URL input" style={{borderBottom: "none"}}>
                       URL

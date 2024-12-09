@@ -37,8 +37,9 @@ const PlayPuzzle = ({ category, shapes, board, picture, bundles, itemPieces, pla
       display: "flex",
       textAlign: "center",
       width: "100%",
+      height: "100%",
     }}>
-      <div style={{margin:"0 auto"}}>
+      <div style={{margin:"0 auto", width:"100%", display:"flex"}}>
         <img
           ref={imgRef}
           id="puzzleImage"
