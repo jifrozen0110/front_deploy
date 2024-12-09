@@ -256,6 +256,8 @@ const CloseButton = styled.button`
 const ModalCard = styled.div`
   position: relative; /* 자식 요소의 위치 기준 */
   background: white;
+  min-width: 600px;
+  min-height: 700px;
   max-width: 60vw;
   max-height: 90vh;
   border-radius: 12px;
