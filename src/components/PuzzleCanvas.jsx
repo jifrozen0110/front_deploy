@@ -137,16 +137,15 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
       const scale = 1000 / canvas.parentElement.clientWidth
       subscribe(`/topic/game/${gameId}/mouse`, message => {
         const data = JSON.parse(message.body)
-        if (data.team == team) {
-          if (data.playerId == userId) {
-            return
+        data.forEach(p => {
+          if (p.team == team && p.playerId != userId) {
+            const pointer = document.getElementById(`user${p.playerId}`)
+            if(pointer){
+              pointer.style.left = `${p.x / scale}px`
+              pointer.style.top = `${p.y / scale}px`
+            }
           }
-          const pointer = document.getElementById(`user${data.playerId}`)
-          if(pointer){
-            pointer.style.left = `${data.x / scale}px`
-            pointer.style.top = `${data.y / scale}px`
-          }
-        }
+        })
       })
 
       setInterval(() => {
