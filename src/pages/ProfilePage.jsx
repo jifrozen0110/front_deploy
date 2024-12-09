@@ -71,13 +71,11 @@ export default function ProfilePage({goGallery}) {
         const galleryRes = await authRequest().get(`/games/${userId}/records/gallery`);
         const galleryData = galleryRes.data;
           
-        console.log(galleryData);
-
         const processedGallery = galleryData.map((record) => ({
           id: record.recordId,
           url: record.puzzleImage,
           roomTitle: record.gameName || "게임 이름 없음",
-          description: "추가적인 설명란 필요?", // 필요에 따라 수정 가능
+          description: "", // 필요에 따라 수정 가능
           piece: record.totalPieceCount.toString(),
           pieceCount: record.totalPieceCount,
           clearTime: `${record.battleTimer}초`,

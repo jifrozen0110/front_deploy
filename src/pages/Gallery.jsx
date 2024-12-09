@@ -16,19 +16,21 @@ export default function Gallery({goProfile}) {
   const fetchGalleryData = async () => {
     try {
       const userId = localStorage.getItem("userId");
-      const response = await authRequest().get(`/games/${userId}/records/gallery`);
-      const data = response.data;
-
-      const processedGallery = data.map((record) => ({
+      const galleryRes = await authRequest().get(`/games/${userId}/records/gallery`);
+      const galleryData = galleryRes.data;
+        
+      const processedGallery = galleryData.map((record) => ({
         id: record.recordId,
         url: record.puzzleImage,
         roomTitle: record.gameName || "게임 이름 없음",
-        description: "추가적인 설명란 필요?", // 필요 시 수정 가능
+        description: "", // 필요에 따라 수정 가능
         piece: record.totalPieceCount.toString(),
-        clearTime: `${record.durationInMinutes}초`,
+        pieceCount: record.totalPieceCount,
+        clearTime: `${record.battleTimer}초`,
         date: new Date(record.playedAt).toLocaleString(),
-        whos: record.teamMates ? JSON.parse(record.teamMates) : [],
+        teamMates: record.teamMates ? JSON.parse(record.teamMates) : [],
         opponents: record.opponents ? JSON.parse(record.opponents) : [],
+        userTeam: record.userTeam, // 실제 데이터에 따라 설정
       }));
       setGalleryImages(processedGallery);
     } catch (error) {

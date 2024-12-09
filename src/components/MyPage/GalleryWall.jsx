@@ -30,11 +30,8 @@ const GalleryWall = ({ count = 0, data }) => { // data prop 추가
 
       {/* 상세 보기 모달 */}
       {selectedImage && (
-        <ModalOverlay>
-          <ModalCard>
-            <CloseButton onClick={() => setSelectedImage(null)}>
-              <X color="rgba(0,0,0,0.6)" />
-            </CloseButton>
+        <ModalOverlay onClick={() => setSelectedImage(null)}>
+          <ModalCard onClick={(e) => e.stopPropagation()}> {/* 이벤트 전파 중지 */}
             <ModalContent>
               <ImageContainerModal>
                 <ImageModal src={selectedImage.url} alt={selectedImage.roomTitle} />
@@ -52,43 +49,42 @@ const GalleryWall = ({ count = 0, data }) => { // data prop 추가
                 </Title>
 
                 {/* 함께한 사람들 */}
-<DescriptionBox>
-  <DescriptionHeader>
-    <Users size={20} color="#22C55E" />
-    <span>함께한 사람들</span>
-  </DescriptionHeader>
-  <UserList>
-    {selectedImage.teamMates && selectedImage.teamMates.length > 0 ? (
-      selectedImage.teamMates.map((member, index) => (
-        <MemberBadge key={index}>
-          {member}
-        </MemberBadge>
-      ))
-    ) : (
-      <NoUsersMessage>함께한 사람이 없습니다.</NoUsersMessage>
-    )}
-  </UserList>
-</DescriptionBox>
+                <DescriptionBox>
+                  <DescriptionHeader>
+                    <Users size={20} color="#22C55E" />
+                    <span>함께한 사람들</span>
+                  </DescriptionHeader>
+                  <UserList>
+                    {selectedImage.teamMates && selectedImage.teamMates.length > 0 ? (
+                      selectedImage.teamMates.map((member, index) => (
+                        <MemberBadge key={index}>
+                          {member}
+                        </MemberBadge>
+                      ))
+                    ) : (
+                      <NoUsersMessage>함께한 사람이 없습니다.</NoUsersMessage>
+                    )}
+                  </UserList>
+                </DescriptionBox>
 
-{/* 상대한 사람들 */}
-<DescriptionBox>
-  <DescriptionHeader>
-    <Users size={20} color="#EF4444" />
-    <span>상대한 사람들</span>
-  </DescriptionHeader>
-  <UserList>
-    {selectedImage.opponents && selectedImage.opponents.length > 0 ? (
-      selectedImage.opponents.map((member, index) => (
-        <MemberBadge key={index}>
-          {member}
-        </MemberBadge>
-      ))
-    ) : (
-      <NoUsersMessage>상대한 사람이 없습니다.</NoUsersMessage>
-    )}
-  </UserList>
-</DescriptionBox>
-
+                {/* 상대한 사람들 */}
+                <DescriptionBox>
+                  <DescriptionHeader>
+                    <Users size={20} color="#EF4444" />
+                    <span>상대한 사람들</span>
+                  </DescriptionHeader>
+                  <UserList>
+                    {selectedImage.opponents && selectedImage.opponents.length > 0 ? (
+                      selectedImage.opponents.map((member, index) => (
+                        <MemberBadge key={index}>
+                          {member}
+                        </MemberBadge>
+                      ))
+                    ) : (
+                      <NoUsersMessage>상대한 사람이 없습니다.</NoUsersMessage>
+                    )}
+                  </UserList>
+                </DescriptionBox>
               </Details>
             </ModalContent>
           </ModalCard>
