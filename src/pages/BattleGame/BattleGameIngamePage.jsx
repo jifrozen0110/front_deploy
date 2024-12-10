@@ -200,7 +200,7 @@ export default function BattleGameIngamePage() {
         mudImg.className = "ink"
 
         const gameBoard = isPlayerTeam
-          ? document.getElementById("gameBoard")
+          ? document.getElementById("canvasContainer")
           : document.getElementById("enemyCanvasContainer");
         
 
