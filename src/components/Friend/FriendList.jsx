@@ -3,7 +3,6 @@ import { styled } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { request } from "../../apis/requestBuilder";
 import IconButton from "@mui/material/IconButton";
-import ChatIcon from "@mui/icons-material/Chat";
 import ContactEmergencyIcon from "@mui/icons-material/ContactEmergency";
 
 export default function FriendList() {
@@ -25,7 +24,6 @@ export default function FriendList() {
 
   useEffect(() => {
     fetchFriendList(getCookie("userId"));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getCookie = (name) => {
@@ -49,9 +47,6 @@ export default function FriendList() {
           </div>
         </UserInfo>
         <IconWrapper>
-          {/* <IconButton aria-label="dmBtn" onClick={() => navigate(`/dm/${item.friend_id}`)}>
-            <ChatIcon />
-          </IconButton> */}
           <IconButton
             aria-label="profileBtn"
             onClick={() => navigate(`/user/${item.friend_user_info.id}`)}

@@ -54,7 +54,7 @@ import { authRequest } from "../../apis/requestBuilder";
 import { colors } from "../../puzzle-core/color";
 
 
-const { connect, send, subscribe, disconnect } = socket;
+const { connect, send, subscribe } = socket;
 const {
   getConfig,
   lockPuzzle,
@@ -67,7 +67,6 @@ export default function BattleGameIngamePage() {
   const navigate = useNavigate();
   const { roomId: gameId } = useParams();
   const [gameData, setGameData] = useState(null);
-  const [gameDataDto, setGameDataDto] = useState(null);
   const [isOpenedDialog, setIsOpenedDialog] = useState(false);
 
   const [time, setTime] = useState(60);
@@ -76,7 +75,6 @@ export default function BattleGameIngamePage() {
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
   const [slots, setSlots] = useState(Array(8).fill(0));
-  const [startTime, setStartTime] = useState(null);
 
   // 게임 결과 데이터를 저장할 상태 변수
   const [ourTeamData, setOurTeamData] = useState([]);
@@ -87,10 +85,6 @@ export default function BattleGameIngamePage() {
   const [enemyTeamKey, setEnemyTeamKey] = useState("");
   const [puzzleImage, setPuzzleImage] = useState("");
   const [enemyCanvasScale, setEnemyCanvasScale] = useState(0.6);
-
-  // 진행도 상태 변수 변경
-  const [redProgressPercent, setRedProgressPercent] = useState(0);
-  const [blueProgressPercent, setBlueProgressPercent] = useState(0);
 
   // 게임 데이터를 백엔드 서버로 보내기 위한 함수 정의
   const sendGameDataToBackend = async (data, finishTime) => {

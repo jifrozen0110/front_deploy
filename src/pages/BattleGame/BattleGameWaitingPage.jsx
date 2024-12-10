@@ -42,7 +42,6 @@ export default function BattleGameWaitingPage() {
   const [chatList, setChatList] = useState([]);
   // 초대 버튼 모달창
   const [isInviteModalOpen, setInviteModalOpen] = useState(false);
-  const location = useLocation();
   
   // InviteAlertModal을 상태로 관리
   const [isInviteAlertOpen, setInviteAlertOpen] = useState(false);
@@ -161,15 +160,6 @@ export default function BattleGameWaitingPage() {
         } else if (data.redPlayers.map(p => p.playerId).includes(Number(playerId))) {
           setTeam("red")
         }
-
-        // if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
-        //   data.blueTeam.players.forEach((player) => {
-        //     console.log(player);
-        //     if (player.id === getSender()) {
-        //       setTeam("blue");
-        //     }
-        //   });
-        // }
       });
 
       subscribe(`/topic/room/${roomId}/game`, (message) => {
@@ -183,7 +173,6 @@ export default function BattleGameWaitingPage() {
           );
           localStorage.setItem("roomId", roomId);
           window.location.replace(`/game/battle/ingame/${data.gameId}`);
-          // window.location.replace(`/game/battle/ingame/${roomId}`);
           return;
         }
       });
@@ -206,22 +195,6 @@ export default function BattleGameWaitingPage() {
       });
 
       enterRoom(roomId);
-
-      // subscribe(`/topic/chat/room/${roomId}`, (message) => {
-      //   const data = JSON.parse(message.body);
-      //   const { userid, chatMessage, time } = data;
-      //   const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
-      //   setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
-      // });
-
-      // // 서버로 메시지 전송
-      // send(
-      //   "/app/room/enter",
-      //   {},
-      //   JSON.stringify({
-      //     roomId: getRoomId(),
-      //   }),
-      // );
     });
   };
 
@@ -244,7 +217,6 @@ export default function BattleGameWaitingPage() {
     } catch (e) {
       if (isAxiosError(e) && e.response?.status >= 400) {
         console.error("방 정보를 불러오지 못했습니다.", e.message);
-        // navigate("/game/battle", { replace: true });
         navigate("/home", { replace: true });
       }
     }
@@ -266,7 +238,6 @@ export default function BattleGameWaitingPage() {
     );
   } else if (roomData.maxPlayers <= roomData.nowPlayers && isNotInRoom()) {
     alert("방이 꽉 찼습니다.");
-    // setTimeout(() => navigate("/game/battle"), 100);
     setTimeout(() => navigate("/home"), 100);
   }
 
@@ -286,7 +257,6 @@ export default function BattleGameWaitingPage() {
       <Content>
         <Top>
           <ButtonGroup>
-            {/* <TopButton onClick={() => navigate("/game/battle")}> */}
             <TopButton onClick={() => navigate("/home")}>
               <div style={{ textAlign: "center" }}>
                 <ArrowLeft style={{ display: "block", margin: "0 auto" }} />
@@ -477,13 +447,6 @@ const TeamGrid = styled(Grid)`
   padding: 30px 0px 0;
 `;
 
-const Versus = styled.div`
-  font-size: 2rem;
-  font-weight: bold;
-  color: white;
-  margin: auto 60px;
-`;
-
 const PuzzleDetails = styled.div`
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(20px);
@@ -520,8 +483,6 @@ const StartButton = styled(Button)`
     background-color: ${({ isMaster }) => (isMaster ? "darkorange" : "lightgray")};
   }
 `;
-
-
 
 const Divider = styled.div`
   margin: 10px 0;

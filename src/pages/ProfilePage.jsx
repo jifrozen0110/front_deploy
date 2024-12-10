@@ -24,7 +24,6 @@ export default function ProfilePage({goGallery}) {
   const [galleryImages, setGalleryImages] = useState([]);
 
   const navigate = useNavigate()
-  const forceUpdate = () => setForUpdate(forUpdate + 1)
 
   // getUserInfo를 컴포넌트의 상위 스코프로 이동
   const getUserInfo = async (page = 0) => {

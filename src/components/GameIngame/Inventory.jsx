@@ -1,13 +1,9 @@
 ﻿import React from "react";
 import styled from "styled-components";
-import firePath from "@/assets/effects/fire.gif";
 import boomPath from "@/assets/effects/boom.png";
-import mudPath from "@/assets/effects/mud.png";
 import squidPath from "@/assets/effects/squid.png";
 import tornadoPath from "@/assets/effects/tornado.gif";
-import bloomPath from "@/assets/effects/blooming.gif";
 import blackholePath from "@/assets/effects/blackhole.png";
-import twinklePath from "@/assets/effects/twinkle.gif";
 import framePath from "@/assets/effects/frame.png";
 
 import { getTeam } from "@/socket-utils/storage";

@@ -1,9 +1,6 @@
 import { useMemo, useEffect } from "react";
 import { styled } from "styled-components";
-import { PlayerCard } from "@/components/GameWaiting/PlayerCard";
-import { getTeam, getRoomId } from "@/socket-utils/storage";
-import { useGameInfo } from "@/hooks/useGameInfo";
-import { socket } from "@/socket-utils/socket2";
+import { getTeam } from "@/socket-utils/storage";
 
 import { resultAudio } from "@/puzzle-core/addAudio";
 import win from "@/assets/audio/win.mp3";

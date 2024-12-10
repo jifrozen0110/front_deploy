@@ -1,7 +1,7 @@
 // src/components/MyPage/GalleryWall.jsx
 import React, { useState } from "react";
 import styled from "styled-components";
-import { X, Users } from "lucide-react";
+import { Users } from "lucide-react";
 
 const GalleryWall = ({ count = 0, data }) => { // data prop 추가
   const [selectedImage, setSelectedImage] = useState(null);

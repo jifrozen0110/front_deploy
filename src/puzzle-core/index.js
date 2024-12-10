@@ -1,9 +1,6 @@
-import Paper from "paper";
 import { Point } from "paper/dist/paper-core";
 import { initializeConfig } from "./initializeConfig";
 import {
-  itemFire,
-  itemFrame,
   itemMagnet,
   removeItemStyleToPiece,
   searchItemList,
@@ -13,7 +10,7 @@ import { setMoveEvent } from "./setMoveEvent";
 import { uniteTiles } from "./uniteTiles";
 import { cleanBorderStyle, switchDirection, updateGroupByBundles } from "./utils";
 import { colors } from "./color";
-import { getNewPoint, getNewX, getNewY } from "./findNearTileGroup";
+import { getNewX, getNewY } from "./findNearTileGroup";
 export const groupPuzzlePieces = ({ config, bundles }) => {
   updateGroupByBundles({ config, bundles });
   return config;
