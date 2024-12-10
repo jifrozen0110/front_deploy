@@ -404,11 +404,6 @@ export default function BattleGameIngamePage() {
             setOurProgressPercent(getTeam() === "red" ? data.redProgressPercent : data.blueProgressPercent);
             setEnemyProgressPercent(getTeam() === "red" ? data.blueProgressPercent : data.redProgressPercent);
             
-            // 게임 종료 시 진행도 설정
-            setRedProgressPercent(data.redProgressPercent);
-            setBlueProgressPercent(data.blueProgressPercent);
-
-
             const puzzleImageUrl = data.game.picture.imageUrl || data.game.picture.encodedString;
             setPuzzleImage(puzzleImageUrl);
 
