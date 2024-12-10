@@ -1,14 +1,14 @@
 import { useEffect, useRef } from "react";
 import { styled } from "styled-components";
 import { playerConfig } from "../puzzle-core";
-import { Color,  MouseEvent,  Point } from "paper/dist/paper-core";
+import { MouseEvent,  Point } from "paper/dist/paper-core";
 import { socket } from "@/socket-utils/socket2";
 import pointerPath from "@/assets/icons/gameRoom/pointer2.png";
 import { getTeam } from "../socket-utils/storage";
 import { colors } from "../puzzle-core/color";
 
 const { initializePuzzle, groupPuzzlePieces, getConfig } = playerConfig;
-const { connect, send, subscribe } = socket;
+const { send, subscribe } = socket;
 
 const myPointer = {x : 0, y : 0}
 const prePointer = {x : 0, y : 0}

@@ -1,8 +1,5 @@
-import Header from "../components/Header";
 import { useEffect, useState } from "react";
 import { authRequest } from "../apis/requestBuilder";
-import { BackGround } from "../components/styled/styled";
-import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import GalleryWall from "@/components/MyPage/GalleryWall";
 import { ChevronLeft } from "lucide-react";
@@ -10,8 +7,6 @@ import { ChevronLeft } from "lucide-react";
 export default function Gallery({goProfile}) {
   const [galleryImages, setGalleryImages] = useState([]);
   const [forUpdate, setForUpdate] = useState(0);
-  const forceUpdate = () => setForUpdate(forUpdate + 1);
-  const navigate = useNavigate();
 
   const fetchGalleryData = async () => {
     try {
@@ -41,10 +36,6 @@ export default function Gallery({goProfile}) {
   useEffect(() => {
     fetchGalleryData();
   }, [forUpdate]);
-
-  // const moveMyPage = () => {
-  //   navigate(`/user`);
-  // };
 
   return (
     <>

@@ -1,6 +1,5 @@
 ﻿import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { setCookie, getCookie } from "../../hooks/cookieUtil"
 import { authRequest } from "../../apis/requestBuilder"
 
 const LoginRedirect = () => {

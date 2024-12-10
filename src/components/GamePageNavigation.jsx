@@ -1,12 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { styled } from "styled-components";
-import { Link, useLocation } from "react-router-dom";
-import { Box, Tabs, Tab } from "@mui/material";
+import { Box } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import music from "@/assets/audio/wait_game.mp3";
-import muteImg from "@/assets/icons/mute.png";
-import plauMusicImg from "@/assets/icons/playMusic.png";
 import { Volume2, VolumeX } from "lucide-react";
 import "./sound.css";
 

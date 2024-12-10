@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import { Plus } from "lucide-react";
@@ -26,7 +26,6 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
-import Slider from "react-slick";
 
 const predefinedImages = [
   {
@@ -48,7 +47,6 @@ const predefinedImages = [
 ];
 
 const IMAGES_PER_SLIDE = 3;
-const DEFAULT_IMAGE_URL = predefinedImages[0].url;
 
 export default function CreateRoomButton({ category }) {
   const navigate = useNavigate();
@@ -142,16 +140,13 @@ export default function CreateRoomButton({ category }) {
         response = await uploadImage("/api/rooms/image-file/dimensions", formData);
       }
       // 응답 데이터 처리
-      console.log("이미지 업로드 성공:", response.data);
     } catch (error) {
-      console.error("이미지 업로드 실패:", error);
       setAlertMessage("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
       setAlertSeverity("error"); 
       setShowPreview(false);
       setIsPuzzleGenerated(false);
     }
     const imageUrl = response.data.imageUrl;
-    console.log("이미지 url:", imageUrl);
 
     if (!imageUrl) {
       setAlertMessage("이미지 URL을 입력하거나 이미지를 선택하세요.");
@@ -244,16 +239,11 @@ export default function CreateRoomButton({ category }) {
       requestData.battleTimer = battleTimer;
     }
 
-    console.log("방 생성 요청 데이터:", requestData);
-
     try {
       const { data } = await authRequest().post("/api/rooms", requestData);
       const { roomId } = data;
-      console.log(`${roomId} : 방 만들기 성공`);
       navigate(`/game/${category}/waiting/${roomId}`);
     } catch (error) {
-      console.error("방 생성에 실패했습니다.", error);
-
       alert("방 생성 중 오류가 발생했습니다.");
     }
   };

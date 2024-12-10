@@ -11,7 +11,7 @@ import { socket } from "@/socket-utils/socket2";
 import UserListSidebar from "@/components/GameRoomList/UserListSidebar";
 import InviteAlertModal from "@/components/GameWaiting/InviteAlertModal";
 import { logout } from "../../hooks/login";
-const { connect, send, subscribe, disconnect } = socket;
+const { connect, send, subscribe } = socket;
 
 export default function BattleGameListPage() {
   const navigate = useNavigate();

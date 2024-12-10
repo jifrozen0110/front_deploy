@@ -1,5 +1,4 @@
-﻿import { styled } from "styled-components";
-import { Button } from "@mui/material";
+﻿import { Button } from "@mui/material";
 import naverLogo from "/src/assets/icons/login/naver_logo.png";
 import kakaoLogo from "/src/assets/icons/login/kakao_logo.png";
 import googleLogo from "/src/assets/icons/login/google_logo.png";

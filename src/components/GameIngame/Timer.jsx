@@ -6,10 +6,6 @@ import { red, blue, deepPurple } from "@mui/material/colors";
 import { useMemo } from "react";
 
 export default function Timer({ num, isCooperation = false, color }) {
-  const isPressing = useMemo(() => {
-    return !isCooperation && num <= 30; // 배틀게임이고, 30초 이하라면
-  }, [isCooperation, num]);
-
   const min = useMemo(() => {
     return String(Math.floor(num / 60));
   }, [num]);
