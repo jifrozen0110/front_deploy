@@ -37,6 +37,8 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
       initializePuzzle({ puzzleImg, level, shapes, board, picture });
       canvas.style.maxWidth = `100%`;
       canvas.style.maxHeight = `100%`;
+      canvas.style.width = ``;
+      canvas.style.height = ``;
       const config = getConfig()
       groupPuzzlePieces({ config, bundles })
       canvas.style.aspectRatio = '1000 / 750'

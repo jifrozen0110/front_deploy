@@ -24,6 +24,7 @@ export default function EnemyPuzzleCanvas({ puzzleImg, level, shapes, board, pic
       // 퍼즐 초기화
       enemyIntializePuzzle({  puzzleImg, level, shapes, board : scaledBoard, picture, canvasId, enemyCanvasScale });
       canvas.style.width = `100%`;
+      canvas.style.height = ``;
       canvas.style.aspectRatio = "4 / 3"
 
       // 퍼즐 조각 그룹화
