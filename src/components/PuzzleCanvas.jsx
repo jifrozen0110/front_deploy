@@ -32,8 +32,8 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
   useEffect(() => {
     if (canvasRef.current) {
       const canvas = canvasRef.current;
-      canvas.width = 1002;
-      canvas.height = 752;
+      canvas.width = 1000;
+      canvas.height = 750;
       initializePuzzle({ puzzleImg, level, shapes, board, picture });
       canvas.style.maxWidth = `100%`;
       canvas.style.maxHeight = `100%`;
@@ -136,15 +136,17 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture,
         });
       }
 
-      const scale = 1000 / canvas.parentElement.clientWidth
+      const scale = 1000 / canvas.clientWidth
       subscribe(`/topic/game/${gameId}/mouse`, message => {
         const data = JSON.parse(message.body)
+        const left = (canvas.parentElement.clientWidth - canvas.clientWidth) / 2
+        const top = (canvas.parentElement.clientHeight - canvas.clientHeight) / 2
         data.forEach(p => {
           if (p.team == team && p.playerId != userId) {
             const pointer = document.getElementById(`user${p.playerId}`)
             if(pointer){
-              pointer.style.left = `${p.x / scale}px`
-              pointer.style.top = `${p.y / scale}px`
+              pointer.style.left = `${left + p.x / scale}px`
+              pointer.style.top = `${top + p.y / scale}px`
             }
           }
         })
