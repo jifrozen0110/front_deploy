@@ -348,23 +348,20 @@ const Wrapper = styled.div`
   background-image: url(${backgroundPath1});
   background-size: cover;
   background-attachment: fixed;
-  // width: 100%;
   padding: 30px;
   box-sizing: border-box;
   user-select: none; /* 텍스트 선택 금지 */
 `;
 
 const LeftSidebar = styled.div`
-  align-items: center;
-  height: 100%;
+  flex: 0 0 280px; /* 고정 너비 */
   max-height: 800px;
-  width: 380px;
+  height: 100%;
 `;
 
 const Content = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
   padding-left: 10px;
   height: 100%;
   max-height: 800px;
@@ -429,10 +426,12 @@ const Title = styled.h1`
 
 const MainSection = styled.div`
   display: flex;
+  flex-grow: 1;
+  max-width: 750px;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(20px);
   padding: 60px 20px;
-  gap: 30px;
+  gap: 20px;
   border-radius: 5px;
 `;
 
@@ -448,11 +447,11 @@ const TeamGrid = styled(Grid)`
 `;
 
 const PuzzleDetails = styled.div`
+  flex: 0 0 410px;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(20px);
   color: white;
   padding: 5px;
-  width: 610px;
   align-items: center;
   border-radius: 5px;
 `;

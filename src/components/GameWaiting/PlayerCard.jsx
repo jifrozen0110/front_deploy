@@ -51,6 +51,7 @@ const WrapperCard = styled(Card)`
   justify-content: space-between;
   width: 100%;
   max-width: 400px;
+  min-width: 200px;
   height: 60px;
   background: "rgba(0, 0, 0, 0.7)";
   align-items: center;
