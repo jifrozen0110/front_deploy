@@ -134,9 +134,11 @@ const createPuzzleConfig = () => {
       bundle.forEach(({ index, position_x, position_y }) => {
         if (targetList.includes(index)) {
           if (isPlayerTeam) {
-            config.tiles[index].position = new Point(position_x, position_y)
+            // config.tiles[index].position = new Point(position_x, position_y)
+            animateRasterTo(config.tiles[index], new Point(position_x, position_y), 100)
           } else {
-            config.tiles[index].position = new Point(position_x * enemyCanvasScale, position_y * enemyCanvasScale)
+            // config.tiles[index].position = new Point(position_x * enemyCanvasScale, position_y * enemyCanvasScale)
+            animateRasterTo(config.tiles[index], new Point(position_x * enemyCanvasScale, position_y * enemyCanvasScale), 100)
           }
         }
       })
@@ -165,15 +167,35 @@ const createPuzzleConfig = () => {
       bundle.forEach(({ index, position_x, position_y }) => {
         if (targetSet.has(index)) {
           if (isPlayerTeam) {
-            config.tiles[index].position = new Point(position_x, position_y)
+            // config.tiles[index].position = new Point(position_x, position_y)
+            animateRasterTo(config.tiles[index], new Point(position_x, position_y), 200)
           } else {
-            config.tiles[index].position = new Point(position_x * enemyCanvasScale, position_y * enemyCanvasScale)
+            // config.tiles[index].position = new Point(position_x * enemyCanvasScale, position_y * enemyCanvasScale)
+            animateRasterTo(config.tiles[index], new Point(position_x * enemyCanvasScale, position_y * enemyCanvasScale), 200)
           }
 
         }
       })
     })
   };
+
+  function animateRasterTo(raster, target, duration) {
+    const start = raster.position.clone(); // Current position
+    const startTime = Date.now(); // Start time
+
+    raster.onFrame = (event) => {
+      const elapsed = Date.now() - startTime; // Elapsed time
+      const progress = Math.min(elapsed / duration, 1); // Progress as a value between 0 and 1
+
+      // Interpolate the position
+      raster.position = start.add(target.subtract(start).multiply(progress));
+
+      // Stop animation when progress reaches 1
+      if (progress >= 1) {
+        raster.onFrame = null; // Remove the onFrame event
+      }
+    };
+  }
 
   const usingItemFrame = (targetList, bundles = [], isPlayerTeam, enemyCanvasScale) => {
     // TODO: Toast를 통해 액자 아이템을 사용했다는 UI 보여주기
@@ -184,9 +206,11 @@ const createPuzzleConfig = () => {
       bundle.forEach(({ index, position_x, position_y }) => {
         if (targetSet.has(index)) {
           if (isPlayerTeam) {
-            config.tiles[index].position = new Point(position_x, position_y)
+            // config.tiles[index].position = new Point(position_x, position_y)
+            animateRasterTo(config.tiles[index], new Point(position_x, position_y), 200)
           } else {
-            config.tiles[index].position = new Point(position_x * enemyCanvasScale, position_y * enemyCanvasScale)
+            // config.tiles[index].position = new Point(position_x * enemyCanvasScale, position_y * enemyCanvasScale)
+            animateRasterTo(config.tiles[index], new Point(position_x * enemyCanvasScale, position_y * enemyCanvasScale), 200)
           }
         }
       })
